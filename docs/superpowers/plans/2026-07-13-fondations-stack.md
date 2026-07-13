@@ -50,7 +50,7 @@ Jour 3        Agent B : Tâche 8 (écran Ma Journée, données réelles)  [dépe
 
 ---
 
-## Tâche 0 : Créer les comptes (action manuelle, hors agents)
+## Task 0 : Créer les comptes (action manuelle, hors agents)
 
 Aucun agent ne peut créer de compte à votre place. À faire une seule fois, avant de lancer la Tâche 1.
 
@@ -68,7 +68,7 @@ Aucun agent ne peut créer de compte à votre place. À faire une seule fois, av
 
 ---
 
-## Tâche 1 : Scaffold du projet Next.js (Agent C)
+## Task 1 : Scaffold du projet Next.js (Agent C)
 
 **Files:**
 - Create: `soinely-app/` (projet Next.js complet généré par l'outil)
@@ -180,7 +180,7 @@ git commit -m "chore: scaffold Next.js app with Vitest"
 
 ---
 
-## Tâche 2 : Dépôt GitHub, CI et déploiement Vercel (Agent C)
+## Task 2 : Dépôt GitHub, CI et déploiement Vercel (Agent C)
 
 **Files:**
 - Create: `.github/workflows/ci.yml`
@@ -280,7 +280,7 @@ Expected: le job `build-and-test` se termine en succès (✓ vert).
 
 ---
 
-## Tâche 3 : Schéma Supabase — contenu clinique et RLS (Agent A)
+## Task 3 : Schéma Supabase — contenu clinique et RLS (Agent A)
 
 **Files:**
 - Create: `supabase/migrations/20260714000000_core_schema.sql`
@@ -482,7 +482,7 @@ git commit -m "feat(db): core clinical schema with row level security"
 
 ---
 
-## Tâche 4 : Trigger d'inscription et contenu clinique de départ (Agent A)
+## Task 4 : Trigger d'inscription et contenu clinique de départ (Agent A)
 
 **Files:**
 - Create: `supabase/migrations/20260714000100_auth_trigger.sql`
@@ -574,7 +574,7 @@ git commit -m "feat(db): profile auto-creation trigger and starter clinical cont
 
 ---
 
-## Tâche 5 : Client Supabase et protection des routes (Agent C)
+## Task 5 : Client Supabase et protection des routes (Agent C)
 
 **Files:**
 - Create: `lib/supabase/client.ts`
@@ -733,7 +733,7 @@ git commit -m "feat(auth): supabase client helpers and protected route middlewar
 
 ---
 
-## Tâche 6 : Design tokens et composants de base (Agent B)
+## Task 6 : Design tokens et composants de base (Agent B)
 
 **Files:**
 - Modify: `tailwind.config.ts`
@@ -906,7 +906,7 @@ git commit -m "feat(ui): design tokens and base components (Button, CarteInforma
 
 ---
 
-## Tâche 7 : Connexion et inscription (Agent B)
+## Task 7 : Connexion et inscription (Agent B)
 
 **Files:**
 - Create: `app/login/page.tsx`
@@ -1043,7 +1043,7 @@ git commit -m "feat(auth): login page and sign-in server action"
 
 ---
 
-## Tâche 8 : Écran "Ma Journée" avec données réelles (Agent B)
+## Task 8 : Écran "Ma Journée" avec données réelles (Agent B)
 
 **Files:**
 - Create: `app/ma-journee/page.tsx`
@@ -1208,7 +1208,7 @@ git commit -m "feat(ma-journee): real Supabase data on the home screen"
 
 ---
 
-## Tâche 9 : Test end-to-end et vérification du déploiement (Agent C)
+## Task 9 : Test end-to-end et vérification du déploiement (Agent C)
 
 **Files:**
 - Create: `e2e/smoke.spec.ts`
