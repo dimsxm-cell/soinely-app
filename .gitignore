@@ -40,6 +40,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# supabase (local link/session state — may contain connection credentials)
+supabase/.temp
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
