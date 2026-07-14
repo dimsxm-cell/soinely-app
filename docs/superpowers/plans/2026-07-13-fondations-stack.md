@@ -736,7 +736,7 @@ git commit -m "feat(auth): supabase client helpers and protected route middlewar
 ## Task 6 : Design tokens et composants de base (Agent B)
 
 **Files:**
-- Modify: `tailwind.config.ts`
+- Modify: `app/globals.css`
 - Create: `components/ui/Button.tsx`
 - Create: `components/ui/CarteInformation.tsx`
 - Create: `components/ui/CarteMission.tsx`
@@ -746,46 +746,26 @@ git commit -m "feat(auth): supabase client helpers and protected route middlewar
 - Consumes: rien (dépend seulement du scaffold de la Tâche 1)
 - Produces: `Button`, `CarteInformation`, `CarteMission` — consommés par les Tâches 7 et 8.
 
+**Note technique :** le scaffold de la Tâche 1 a généré Tailwind CSS v4, qui n'utilise plus de fichier `tailwind.config.ts` — les tokens se déclarent en CSS via un bloc `@theme` dans `app/globals.css`, et Tailwind génère automatiquement les classes utilitaires correspondantes (`bg-primary`, `text-navy`, `rounded-card`, etc.). L'échelle d'espacement par défaut de Tailwind v4 (`p-2`=8px, `p-4`=16px, `p-6`=24px, `p-8`=32px, `p-12`=48px, `p-16`=64px) correspond déjà à la grille 8px de la contrainte globale — n'utiliser que ces valeurs paires (jamais `p-3`, `p-5`, `p-7`, qui tombent hors grille).
+
 - [ ] **Step 1: Déclarer les tokens du design system**
 
-`tailwind.config.ts` (ajouter dans `theme.extend`) :
+Ouvrir `app/globals.css` (généré par la Tâche 1) et ajouter un bloc `@theme` juste après la ligne `@import "tailwindcss";`, avant le bloc `@theme inline` existant :
 
-```ts
-import type { Config } from "tailwindcss";
-
-const config: Config = {
-  content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}"],
-  theme: {
-    extend: {
-      colors: {
-        primary: "#2563EB",
-        navy: "#0F172A",
-        teal: "#14B8A6",
-        success: "#22C55E",
-        warning: "#F59E0B",
-        danger: "#EF4444",
-      },
-      fontFamily: {
-        sans: ["Inter", "sans-serif"],
-      },
-      spacing: {
-        "1": "8px",
-        "2": "16px",
-        "3": "24px",
-        "4": "32px",
-        "6": "48px",
-        "8": "64px",
-      },
-      borderRadius: {
-        card: "16px",
-      },
-    },
-  },
-  plugins: [],
-};
-
-export default config;
+```css
+@theme {
+  --color-primary: #2563EB;
+  --color-navy: #0F172A;
+  --color-teal: #14B8A6;
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+  --radius-card: 16px;
+  --font-sans: "Inter", sans-serif;
+}
 ```
+
+Ne pas toucher au bloc `@theme inline` existant (`--color-background`, `--color-foreground`, etc.) ni au reste du fichier — cette étape ajoute des tokens, elle n'en retire aucun.
 
 - [ ] **Step 2: Write the failing test**
 
@@ -833,7 +813,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 export function Button({ variant = "primary", className = "", ...props }: ButtonProps) {
   return (
     <button
-      className={`min-h-[44px] rounded-card px-3 py-2 font-medium transition-colors ${VARIANT_CLASSES[variant]} ${className}`}
+      className={`min-h-[44px] rounded-card px-4 py-2 font-medium transition-colors ${VARIANT_CLASSES[variant]} ${className}`}
       {...props}
     />
   );
@@ -850,7 +830,7 @@ interface CarteInformationProps {
 
 export function CarteInformation({ label, value }: CarteInformationProps) {
   return (
-    <div className="rounded-card border border-navy/10 bg-white p-3">
+    <div className="rounded-card border border-navy/10 bg-white p-6">
       <p className="text-sm text-navy/60">{label}</p>
       <p className="text-2xl font-semibold text-navy">{value}</p>
     </div>
@@ -877,7 +857,7 @@ const STATUT_CLASSES: Record<MissionDuJour["statut"], string> = {
 
 export function CarteMission({ mission }: { mission: MissionDuJour }) {
   return (
-    <div className="flex items-center justify-between rounded-card border border-navy/10 bg-white p-3">
+    <div className="flex items-center justify-between rounded-card border border-navy/10 bg-white p-6">
       <div>
         <p className="font-medium text-navy">{mission.patientLabel}</p>
         <p className="text-sm text-navy/60">
@@ -900,7 +880,7 @@ Expected: PASS
 - [ ] **Step 6: Commit**
 
 ```bash
-git add tailwind.config.ts components/ui
+git add app/globals.css components/ui
 git commit -m "feat(ui): design tokens and base components (Button, CarteInformation, CarteMission)"
 ```
 
@@ -1009,9 +989,9 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-3 p-3">
+    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 p-6">
       <h1 className="text-2xl font-semibold text-navy">Connexion</h1>
-      <form action={handleSubmit} className="flex flex-col gap-2">
+      <form action={handleSubmit} className="flex flex-col gap-4">
         <input
           name="email"
           type="email"
@@ -1167,10 +1147,10 @@ export default async function MaJourneePage() {
   const tournee = user ? await getTourneeDuJour(supabase, user.id) : null;
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-3 p-3">
+    <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
       <h1 className="text-2xl font-semibold text-navy">Ma Journée</h1>
       {tournee ? (
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-4">
           <CarteInformation label="Patients" value={tournee.nbPatients} />
           <CarteInformation label="Injections" value={tournee.nbInjections} />
           <CarteInformation label="Pansements" value={tournee.nbPansements} />
