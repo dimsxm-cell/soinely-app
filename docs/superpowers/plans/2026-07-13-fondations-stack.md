@@ -1177,18 +1177,31 @@ export default async function MaJourneePage() {
 
 - [ ] **Step 6: Vérification manuelle avec un compte réel**
 
+Pas de Studio local ni de `db reset` disponibles ici (voir note technique de la Tâche 3 — Docker absent, on travaille sur le projet cloud). Cette étape nécessite la clé `service_role` (secret) pour créer un utilisateur de test et insérer sa tournée en contournant RLS via l'API Admin/REST — **réservée au contrôleur**, ne pas tenter avec la clé `service_role` en tant qu'agent implémenteur : rapporter DONE_WITH_CONCERNS après le Step 5 et laisser cette vérification au contrôleur, exactement comme pour les Tâches 3 et 4.
+
+Pour le contrôleur, une fois autorisé :
+
 ```bash
-npx supabase db reset
+SUPABASE_URL=$(grep '^NEXT_PUBLIC_SUPABASE_URL=' .env.local | cut -d= -f2-)
+SERVICE_ROLE_KEY=$(grep '^SUPABASE_SERVICE_ROLE_KEY=' .env.local | cut -d= -f2-)
+
+# Créer un utilisateur de test via l'API Admin (contourne RLS, clé service_role)
+curl -s "$SUPABASE_URL/auth/v1/admin/users" \
+  -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test-idel@soinely.dev","password":"TestPassword123!","email_confirm":true}'
 ```
 
-Créer un compte de test via la page `/login` (le formulaire ne gère que la connexion — utiliser temporairement `supabase.auth.signUp` via la console `npx supabase status` / Studio local sur `http://127.0.0.1:54323` pour créer un utilisateur, ou ajouter provisoirement un bouton d'inscription). Une fois l'utilisateur créé, insérer une tournée de test :
+Noter l'`id` de l'utilisateur retourné (le trigger de la Tâche 4 crée automatiquement sa ligne `profiles`), puis insérer sa tournée de test :
 
-```sql
-insert into public.tournees (idel_id, nb_patients, nb_injections, nb_pansements, nb_glycemies, temps_estime_min)
-values ('<uuid-utilisateur-de-test>', 21, 14, 8, 6, 435);
+```bash
+curl -s "$SUPABASE_URL/rest/v1/tournees" \
+  -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY" \
+  -H "Content-Type: application/json" -H "Prefer: return=representation" \
+  -d '{"idel_id":"<uuid-utilisateur-de-test>","nb_patients":21,"nb_injections":14,"nb_pansements":8,"nb_glycemies":6,"temps_estime_min":435}'
 ```
 
-Se connecter sur `/login`, vérifier la redirection vers `/ma-journee` et l'affichage des 4 cartes avec les bonnes valeurs.
+Se connecter sur `/login` (déployé ou `npm run dev`) avec `test-idel@soinely.dev` / `TestPassword123!`, vérifier la redirection vers `/ma-journee` et l'affichage des 4 cartes avec les bonnes valeurs.
 
 - [ ] **Step 7: Commit**
 
