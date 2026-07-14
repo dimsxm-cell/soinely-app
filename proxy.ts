@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const PROTECTED_PATHS = ["/ma-journee"];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const response = NextResponse.next({ request });
 
   const supabase = createServerClient(
