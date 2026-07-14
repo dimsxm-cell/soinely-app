@@ -44,3 +44,7 @@ export interface Tournee {
   nbGlycemies: number;
   tempsEstimeMin: number;
 }
+
+export interface SituationTerrainDetail extends SituationTerrain {
+  missions: MissionClinique[];
+}
