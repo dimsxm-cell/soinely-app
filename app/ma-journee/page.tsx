@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getTourneeDuJour } from "@/lib/data/ma-journee";
+import { Button } from "@/components/ui/Button";
 import { CarteInformation } from "@/components/ui/CarteInformation";
 
 export default async function MaJourneePage() {
@@ -13,6 +15,9 @@ export default async function MaJourneePage() {
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
       <h1 className="text-2xl font-semibold text-navy">Ma Journée</h1>
+      <Link href="/recherche">
+        <Button variant="secondary">Rechercher</Button>
+      </Link>
       {tournee ? (
         <div className="grid grid-cols-2 gap-4">
           <CarteInformation label="Patients" value={tournee.nbPatients} />
