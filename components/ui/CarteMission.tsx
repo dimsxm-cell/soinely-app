@@ -8,8 +8,8 @@ const STATUT_LABEL: Record<MissionDuJour["statut"], string> = {
 
 const STATUT_CLASSES: Record<MissionDuJour["statut"], string> = {
   a_faire: "bg-navy/5 text-navy",
-  en_cours: "bg-warning text-white",
-  terminee: "bg-success text-white",
+  en_cours: "bg-warning text-navy",
+  terminee: "bg-success text-navy",
 };
 
 export function CarteMission({ mission }: { mission: MissionDuJour }) {
