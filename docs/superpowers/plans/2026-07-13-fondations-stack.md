@@ -292,20 +292,20 @@ Expected: le job `build-and-test` se termine en succès (✓ vert).
 - Create: `lib/types/clinical.ts`
 
 **Interfaces:**
-- Consumes: rien (indépendant du scaffold Next.js, nécessite uniquement Supabase CLI + Docker)
+- Consumes: le projet Supabase distant `soinely-app` (région Frankfurt) déjà créé et lié par le contrôleur (`supabase link`) — cette machine n'a pas Docker, donc les migrations s'appliquent directement sur le projet cloud, pas sur une instance locale.
 - Produces: tables `profiles`, `situations_terrain`, `missions_cliniques`, `ngap_codes`, `tournees`, `missions_du_jour` avec RLS ; types TypeScript `SituationTerrain`, `MissionClinique`, `NiveauConfiance`, `Tournee`, `MissionDuJour`, `StatutMission` consommés par les Tâches 8.
 
-- [ ] **Step 1: Initialiser Supabase en local**
+**Note technique :** Docker n'étant pas disponible, `supabase start` (stack locale) est impossible ici. Le contrôleur a déjà exécuté `supabase link --project-ref jeqrajpqbquewevjmond` à la racine du dépôt — ce lien vit dans `supabase/.temp/` (ignoré par Git, jamais commité). Toutes les commandes CLI de cette tâche nécessitent la variable `SUPABASE_ACCESS_TOKEN` (jeton d'accès personnel, fourni par le contrôleur — ne jamais l'écrire dans un fichier ni l'afficher dans un rapport).
 
-Prérequis : Docker Desktop installé et lancé.
+- [ ] **Step 1: Vérifier le lien avec le projet distant**
 
 ```bash
 npm install --save-dev supabase
 npx supabase init
-npx supabase start
+cat supabase/.temp/project-ref
 ```
 
-Noter l'URL et la clé `anon` locales affichées (utilisées uniquement pour le développement local, différentes des clés du projet cloud).
+Expected : `jeqrajpqbquewevjmond`. Si ce fichier est absent, relier avec `SUPABASE_ACCESS_TOKEN="$SUPABASE_ACCESS_TOKEN" npx supabase link --project-ref jeqrajpqbquewevjmond`.
 
 - [ ] **Step 2: Écrire la migration du schéma**
 
@@ -472,11 +472,11 @@ export interface Tournee {
 - [ ] **Step 4: Appliquer la migration et vérifier**
 
 ```bash
-npx supabase db reset
-psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -c "select table_name from information_schema.tables where table_schema='public' order by table_name;"
+npx supabase db push --linked
+npx supabase migration list --linked
 ```
 
-Expected: la liste contient `missions_cliniques`, `missions_du_jour`, `ngap_codes`, `profiles`, `situations_terrain`, `tournees`.
+Expected : la seconde commande liste `20260714000000` avec une date dans les colonnes **Local** et **Remote** (confirme que la migration est bien appliquée côté cloud).
 
 - [ ] **Step 5: Commit**
 
@@ -563,12 +563,18 @@ insert into public.ngap_codes (code, libelle, cotation, conditions) values
 
 - [ ] **Step 3: Appliquer et vérifier**
 
+Docker n'étant pas disponible (voir note technique de la Tâche 3), le seed s'applique sur le projet distant via `--include-seed`, et la vérification se fait via l'API PostgREST (avec la clé `anon` de `.env.local`) plutôt que `psql` — ce qui a l'avantage de vérifier au passage que la policy RLS `situations_terrain_select_published` fonctionne réellement pour un utilisateur non authentifié :
+
 ```bash
-npx supabase db reset
-psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -c "select titre, published from public.situations_terrain;"
+npx supabase db push --linked --include-seed
+
+SUPABASE_URL=$(grep '^NEXT_PUBLIC_SUPABASE_URL=' .env.local | cut -d= -f2-)
+ANON_KEY=$(grep '^NEXT_PUBLIC_SUPABASE_ANON_KEY=' .env.local | cut -d= -f2-)
+curl -s "$SUPABASE_URL/rest/v1/situations_terrain?select=titre,published" \
+  -H "apikey: $ANON_KEY" -H "Authorization: Bearer $ANON_KEY"
 ```
 
-Expected: 2 lignes, `published = t` pour les deux.
+Expected : un JSON avec 2 objets (`"Hypoglycémie chez un patient diabétique"` et `"Pansement qui saigne de façon inhabituelle"`), chacun avec `"published":true`.
 
 - [ ] **Step 4: Commit**
 
