@@ -8,8 +8,8 @@ const STATUT_LABEL: Record<MissionDuJour["statut"], string> = {
 
 const STATUT_CLASSES: Record<MissionDuJour["statut"], string> = {
   a_faire: "bg-navy/5 text-navy",
-  en_cours: "bg-warning/10 text-warning",
-  terminee: "bg-success/10 text-success",
+  en_cours: "bg-warning text-white",
+  terminee: "bg-success text-white",
 };
 
 export function CarteMission({ mission }: { mission: MissionDuJour }) {
@@ -21,7 +21,7 @@ export function CarteMission({ mission }: { mission: MissionDuJour }) {
           {mission.typeSoin} · {mission.heurePrevue}
         </p>
       </div>
-      <span className={`rounded-full px-2 py-1 text-xs font-medium ${STATUT_CLASSES[mission.statut]}`}>
+      <span className={`rounded-full px-2 py-2 text-xs font-medium ${STATUT_CLASSES[mission.statut]}`}>
         {STATUT_LABEL[mission.statut]}
       </span>
     </div>
