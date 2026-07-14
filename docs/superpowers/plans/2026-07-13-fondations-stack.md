@@ -905,8 +905,8 @@ git commit -m "feat(ui): design tokens and base components (Button, CarteInforma
 - Test: `app/login/actions.test.ts`
 
 **Interfaces:**
-- Consumes: `createClient()` serveur (Tâche 5), `Button` (Tâche 6)
-- Produces: route `/login` fonctionnelle, action `signInAction` consommée implicitement par le middleware (redirection après connexion).
+- Consumes: `createClient()` serveur (Tâche 5, désormais asynchrone — `await createClient()`), `Button` (Tâche 6)
+- Produces: route `/login` fonctionnelle, action `signInAction` consommée implicitement par `proxy.ts` (redirection après connexion).
 
 - [ ] **Step 1: Write the failing test**
 
@@ -958,7 +958,7 @@ export async function signInAction(
   const email = String(formData.get("email"));
   const password = String(formData.get("password"));
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
@@ -1042,7 +1042,7 @@ git commit -m "feat(auth): login page and sign-in server action"
 - Test: `lib/data/ma-journee.test.ts`
 
 **Interfaces:**
-- Consumes: `createClient()` serveur (Tâche 5), types `Tournee`/`MissionDuJour` (Tâche 3), `CarteInformation`/`CarteMission` (Tâche 6)
+- Consumes: `createClient()` serveur (Tâche 5, asynchrone — `await createClient()`), types `Tournee`/`MissionDuJour` (Tâche 3), `CarteInformation`/`CarteMission` (Tâche 6)
 - Produces: écran `/ma-journee` affichant les vraies statistiques du jour et la liste des missions — premier écran du MVP réellement fonctionnel.
 
 - [ ] **Step 1: Write the failing test**
@@ -1150,7 +1150,7 @@ import { getTourneeDuJour } from "@/lib/data/ma-journee";
 import { CarteInformation } from "@/components/ui/CarteInformation";
 
 export default async function MaJourneePage() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -1206,7 +1206,7 @@ git commit -m "feat(ma-journee): real Supabase data on the home screen"
 - Create: `playwright.config.ts`
 
 **Interfaces:**
-- Consumes: routes `/login` et `/ma-journee` (Tâches 7, 8), middleware (Tâche 5)
+- Consumes: routes `/login` et `/ma-journee` (Tâches 7, 8), `proxy.ts` (Tâche 5)
 - Produces: garde-fou automatisé exécuté en CI, confirmation que le socle est déployé et fonctionnel en production.
 
 - [ ] **Step 1: Installer Playwright**
