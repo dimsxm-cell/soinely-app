@@ -1,11 +1,36 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   MissionClinique,
+  NiveauConfiance,
   SituationTerrain,
   SituationTerrainDetail,
 } from "@/lib/types/clinical";
 
-function mapSituationTerrain(row: any): SituationTerrain {
+interface SituationTerrainRow {
+  id: string;
+  titre: string;
+  observation: string;
+  verifications: string[];
+  causes_possibles: string[];
+  conduite_a_tenir: string[];
+  quand_avis_medical: string;
+  sources: string[];
+  specialite: string;
+  niveau_confiance: NiveauConfiance;
+  version: number;
+  published: boolean;
+}
+
+interface MissionCliniqueRow {
+  id: string;
+  titre: string;
+  situation_terrain_id: string | null;
+  etapes: { titre: string; description: string }[];
+  duree_estimee_min: number;
+  published: boolean;
+}
+
+function mapSituationTerrain(row: SituationTerrainRow): SituationTerrain {
   return {
     id: row.id,
     titre: row.titre,
@@ -22,7 +47,7 @@ function mapSituationTerrain(row: any): SituationTerrain {
   };
 }
 
-function mapMissionClinique(row: any): MissionClinique {
+function mapMissionClinique(row: MissionCliniqueRow): MissionClinique {
   return {
     id: row.id,
     titre: row.titre,
