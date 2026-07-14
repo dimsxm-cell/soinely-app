@@ -245,23 +245,28 @@ jobs:
 
 - [ ] **Step 5: Lier le projet Vercel**
 
+Authentification non interactive via jeton (`VERCEL_TOKEN` fourni par le contrôleur — ne jamais écrire ce jeton dans un fichier du dépôt ni l'afficher dans un rapport) :
+
 ```bash
 npm install -g vercel
-vercel login
-vercel link --yes
+vercel link --yes --token "$VERCEL_TOKEN"
 ```
 
-Puis déclarer les 3 variables d'environnement (valeurs récupérées à la Tâche 0, étape 2) pour les environnements Preview et Production :
+Puis déclarer les 3 variables d'environnement pour Preview et Production, en lisant les valeurs depuis `.env.local` (présent localement, jamais commité) plutôt qu'en les saisissant à la main :
 
 ```bash
-vercel env add NEXT_PUBLIC_SUPABASE_URL production
-vercel env add NEXT_PUBLIC_SUPABASE_URL preview
-vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY production
-vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY preview
-vercel env add SUPABASE_SERVICE_ROLE_KEY production
+NEXT_PUBLIC_SUPABASE_URL=$(grep '^NEXT_PUBLIC_SUPABASE_URL=' .env.local | cut -d= -f2-)
+NEXT_PUBLIC_SUPABASE_ANON_KEY=$(grep '^NEXT_PUBLIC_SUPABASE_ANON_KEY=' .env.local | cut -d= -f2-)
+SUPABASE_SERVICE_ROLE_KEY=$(grep '^SUPABASE_SERVICE_ROLE_KEY=' .env.local | cut -d= -f2-)
+
+printf '%s' "$NEXT_PUBLIC_SUPABASE_URL" | vercel env add NEXT_PUBLIC_SUPABASE_URL production --token "$VERCEL_TOKEN"
+printf '%s' "$NEXT_PUBLIC_SUPABASE_URL" | vercel env add NEXT_PUBLIC_SUPABASE_URL preview --token "$VERCEL_TOKEN"
+printf '%s' "$NEXT_PUBLIC_SUPABASE_ANON_KEY" | vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY production --token "$VERCEL_TOKEN"
+printf '%s' "$NEXT_PUBLIC_SUPABASE_ANON_KEY" | vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY preview --token "$VERCEL_TOKEN"
+printf '%s' "$SUPABASE_SERVICE_ROLE_KEY" | vercel env add SUPABASE_SERVICE_ROLE_KEY production --token "$VERCEL_TOKEN"
 ```
 
-(Chaque commande demande de coller la valeur — ne jamais coller `SUPABASE_SERVICE_ROLE_KEY` dans l'environnement `preview`, réservé au `anon key` uniquement.)
+Ne jamais ajouter `SUPABASE_SERVICE_ROLE_KEY` à l'environnement `preview`, réservé à la clé `anon` uniquement.
 
 - [ ] **Step 6: Activer le déploiement automatique**
 
