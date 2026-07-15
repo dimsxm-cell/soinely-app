@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/lib/types/database.types";
 import type {
   MissionClinique,
   NiveauConfiance,
@@ -6,42 +7,21 @@ import type {
   SituationTerrainDetail,
 } from "@/lib/types/clinical";
 
-interface SituationTerrainRow {
-  id: string;
-  titre: string;
-  observation: string;
-  verifications: string[];
-  causes_possibles: string[];
-  conduite_a_tenir: string[];
-  quand_avis_medical: string;
-  sources: string[];
-  specialite: string;
-  niveau_confiance: NiveauConfiance;
-  version: number;
-  published: boolean;
-}
-
-interface MissionCliniqueRow {
-  id: string;
-  titre: string;
-  situation_terrain_id: string | null;
-  etapes: { titre: string; description: string }[];
-  duree_estimee_min: number;
-  published: boolean;
-}
+type SituationTerrainRow = Database["public"]["Tables"]["situations_terrain"]["Row"];
+type MissionCliniqueRow = Database["public"]["Tables"]["missions_cliniques"]["Row"];
 
 function mapSituationTerrain(row: SituationTerrainRow): SituationTerrain {
   return {
     id: row.id,
     titre: row.titre,
     observation: row.observation,
-    verifications: row.verifications,
-    causesPossibles: row.causes_possibles,
-    conduiteATenir: row.conduite_a_tenir,
+    verifications: row.verifications as string[],
+    causesPossibles: row.causes_possibles as string[],
+    conduiteATenir: row.conduite_a_tenir as string[],
     quandAvisMedical: row.quand_avis_medical,
-    sources: row.sources,
+    sources: row.sources as string[],
     specialite: row.specialite,
-    niveauConfiance: row.niveau_confiance,
+    niveauConfiance: row.niveau_confiance as NiveauConfiance,
     version: row.version,
     published: row.published,
   };
@@ -52,14 +32,14 @@ function mapMissionClinique(row: MissionCliniqueRow): MissionClinique {
     id: row.id,
     titre: row.titre,
     situationTerrainId: row.situation_terrain_id,
-    etapes: row.etapes,
+    etapes: row.etapes as { titre: string; description: string }[],
     dureeEstimeeMin: row.duree_estimee_min,
     published: row.published,
   };
 }
 
 export async function searchSituationsTerrain(
-  supabase: SupabaseClient,
+  supabase: SupabaseClient<Database>,
   query: string
 ): Promise<SituationTerrain[]> {
   const trimmed = query.trim();
@@ -75,7 +55,7 @@ export async function searchSituationsTerrain(
 }
 
 export async function getSituationTerrainDetail(
-  supabase: SupabaseClient,
+  supabase: SupabaseClient<Database>,
   id: string
 ): Promise<SituationTerrainDetail | null> {
   const { data: situation, error: situationError } = await supabase
