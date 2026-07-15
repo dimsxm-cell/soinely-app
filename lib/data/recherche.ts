@@ -78,3 +78,17 @@ export async function getSituationTerrainDetail(
     missions: missionsError || !missions ? [] : missions.map(mapMissionClinique),
   };
 }
+
+export async function getAllSituationsTerrain(
+  supabase: SupabaseClient<Database>
+): Promise<SituationTerrain[]> {
+  const { data, error } = await supabase
+    .from("situations_terrain")
+    .select("*")
+    .eq("published", true)
+    .order("titre");
+
+  if (error || !data) return [];
+
+  return data.map(mapSituationTerrain);
+}
