@@ -15,9 +15,14 @@ export default async function MaJourneePage() {
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
       <h1 className="text-2xl font-semibold text-navy">Ma Journée</h1>
-      <Link href="/recherche">
-        <Button variant="secondary">Rechercher</Button>
-      </Link>
+      <div className="flex gap-4">
+        <Link href="/recherche">
+          <Button variant="secondary">Rechercher</Button>
+        </Link>
+        <Link href="/copilote">
+          <Button variant="secondary">Copilote</Button>
+        </Link>
+      </div>
       {tournee ? (
         <div className="grid grid-cols-2 gap-4">
           <CarteInformation label="Patients" value={tournee.nbPatients} />
