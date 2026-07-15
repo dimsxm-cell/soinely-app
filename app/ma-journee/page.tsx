@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { getTourneeDuJour } from "@/lib/data/ma-journee";
+import { getMissionsDuJour, getTourneeDuJour } from "@/lib/data/ma-journee";
 import { Button } from "@/components/ui/Button";
 import { CarteInformation } from "@/components/ui/CarteInformation";
+import { CarteMission } from "@/components/ui/CarteMission";
 
 export default async function MaJourneePage() {
   const supabase = await createClient();
@@ -11,6 +12,7 @@ export default async function MaJourneePage() {
   } = await supabase.auth.getUser();
 
   const tournee = user ? await getTourneeDuJour(supabase, user.id) : null;
+  const missions = tournee ? await getMissionsDuJour(supabase, tournee.id) : [];
 
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
@@ -33,6 +35,16 @@ export default async function MaJourneePage() {
       ) : (
         <p className="text-navy/60">Aucune tournée enregistrée pour aujourd&apos;hui.</p>
       )}
+      {tournee &&
+        (missions.length > 0 ? (
+          <div className="flex flex-col gap-4">
+            {missions.map((mission) => (
+              <CarteMission key={mission.id} mission={mission} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-navy/60">Aucune mission prévue pour aujourd&apos;hui.</p>
+        ))}
     </main>
   );
 }
