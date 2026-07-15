@@ -63,9 +63,11 @@ export async function getMissionEnCoursHref(
   if (error || !data || data.length === 0) return null;
 
   const mission = data[0];
-  const situationTerrainId = (
-    mission.missions_cliniques as { situation_terrain_id: string | null } | null
-  )?.situation_terrain_id;
+  const missionsCliniquesEmbed = mission.missions_cliniques as unknown;
+  const missionClinique = Array.isArray(missionsCliniquesEmbed)
+    ? (missionsCliniquesEmbed[0] as { situation_terrain_id: string | null } | undefined)
+    : (missionsCliniquesEmbed as { situation_terrain_id: string | null } | null);
+  const situationTerrainId = missionClinique?.situation_terrain_id;
 
   const href = situationTerrainId
     ? `/situations/${situationTerrainId}`
