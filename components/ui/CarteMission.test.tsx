@@ -1,7 +1,11 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { CarteMission } from "./CarteMission";
 import type { MissionDuJour } from "@/lib/types/clinical";
+
+vi.mock("@/lib/data/ma-journee-actions", () => ({
+  updateMissionStatutAction: vi.fn(),
+}));
 
 const mission: MissionDuJour = {
   id: "m1",
@@ -30,5 +34,28 @@ describe("CarteMission", () => {
   it("affiche le bon libellé pour le statut « terminée »", () => {
     render(<CarteMission mission={{ ...mission, statut: "terminee" }} />);
     expect(screen.getByText("Terminée")).toBeInTheDocument();
+  });
+
+  it("affiche le bouton « Démarrer » pour une mission à faire", () => {
+    render(<CarteMission mission={mission} />);
+
+    expect(screen.getByRole("button", { name: "Démarrer" })).toBeInTheDocument();
+
+    const champStatut = document.querySelector('input[name="nouveauStatut"]') as HTMLInputElement;
+    expect(champStatut.value).toBe("en_cours");
+  });
+
+  it("affiche le bouton « Terminer » pour une mission en cours", () => {
+    render(<CarteMission mission={{ ...mission, statut: "en_cours" }} />);
+
+    expect(screen.getByRole("button", { name: "Terminer" })).toBeInTheDocument();
+
+    const champStatut = document.querySelector('input[name="nouveauStatut"]') as HTMLInputElement;
+    expect(champStatut.value).toBe("terminee");
+  });
+
+  it("n'affiche aucun bouton pour une mission terminée", () => {
+    render(<CarteMission mission={{ ...mission, statut: "terminee" }} />);
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
 });

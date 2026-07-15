@@ -1,4 +1,6 @@
-import type { MissionDuJour } from "@/lib/types/clinical";
+import type { MissionDuJour, StatutMission } from "@/lib/types/clinical";
+import { updateMissionStatutAction } from "@/lib/data/ma-journee-actions";
+import { Button } from "@/components/ui/Button";
 
 const STATUT_LABEL: Record<MissionDuJour["statut"], string> = {
   a_faire: "À faire",
@@ -12,7 +14,19 @@ const STATUT_CLASSES: Record<MissionDuJour["statut"], string> = {
   terminee: "bg-success text-navy",
 };
 
+const PROCHAIN_STATUT: Partial<Record<StatutMission, StatutMission>> = {
+  a_faire: "en_cours",
+  en_cours: "terminee",
+};
+
+const LIBELLE_ACTION: Partial<Record<StatutMission, string>> = {
+  a_faire: "Démarrer",
+  en_cours: "Terminer",
+};
+
 export function CarteMission({ mission }: { mission: MissionDuJour }) {
+  const prochainStatut = PROCHAIN_STATUT[mission.statut];
+
   return (
     <div className="flex items-center justify-between rounded-card border border-navy/10 bg-white p-6">
       <div>
@@ -21,9 +35,20 @@ export function CarteMission({ mission }: { mission: MissionDuJour }) {
           {mission.typeSoin} · {mission.heurePrevue}
         </p>
       </div>
-      <span className={`rounded-full px-2 py-2 text-xs font-medium ${STATUT_CLASSES[mission.statut]}`}>
-        {STATUT_LABEL[mission.statut]}
-      </span>
+      <div className="flex items-center gap-4">
+        <span className={`rounded-full px-2 py-2 text-xs font-medium ${STATUT_CLASSES[mission.statut]}`}>
+          {STATUT_LABEL[mission.statut]}
+        </span>
+        {prochainStatut && (
+          <form action={updateMissionStatutAction}>
+            <input type="hidden" name="missionId" value={mission.id} />
+            <input type="hidden" name="nouveauStatut" value={prochainStatut} />
+            <Button type="submit" variant="secondary">
+              {LIBELLE_ACTION[mission.statut]}
+            </Button>
+          </form>
+        )}
+      </div>
     </div>
   );
 }
