@@ -25,6 +25,9 @@ export default async function MaJourneePage() {
         <Link href="/copilote">
           <Button variant="secondary">Copilote</Button>
         </Link>
+        <Link href="/situations">
+          <Button variant="secondary">Parcourir</Button>
+        </Link>
       </div>
       {tournee ? (
         <div className="grid grid-cols-2 gap-4">
