@@ -195,4 +195,34 @@ describe("getMissionEnCoursHref", () => {
 
     expect(contexte).toBeNull();
   });
+
+  it("retourne un lien direct même si l'embed missions_cliniques est renvoyé sous forme de tableau", async () => {
+    const fakeClient = {
+      from: () => ({
+        select: () => ({
+          eq: () => ({
+            eq: () => ({
+              limit: () =>
+                Promise.resolve({
+                  data: [
+                    {
+                      id: "m3",
+                      type_soin: "Injection",
+                      mission_clinique_id: "mc3",
+                      missions_cliniques: [{ situation_terrain_id: "s3" }],
+                    },
+                  ],
+                  error: null,
+                }),
+            }),
+          }),
+        }),
+      }),
+    } as unknown as SupabaseClient;
+
+    const { getMissionEnCoursHref } = await import("./ma-journee");
+    const contexte = await getMissionEnCoursHref(fakeClient, "t1");
+
+    expect(contexte).toEqual({ missionId: "m3", href: "/situations/s3" });
+  });
 });
