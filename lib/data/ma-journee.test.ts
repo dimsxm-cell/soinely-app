@@ -115,3 +115,84 @@ describe("getMissionsDuJour", () => {
     expect(missions).toEqual([]);
   });
 });
+
+describe("getMissionEnCoursHref", () => {
+  it("retourne un lien direct vers la situation terrain si un protocole est lié", async () => {
+    const fakeClient = {
+      from: () => ({
+        select: () => ({
+          eq: () => ({
+            eq: () => ({
+              limit: () =>
+                Promise.resolve({
+                  data: [
+                    {
+                      id: "m1",
+                      type_soin: "Glycémie",
+                      mission_clinique_id: "mc1",
+                      missions_cliniques: { situation_terrain_id: "s1" },
+                    },
+                  ],
+                  error: null,
+                }),
+            }),
+          }),
+        }),
+      }),
+    } as unknown as SupabaseClient;
+
+    const { getMissionEnCoursHref } = await import("./ma-journee");
+    const contexte = await getMissionEnCoursHref(fakeClient, "t1");
+
+    expect(contexte).toEqual({ missionId: "m1", href: "/situations/s1" });
+  });
+
+  it("retourne un lien de recherche pré-remplie si aucun protocole n'est lié", async () => {
+    const fakeClient = {
+      from: () => ({
+        select: () => ({
+          eq: () => ({
+            eq: () => ({
+              limit: () =>
+                Promise.resolve({
+                  data: [
+                    {
+                      id: "m2",
+                      type_soin: "Pansement",
+                      mission_clinique_id: null,
+                      missions_cliniques: null,
+                    },
+                  ],
+                  error: null,
+                }),
+            }),
+          }),
+        }),
+      }),
+    } as unknown as SupabaseClient;
+
+    const { getMissionEnCoursHref } = await import("./ma-journee");
+    const contexte = await getMissionEnCoursHref(fakeClient, "t1");
+
+    expect(contexte).toEqual({ missionId: "m2", href: "/copilote?q=Pansement" });
+  });
+
+  it("retourne null si aucune mission n'est en cours", async () => {
+    const fakeClient = {
+      from: () => ({
+        select: () => ({
+          eq: () => ({
+            eq: () => ({
+              limit: () => Promise.resolve({ data: [], error: null }),
+            }),
+          }),
+        }),
+      }),
+    } as unknown as SupabaseClient;
+
+    const { getMissionEnCoursHref } = await import("./ma-journee");
+    const contexte = await getMissionEnCoursHref(fakeClient, "t1");
+
+    expect(contexte).toBeNull();
+  });
+});

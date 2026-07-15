@@ -48,3 +48,30 @@ export async function getMissionsDuJour(
     missionCliniqueId: row.mission_clinique_id,
   }));
 }
+
+export async function getMissionEnCoursHref(
+  supabase: SupabaseClient,
+  tourneeId: string
+): Promise<{ missionId: string; href: string } | null> {
+  const { data, error } = await supabase
+    .from("missions_du_jour")
+    .select("id, type_soin, mission_clinique_id, missions_cliniques(situation_terrain_id)")
+    .eq("tournee_id", tourneeId)
+    .eq("statut", "en_cours")
+    .limit(1);
+
+  if (error || !data || data.length === 0) return null;
+
+  const mission = data[0];
+  const missionsCliniquesEmbed = mission.missions_cliniques as unknown;
+  const missionClinique = Array.isArray(missionsCliniquesEmbed)
+    ? (missionsCliniquesEmbed[0] as { situation_terrain_id: string | null } | undefined)
+    : (missionsCliniquesEmbed as { situation_terrain_id: string | null } | null);
+  const situationTerrainId = missionClinique?.situation_terrain_id;
+
+  const href = situationTerrainId
+    ? `/situations/${situationTerrainId}`
+    : `/copilote?q=${encodeURIComponent(mission.type_soin)}`;
+
+  return { missionId: mission.id, href };
+}
