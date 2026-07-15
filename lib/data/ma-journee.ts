@@ -1,8 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { MissionDuJour, Tournee } from "@/lib/types/clinical";
+import type { Database } from "@/lib/types/database.types";
+import type { MissionDuJour, StatutMission, Tournee } from "@/lib/types/clinical";
 
 export async function getTourneeDuJour(
-  supabase: SupabaseClient,
+  supabase: SupabaseClient<Database>,
   idelId: string
 ): Promise<Tournee | null> {
   const today = new Date().toISOString().slice(0, 10);
@@ -28,7 +29,7 @@ export async function getTourneeDuJour(
 }
 
 export async function getMissionsDuJour(
-  supabase: SupabaseClient,
+  supabase: SupabaseClient<Database>,
   tourneeId: string
 ): Promise<MissionDuJour[]> {
   const { data, error } = await supabase
@@ -44,13 +45,13 @@ export async function getMissionsDuJour(
     patientLabel: row.patient_label,
     typeSoin: row.type_soin,
     heurePrevue: row.heure_prevue,
-    statut: row.statut,
+    statut: row.statut as StatutMission,
     missionCliniqueId: row.mission_clinique_id,
   }));
 }
 
 export async function getMissionEnCoursHref(
-  supabase: SupabaseClient,
+  supabase: SupabaseClient<Database>,
   tourneeId: string
 ): Promise<{ missionId: string; href: string } | null> {
   const { data, error } = await supabase
