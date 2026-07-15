@@ -54,6 +54,38 @@ describe("updateMissionStatutAction", () => {
     expect(revalidatePath).not.toHaveBeenCalled();
   });
 
+  it("n'applique pas une transition invalide (a_faire directement vers terminee)", async () => {
+    eqSelectMock.mockResolvedValue({ data: { statut: "a_faire" }, error: null });
+
+    const { updateMissionStatutAction } = await import("./ma-journee-actions");
+    const { revalidatePath } = await import("next/cache");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("nouveauStatut", "terminee");
+
+    await updateMissionStatutAction(formData);
+
+    expect(updateMock).not.toHaveBeenCalled();
+    expect(revalidatePath).not.toHaveBeenCalled();
+  });
+
+  it("n'applique pas une transition invalide (en_cours vers a_faire)", async () => {
+    eqSelectMock.mockResolvedValue({ data: { statut: "en_cours" }, error: null });
+
+    const { updateMissionStatutAction } = await import("./ma-journee-actions");
+    const { revalidatePath } = await import("next/cache");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("nouveauStatut", "a_faire");
+
+    await updateMissionStatutAction(formData);
+
+    expect(updateMock).not.toHaveBeenCalled();
+    expect(revalidatePath).not.toHaveBeenCalled();
+  });
+
   it("n'applique rien si la mission n'existe pas", async () => {
     eqSelectMock.mockResolvedValue({ data: null, error: null });
 
