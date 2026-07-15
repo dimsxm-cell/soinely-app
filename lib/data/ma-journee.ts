@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Tournee } from "@/lib/types/clinical";
+import type { MissionDuJour, Tournee } from "@/lib/types/clinical";
 
 export async function getTourneeDuJour(
   supabase: SupabaseClient,
@@ -25,4 +25,26 @@ export async function getTourneeDuJour(
     nbGlycemies: data.nb_glycemies,
     tempsEstimeMin: data.temps_estime_min,
   };
+}
+
+export async function getMissionsDuJour(
+  supabase: SupabaseClient,
+  tourneeId: string
+): Promise<MissionDuJour[]> {
+  const { data, error } = await supabase
+    .from("missions_du_jour")
+    .select("id, patient_label, type_soin, heure_prevue, statut, mission_clinique_id")
+    .eq("tournee_id", tourneeId)
+    .order("heure_prevue");
+
+  if (error || !data) return [];
+
+  return data.map((row) => ({
+    id: row.id,
+    patientLabel: row.patient_label,
+    typeSoin: row.type_soin,
+    heurePrevue: row.heure_prevue,
+    statut: row.statut,
+    missionCliniqueId: row.mission_clinique_id,
+  }));
 }
