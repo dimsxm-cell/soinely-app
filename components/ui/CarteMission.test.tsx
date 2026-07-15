@@ -58,4 +58,16 @@ describe("CarteMission", () => {
     render(<CarteMission mission={{ ...mission, statut: "terminee" }} />);
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
+
+  it("affiche un lien « Contexte clinique » quand contexteHref est fourni", () => {
+    render(<CarteMission mission={{ ...mission, statut: "en_cours" }} contexteHref="/situations/s1" />);
+
+    const lien = screen.getByRole("link", { name: "Contexte clinique" });
+    expect(lien).toHaveAttribute("href", "/situations/s1");
+  });
+
+  it("n'affiche aucun lien contexte si contexteHref n'est pas fourni", () => {
+    render(<CarteMission mission={{ ...mission, statut: "en_cours" }} />);
+    expect(screen.queryByRole("link")).not.toBeInTheDocument();
+  });
 });

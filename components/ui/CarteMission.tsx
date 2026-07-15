@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { MissionDuJour, StatutMission } from "@/lib/types/clinical";
 import { updateMissionStatutAction } from "@/lib/data/ma-journee-actions";
 import { Button } from "@/components/ui/Button";
@@ -24,7 +25,12 @@ const LIBELLE_ACTION: Partial<Record<StatutMission, string>> = {
   en_cours: "Terminer",
 };
 
-export function CarteMission({ mission }: { mission: MissionDuJour }) {
+interface CarteMissionProps {
+  mission: MissionDuJour;
+  contexteHref?: string;
+}
+
+export function CarteMission({ mission, contexteHref }: CarteMissionProps) {
   const prochainStatut = PROCHAIN_STATUT[mission.statut];
 
   return (
@@ -36,6 +42,11 @@ export function CarteMission({ mission }: { mission: MissionDuJour }) {
         </p>
       </div>
       <div className="flex items-center gap-4">
+        {contexteHref && (
+          <Link href={contexteHref}>
+            <Button variant="tertiary">Contexte clinique</Button>
+          </Link>
+        )}
         <span className={`rounded-full px-2 py-2 text-xs font-medium ${STATUT_CLASSES[mission.statut]}`}>
           {STATUT_LABEL[mission.statut]}
         </span>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { getMissionsDuJour, getTourneeDuJour } from "@/lib/data/ma-journee";
+import { getMissionEnCoursHref, getMissionsDuJour, getTourneeDuJour } from "@/lib/data/ma-journee";
 import { Button } from "@/components/ui/Button";
 import { CarteInformation } from "@/components/ui/CarteInformation";
 import { CarteMission } from "@/components/ui/CarteMission";
@@ -13,6 +13,7 @@ export default async function MaJourneePage() {
 
   const tournee = user ? await getTourneeDuJour(supabase, user.id) : null;
   const missions = tournee ? await getMissionsDuJour(supabase, tournee.id) : [];
+  const contexte = tournee ? await getMissionEnCoursHref(supabase, tournee.id) : null;
 
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
@@ -39,7 +40,11 @@ export default async function MaJourneePage() {
         (missions.length > 0 ? (
           <div className="flex flex-col gap-4">
             {missions.map((mission) => (
-              <CarteMission key={mission.id} mission={mission} />
+              <CarteMission
+                key={mission.id}
+                mission={mission}
+                contexteHref={mission.id === contexte?.missionId ? contexte.href : undefined}
+              />
             ))}
           </div>
         ) : (
