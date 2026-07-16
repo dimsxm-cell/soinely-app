@@ -26,13 +26,27 @@ export interface MissionClinique {
 
 export type StatutMission = "a_faire" | "en_cours" | "terminee";
 
+export interface Patient {
+  id: string;
+  nomComplet: string;
+  adresse: string;
+  telephone: string;
+  allergies: string | null;
+  consignes: string | null;
+}
+
 export interface MissionDuJour {
   id: string;
-  patientLabel: string;
+  patientId: string;
+  patientNom: string;
   typeSoin: string;
   heurePrevue: string;
   statut: StatutMission;
   missionCliniqueId: string | null;
+}
+
+export interface MissionDetail extends MissionDuJour {
+  patient: Patient;
 }
 
 export interface Tournee {

@@ -35,12 +35,12 @@ export function CarteMission({ mission, contexteHref }: CarteMissionProps) {
 
   return (
     <div className="flex items-center justify-between rounded-card border border-navy/10 bg-white p-6">
-      <div>
-        <p className="font-medium text-navy">{mission.patientLabel}</p>
+      <Link href={`/ma-journee/${mission.id}`} className="hover:underline">
+        <p className="font-medium text-navy">{mission.patientNom}</p>
         <p className="text-sm text-navy/60">
           {mission.typeSoin} · {mission.heurePrevue}
         </p>
-      </div>
+      </Link>
       <div className="flex items-center gap-4">
         {contexteHref && (
           <Link href={contexteHref}>

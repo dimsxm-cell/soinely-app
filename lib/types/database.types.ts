@@ -82,7 +82,7 @@ export type Database = {
           heure_prevue: string
           id: string
           mission_clinique_id: string | null
-          patient_label: string
+          patient_id: string
           statut: string
           tournee_id: string
           type_soin: string
@@ -91,7 +91,7 @@ export type Database = {
           heure_prevue: string
           id?: string
           mission_clinique_id?: string | null
-          patient_label: string
+          patient_id: string
           statut?: string
           tournee_id: string
           type_soin: string
@@ -100,7 +100,7 @@ export type Database = {
           heure_prevue?: string
           id?: string
           mission_clinique_id?: string | null
-          patient_label?: string
+          patient_id?: string
           statut?: string
           tournee_id?: string
           type_soin?: string
@@ -111,6 +111,13 @@ export type Database = {
             columns: ["mission_clinique_id"]
             isOneToOne: false
             referencedRelation: "missions_cliniques"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "missions_du_jour_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
             referencedColumns: ["id"]
           },
           {
@@ -145,6 +152,47 @@ export type Database = {
           libelle?: string
         }
         Relationships: []
+      }
+      patients: {
+        Row: {
+          adresse: string
+          allergies: string | null
+          consignes: string | null
+          created_at: string
+          id: string
+          idel_id: string
+          nom_complet: string
+          telephone: string
+        }
+        Insert: {
+          adresse: string
+          allergies?: string | null
+          consignes?: string | null
+          created_at?: string
+          id?: string
+          idel_id: string
+          nom_complet: string
+          telephone: string
+        }
+        Update: {
+          adresse?: string
+          allergies?: string | null
+          consignes?: string | null
+          created_at?: string
+          id?: string
+          idel_id?: string
+          nom_complet?: string
+          telephone?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patients_idel_id_fkey"
+            columns: ["idel_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
