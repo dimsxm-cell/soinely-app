@@ -24,7 +24,7 @@ export interface MissionClinique {
   published: boolean;
 }
 
-export type StatutMission = "a_faire" | "en_cours" | "terminee";
+export type StatutMission = "a_faire" | "en_cours" | "terminee" | "absent";
 
 export interface Patient {
   id: string;
@@ -33,6 +33,7 @@ export interface Patient {
   telephone: string;
   allergies: string | null;
   consignes: string | null;
+  dateNaissance: string | null;
 }
 
 export interface MissionDuJour {
@@ -47,6 +48,8 @@ export interface MissionDuJour {
 
 export interface MissionDetail extends MissionDuJour {
   patient: Patient;
+  transmission: string | null;
+  derniereTransmission: string | null;
 }
 
 export interface Tournee {

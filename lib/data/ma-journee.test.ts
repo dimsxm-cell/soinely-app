@@ -162,35 +162,53 @@ describe("getMissionsDuJour", () => {
 });
 
 describe("getMissionDetail", () => {
-  it("mappe la mission et le patient joint", async () => {
-    const fakeClient = {
+  function fakeClientAvecCandidats(missionRow: unknown, candidats: unknown[]) {
+    return {
       from: () => ({
-        select: () => ({
-          eq: () => ({
-            maybeSingle: () =>
-              Promise.resolve({
-                data: {
-                  id: "m1",
-                  patient_id: "p1",
-                  type_soin: "Injection Lovenox",
-                  heure_prevue: "14:30:00",
-                  statut: "a_faire",
-                  mission_clinique_id: null,
-                  patients: {
-                    id: "p1",
-                    nom_complet: "Mme Dupont",
-                    adresse: "12 rue des Lilas, 75011 Paris",
-                    telephone: "06 12 34 56 78",
-                    allergies: "Allergie pénicilline",
-                    consignes: "Sonner au portail.",
-                  },
-                },
-                error: null,
+        select: (colonnes: string) => {
+          if (colonnes.includes("patients(")) {
+            return {
+              eq: () => ({
+                maybeSingle: () => Promise.resolve({ data: missionRow, error: null }),
               }),
-          }),
-        }),
+            };
+          }
+          return {
+            eq: () => ({
+              neq: () => ({
+                not: () => Promise.resolve({ data: candidats, error: null }),
+              }),
+            }),
+          };
+        },
       }),
     } as unknown as SupabaseClient;
+  }
+
+  const missionRow = {
+    id: "m1",
+    patient_id: "p1",
+    type_soin: "Injection Lovenox",
+    heure_prevue: "14:30:00",
+    statut: "a_faire",
+    mission_clinique_id: null,
+    transmission: "Vu ce jour, tout va bien.",
+    patients: {
+      id: "p1",
+      nom_complet: "Mme Dupont",
+      adresse: "12 rue des Lilas, 75011 Paris",
+      telephone: "06 12 34 56 78",
+      allergies: "Allergie pénicilline",
+      consignes: "Sonner au portail.",
+      date_naissance: "1948-03-14",
+    },
+  };
+
+  it("mappe la mission et le patient joint, avec la dernière transmission la plus récente", async () => {
+    const fakeClient = fakeClientAvecCandidats(missionRow, [
+      { transmission: "Ancienne visite, RAS.", heure_prevue: "09:00:00", tournees: { date: "2026-07-01" } },
+      { transmission: "Pansement refait, rougeur à surveiller.", heure_prevue: "10:00:00", tournees: { date: "2026-07-14" } },
+    ]);
 
     const { getMissionDetail } = await import("./ma-journee");
     const detail = await getMissionDetail(fakeClient, "m1");
@@ -203,6 +221,8 @@ describe("getMissionDetail", () => {
       heurePrevue: "14:30:00",
       statut: "a_faire",
       missionCliniqueId: null,
+      transmission: "Vu ce jour, tout va bien.",
+      derniereTransmission: "Pansement refait, rougeur à surveiller.",
       patient: {
         id: "p1",
         nomComplet: "Mme Dupont",
@@ -210,8 +230,18 @@ describe("getMissionDetail", () => {
         telephone: "06 12 34 56 78",
         allergies: "Allergie pénicilline",
         consignes: "Sonner au portail.",
+        dateNaissance: "1948-03-14",
       },
     });
+  });
+
+  it("retourne derniereTransmission à null si aucune visite précédente n'a de transmission", async () => {
+    const fakeClient = fakeClientAvecCandidats(missionRow, []);
+
+    const { getMissionDetail } = await import("./ma-journee");
+    const detail = await getMissionDetail(fakeClient, "m1");
+
+    expect(detail?.derniereTransmission).toBeNull();
   });
 
   it("retourne null si la mission n'existe pas", async () => {

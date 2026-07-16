@@ -85,6 +85,7 @@ export type Database = {
           patient_id: string
           statut: string
           tournee_id: string
+          transmission: string | null
           type_soin: string
         }
         Insert: {
@@ -94,6 +95,7 @@ export type Database = {
           patient_id: string
           statut?: string
           tournee_id: string
+          transmission?: string | null
           type_soin: string
         }
         Update: {
@@ -103,6 +105,7 @@ export type Database = {
           patient_id?: string
           statut?: string
           tournee_id?: string
+          transmission?: string | null
           type_soin?: string
         }
         Relationships: [
@@ -159,6 +162,7 @@ export type Database = {
           allergies: string | null
           consignes: string | null
           created_at: string
+          date_naissance: string | null
           id: string
           idel_id: string
           nom_complet: string
@@ -169,6 +173,7 @@ export type Database = {
           allergies?: string | null
           consignes?: string | null
           created_at?: string
+          date_naissance?: string | null
           id?: string
           idel_id: string
           nom_complet: string
@@ -179,6 +184,7 @@ export type Database = {
           allergies?: string | null
           consignes?: string | null
           created_at?: string
+          date_naissance?: string | null
           id?: string
           idel_id?: string
           nom_complet?: string

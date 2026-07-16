@@ -58,6 +58,34 @@ export async function getMissionsDuJour(
   });
 }
 
+async function getDerniereTransmission(
+  supabase: SupabaseClient<Database>,
+  patientId: string,
+  missionIdActuelle: string
+): Promise<string | null> {
+  const { data } = await supabase
+    .from("missions_du_jour")
+    .select("transmission, heure_prevue, tournees(date)")
+    .eq("patient_id", patientId)
+    .neq("id", missionIdActuelle)
+    .not("transmission", "is", null);
+
+  if (!data || data.length === 0) return null;
+
+  type CandidatRow = { transmission: string | null; heure_prevue: string; tournees: unknown };
+  const avecDate = (data as CandidatRow[]).map((row) => {
+    const tourneeEmbed = row.tournees;
+    const tournee = Array.isArray(tourneeEmbed)
+      ? (tourneeEmbed[0] as { date: string } | undefined)
+      : (tourneeEmbed as { date: string } | null);
+    return { transmission: row.transmission, dateHeure: `${tournee?.date ?? ""}T${row.heure_prevue}` };
+  });
+
+  avecDate.sort((a, b) => b.dateHeure.localeCompare(a.dateHeure));
+
+  return avecDate[0].transmission;
+}
+
 export async function getMissionDetail(
   supabase: SupabaseClient<Database>,
   missionId: string
@@ -65,7 +93,7 @@ export async function getMissionDetail(
   const { data, error } = await supabase
     .from("missions_du_jour")
     .select(
-      "id, patient_id, type_soin, heure_prevue, statut, mission_clinique_id, patients(id, nom_complet, adresse, telephone, allergies, consignes)"
+      "id, patient_id, type_soin, heure_prevue, statut, mission_clinique_id, transmission, patients(id, nom_complet, adresse, telephone, allergies, consignes, date_naissance)"
     )
     .eq("id", missionId)
     .maybeSingle();
@@ -80,10 +108,13 @@ export async function getMissionDetail(
     telephone: string;
     allergies: string | null;
     consignes: string | null;
+    date_naissance: string | null;
   };
   const patientRow = Array.isArray(patientEmbed)
     ? (patientEmbed[0] as PatientRow)
     : (patientEmbed as PatientRow);
+
+  const derniereTransmission = await getDerniereTransmission(supabase, data.patient_id, missionId);
 
   return {
     id: data.id,
@@ -93,6 +124,8 @@ export async function getMissionDetail(
     heurePrevue: data.heure_prevue,
     statut: data.statut as StatutMission,
     missionCliniqueId: data.mission_clinique_id,
+    transmission: data.transmission,
+    derniereTransmission,
     patient: {
       id: patientRow.id,
       nomComplet: patientRow.nom_complet,
@@ -100,6 +133,7 @@ export async function getMissionDetail(
       telephone: patientRow.telephone,
       allergies: patientRow.allergies,
       consignes: patientRow.consignes,
+      dateNaissance: patientRow.date_naissance,
     },
   };
 }

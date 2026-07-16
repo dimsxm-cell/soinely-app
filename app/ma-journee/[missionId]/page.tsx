@@ -10,6 +10,7 @@ const STATUT_LABEL: Record<StatutMission, string> = {
   a_faire: "À faire",
   en_cours: "En cours",
   terminee: "Terminée",
+  absent: "Absente",
 };
 
 const PROCHAIN_STATUT: Partial<Record<StatutMission, StatutMission>> = {
