@@ -9,7 +9,8 @@ vi.mock("@/lib/data/ma-journee-actions", () => ({
 
 const mission: MissionDuJour = {
   id: "m1",
-  patientLabel: "Mme Dupont",
+  patientId: "p1",
+  patientNom: "Mme Dupont",
   typeSoin: "Pansement",
   heurePrevue: "08:30:00",
   statut: "a_faire",
@@ -24,6 +25,13 @@ describe("CarteMission", () => {
     expect(screen.getByText(/Pansement/)).toBeInTheDocument();
     expect(screen.getByText(/08:30:00/)).toBeInTheDocument();
     expect(screen.getByText("À faire")).toBeInTheDocument();
+  });
+
+  it("le nom du patient est un lien vers l'écran d'arrivée de la mission", () => {
+    render(<CarteMission mission={mission} />);
+
+    const lien = screen.getByRole("link", { name: /Mme Dupont/ });
+    expect(lien).toHaveAttribute("href", "/ma-journee/m1");
   });
 
   it("affiche le bon libellé pour le statut « en cours »", () => {
@@ -66,8 +74,8 @@ describe("CarteMission", () => {
     expect(lien).toHaveAttribute("href", "/situations/s1");
   });
 
-  it("n'affiche aucun lien contexte si contexteHref n'est pas fourni", () => {
+  it("n'affiche que le lien vers le patient quand contexteHref n'est pas fourni", () => {
     render(<CarteMission mission={{ ...mission, statut: "en_cours" }} />);
-    expect(screen.queryByRole("link")).not.toBeInTheDocument();
+    expect(screen.getAllByRole("link")).toHaveLength(1);
   });
 });
