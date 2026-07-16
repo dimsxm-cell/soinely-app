@@ -21,9 +21,14 @@ export async function updateMissionStatutAction(formData: FormData): Promise<voi
     .eq("id", missionId)
     .maybeSingle();
 
-  if (!mission || TRANSITIONS_VALIDES[mission.statut as StatutMission] !== nouveauStatut) {
-    return;
-  }
+  if (!mission) return;
+
+  const statutActuel = mission.statut as StatutMission;
+  const transitionValide =
+    TRANSITIONS_VALIDES[statutActuel] === nouveauStatut ||
+    (statutActuel === "a_faire" && nouveauStatut === "absent");
+
+  if (!transitionValide) return;
 
   await supabase.from("missions_du_jour").update({ statut: nouveauStatut }).eq("id", missionId);
 
@@ -46,6 +51,25 @@ export async function updateConsignesAction(formData: FormData): Promise<void> {
   if (!mission) return;
 
   await supabase.from("patients").update({ consignes }).eq("id", mission.patient_id);
+
+  revalidatePath(`/ma-journee/${missionId}`);
+}
+
+export async function updateTransmissionAction(formData: FormData): Promise<void> {
+  const missionId = String(formData.get("missionId"));
+  const transmission = String(formData.get("transmission"));
+
+  const supabase = await createClient();
+
+  const { data: mission } = await supabase
+    .from("missions_du_jour")
+    .select("id")
+    .eq("id", missionId)
+    .maybeSingle();
+
+  if (!mission) return;
+
+  await supabase.from("missions_du_jour").update({ transmission }).eq("id", missionId);
 
   revalidatePath(`/ma-journee/${missionId}`);
 }
