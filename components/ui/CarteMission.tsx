@@ -7,12 +7,14 @@ const STATUT_LABEL: Record<MissionDuJour["statut"], string> = {
   a_faire: "À faire",
   en_cours: "En cours",
   terminee: "Terminée",
+  absent: "Absente",
 };
 
 const STATUT_CLASSES: Record<MissionDuJour["statut"], string> = {
   a_faire: "bg-navy/5 text-navy",
   en_cours: "bg-warning text-navy",
   terminee: "bg-success text-navy",
+  absent: "bg-navy/10 text-navy/50",
 };
 
 const PROCHAIN_STATUT: Partial<Record<StatutMission, StatutMission>> = {

@@ -67,6 +67,16 @@ describe("CarteMission", () => {
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
 
+  it("affiche le bon libellé pour le statut « absente »", () => {
+    render(<CarteMission mission={{ ...mission, statut: "absent" }} />);
+    expect(screen.getByText("Absente")).toBeInTheDocument();
+  });
+
+  it("n'affiche aucun bouton pour une mission absente", () => {
+    render(<CarteMission mission={{ ...mission, statut: "absent" }} />);
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+  });
+
   it("affiche un lien « Contexte clinique » quand contexteHref est fourni", () => {
     render(<CarteMission mission={{ ...mission, statut: "en_cours" }} contexteHref="/situations/s1" />);
 
