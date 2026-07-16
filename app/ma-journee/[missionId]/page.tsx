@@ -2,7 +2,11 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getMissionDetail } from "@/lib/data/ma-journee";
-import { updateConsignesAction, updateMissionStatutAction } from "@/lib/data/ma-journee-actions";
+import {
+  updateConsignesAction,
+  updateMissionStatutAction,
+  updateTransmissionAction,
+} from "@/lib/data/ma-journee-actions";
 import { Button } from "@/components/ui/Button";
 import type { StatutMission } from "@/lib/types/clinical";
 
@@ -23,6 +27,17 @@ const LIBELLE_ACTION: Partial<Record<StatutMission, string>> = {
   en_cours: "Terminer",
 };
 
+function calculerAge(dateNaissance: string): number {
+  const naissance = new Date(dateNaissance);
+  const aujourdHui = new Date();
+  let age = aujourdHui.getFullYear() - naissance.getFullYear();
+  const anniversairePasse =
+    aujourdHui.getMonth() > naissance.getMonth() ||
+    (aujourdHui.getMonth() === naissance.getMonth() && aujourdHui.getDate() >= naissance.getDate());
+  if (!anniversairePasse) age -= 1;
+  return age;
+}
+
 export default async function ArriveePatientPage({
   params,
 }: {
@@ -35,6 +50,8 @@ export default async function ArriveePatientPage({
   if (!mission) notFound();
 
   const prochainStatut = PROCHAIN_STATUT[mission.statut];
+  const peutMarquerAbsent = mission.statut === "a_faire";
+  const peutEcrireTransmission = mission.statut === "en_cours" || mission.statut === "terminee";
   const itineraireHref = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mission.patient.adresse)}`;
 
   return (
@@ -49,8 +66,26 @@ export default async function ArriveePatientPage({
       </div>
 
       <div>
-        <h1 className="text-2xl font-semibold text-navy">{mission.patientNom}</h1>
+        <div className="flex items-baseline gap-2">
+          <h1 className="text-2xl font-semibold text-navy">{mission.patientNom}</h1>
+          {mission.patient.dateNaissance && (
+            <span className="text-sm text-navy/60">{calculerAge(mission.patient.dateNaissance)} ans</span>
+          )}
+        </div>
         <p className="mt-1 text-navy/60">{mission.heurePrevue}</p>
+      </div>
+
+      <div className="flex gap-3">
+        <a href={`tel:${mission.patient.telephone}`} className="flex-1">
+          <Button variant="secondary" className="w-full">
+            Appeler
+          </Button>
+        </a>
+        <a href={`sms:${mission.patient.telephone}`} className="flex-1">
+          <Button variant="secondary" className="w-full">
+            SMS
+          </Button>
+        </a>
       </div>
 
       <div className="rounded-card border border-navy/10 bg-white p-6">
@@ -82,6 +117,13 @@ export default async function ArriveePatientPage({
         </section>
       )}
 
+      {mission.derniereTransmission && (
+        <section className="rounded-card border border-navy/10 bg-navy/5 p-6">
+          <p className="text-xs font-medium uppercase text-navy/60">Dernière transmission</p>
+          <p className="mt-1 text-navy">{mission.derniereTransmission}</p>
+        </section>
+      )}
+
       <section className="rounded-card border border-navy/10 bg-white p-6">
         <p className="text-xs font-medium uppercase text-navy/60">Consignes</p>
         <form action={updateConsignesAction} className="mt-2 flex flex-col gap-3">
@@ -98,14 +140,43 @@ export default async function ArriveePatientPage({
         </form>
       </section>
 
+      {peutEcrireTransmission && (
+        <section className="rounded-card border border-navy/10 bg-white p-6">
+          <p className="text-xs font-medium uppercase text-navy/60">Transmission de cette visite</p>
+          <form action={updateTransmissionAction} className="mt-2 flex flex-col gap-3">
+            <input type="hidden" name="missionId" value={mission.id} />
+            <textarea
+              name="transmission"
+              defaultValue={mission.transmission ?? ""}
+              rows={3}
+              className="rounded-card border border-navy/10 p-3 text-navy"
+            />
+            <Button type="submit" variant="tertiary" className="self-start">
+              Enregistrer
+            </Button>
+          </form>
+        </section>
+      )}
+
       {prochainStatut && (
-        <form action={updateMissionStatutAction}>
-          <input type="hidden" name="missionId" value={mission.id} />
-          <input type="hidden" name="nouveauStatut" value={prochainStatut} />
-          <Button type="submit" variant="primary" className="w-full">
-            {LIBELLE_ACTION[mission.statut]}
-          </Button>
-        </form>
+        <div className="flex gap-3">
+          {peutMarquerAbsent && (
+            <form action={updateMissionStatutAction} className="flex-1">
+              <input type="hidden" name="missionId" value={mission.id} />
+              <input type="hidden" name="nouveauStatut" value="absent" />
+              <Button type="submit" variant="secondary" className="w-full">
+                Absence
+              </Button>
+            </form>
+          )}
+          <form action={updateMissionStatutAction} className="flex-1">
+            <input type="hidden" name="missionId" value={mission.id} />
+            <input type="hidden" name="nouveauStatut" value={prochainStatut} />
+            <Button type="submit" variant="primary" className="w-full">
+              {LIBELLE_ACTION[mission.statut]}
+            </Button>
+          </form>
+        </div>
       )}
     </main>
   );
