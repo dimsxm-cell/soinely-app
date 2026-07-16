@@ -19,7 +19,7 @@ beforeEach(() => {
 });
 
 describe("updateMissionStatutAction", () => {
-  it("applique une transition valide (a_faire vers en_cours) et invalide le cache", async () => {
+  it("applique une transition valide (a_faire vers en_cours) et invalide le cache des deux écrans", async () => {
     eqSelectMock.mockResolvedValue({ data: { statut: "a_faire" }, error: null });
     eqUpdateMock.mockResolvedValue({ error: null });
 
@@ -36,6 +36,7 @@ describe("updateMissionStatutAction", () => {
     expect(updateMock).toHaveBeenCalledWith({ statut: "en_cours" });
     expect(eqUpdateMock).toHaveBeenCalledWith("id", "m1");
     expect(revalidatePath).toHaveBeenCalledWith("/ma-journee");
+    expect(revalidatePath).toHaveBeenCalledWith("/ma-journee/m1");
   });
 
   it("n'applique pas une transition invalide (terminee vers a_faire)", async () => {
@@ -97,6 +98,44 @@ describe("updateMissionStatutAction", () => {
     formData.set("nouveauStatut", "en_cours");
 
     await updateMissionStatutAction(formData);
+
+    expect(updateMock).not.toHaveBeenCalled();
+    expect(revalidatePath).not.toHaveBeenCalled();
+  });
+});
+
+describe("updateConsignesAction", () => {
+  it("met à jour les consignes du patient lié à la mission et invalide le cache", async () => {
+    eqSelectMock.mockResolvedValue({ data: { patient_id: "p1" }, error: null });
+    eqUpdateMock.mockResolvedValue({ error: null });
+
+    const { updateConsignesAction } = await import("./ma-journee-actions");
+    const { revalidatePath } = await import("next/cache");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("consignes", "Sonner au portail.");
+
+    await updateConsignesAction(formData);
+
+    expect(fromMock).toHaveBeenCalledWith("missions_du_jour");
+    expect(fromMock).toHaveBeenCalledWith("patients");
+    expect(updateMock).toHaveBeenCalledWith({ consignes: "Sonner au portail." });
+    expect(eqUpdateMock).toHaveBeenCalledWith("id", "p1");
+    expect(revalidatePath).toHaveBeenCalledWith("/ma-journee/m1");
+  });
+
+  it("ne fait rien si la mission n'existe pas", async () => {
+    eqSelectMock.mockResolvedValue({ data: null, error: null });
+
+    const { updateConsignesAction } = await import("./ma-journee-actions");
+    const { revalidatePath } = await import("next/cache");
+
+    const formData = new FormData();
+    formData.set("missionId", "inconnue");
+    formData.set("consignes", "Peu importe");
+
+    await updateConsignesAction(formData);
 
     expect(updateMock).not.toHaveBeenCalled();
     expect(revalidatePath).not.toHaveBeenCalled();

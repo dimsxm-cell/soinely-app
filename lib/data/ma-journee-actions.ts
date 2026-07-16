@@ -28,4 +28,24 @@ export async function updateMissionStatutAction(formData: FormData): Promise<voi
   await supabase.from("missions_du_jour").update({ statut: nouveauStatut }).eq("id", missionId);
 
   revalidatePath("/ma-journee");
+  revalidatePath(`/ma-journee/${missionId}`);
+}
+
+export async function updateConsignesAction(formData: FormData): Promise<void> {
+  const missionId = String(formData.get("missionId"));
+  const consignes = String(formData.get("consignes"));
+
+  const supabase = await createClient();
+
+  const { data: mission } = await supabase
+    .from("missions_du_jour")
+    .select("patient_id")
+    .eq("id", missionId)
+    .maybeSingle();
+
+  if (!mission) return;
+
+  await supabase.from("patients").update({ consignes }).eq("id", mission.patient_id);
+
+  revalidatePath(`/ma-journee/${missionId}`);
 }
