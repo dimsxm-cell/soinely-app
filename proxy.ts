@@ -1,5 +1,6 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { getAbonnement } from "@/lib/data/abonnement";
 
 const PROTECTED_PATHS = ["/ma-journee", "/recherche", "/situations", "/ely"];
 
@@ -24,16 +25,27 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
   const isProtected = PROTECTED_PATHS.some((path) =>
     request.nextUrl.pathname.startsWith(path)
   );
 
-  if (isProtected && !user) {
+  if (!isProtected) {
+    return response;
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
     return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  const abonnement = await getAbonnement(supabase, user.id);
+  const acces = abonnement?.statut === "essai" || abonnement?.statut === "actif";
+
+  if (!acces) {
+    return NextResponse.redirect(new URL("/abonnement", request.url));
   }
 
   return response;
