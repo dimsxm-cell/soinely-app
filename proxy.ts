@@ -1,7 +1,7 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PROTECTED_PATHS = ["/ma-journee", "/recherche", "/situations", "/copilote"];
+const PROTECTED_PATHS = ["/ma-journee", "/recherche", "/situations", "/ely"];
 
 export async function proxy(request: NextRequest) {
   const response = NextResponse.next({ request });
@@ -44,6 +44,6 @@ export const config = {
     "/ma-journee/:path*",
     "/recherche/:path*",
     "/situations/:path*",
-    "/copilote/:path*",
+    "/ely/:path*",
   ],
 };

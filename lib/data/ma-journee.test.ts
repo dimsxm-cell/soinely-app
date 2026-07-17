@@ -472,7 +472,7 @@ describe("getMissionEnCoursHref", () => {
     const { getMissionEnCoursHref } = await import("./ma-journee");
     const contexte = await getMissionEnCoursHref(fakeClient, "t1");
 
-    expect(contexte).toEqual({ missionId: "m2", href: "/copilote?q=Pansement" });
+    expect(contexte).toEqual({ missionId: "m2", href: "/ely?q=Pansement" });
   });
 
   it("retourne null si aucune mission n'est en cours", async () => {

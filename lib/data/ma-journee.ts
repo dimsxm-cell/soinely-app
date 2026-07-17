@@ -275,7 +275,7 @@ export async function getMissionEnCoursHref(
 
   const href = situationTerrainId
     ? `/situations/${situationTerrainId}`
-    : `/copilote?q=${encodeURIComponent(mission.type_soin)}`;
+    : `/ely?q=${encodeURIComponent(mission.type_soin)}`;
 
   return { missionId: mission.id, href };
 }
