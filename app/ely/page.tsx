@@ -4,7 +4,7 @@ import { CarteReponse } from "@/components/ui/CarteReponse";
 import { CarteSituationTerrain } from "@/components/ui/CarteSituationTerrain";
 import { Button } from "@/components/ui/Button";
 
-export default async function CopilotePage({
+export default async function ElyPage({
   searchParams,
 }: {
   searchParams: Promise<{ q?: string }>;
@@ -18,7 +18,7 @@ export default async function CopilotePage({
 
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
-      <h1 className="text-2xl font-semibold text-navy">Copilote Clinique</h1>
+      <h1 className="text-2xl font-semibold text-navy">Ely</h1>
 
       <form method="GET" className="flex gap-4">
         <input

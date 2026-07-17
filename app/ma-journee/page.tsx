@@ -22,8 +22,8 @@ export default async function MaJourneePage() {
         <Link href="/recherche">
           <Button variant="secondary">Rechercher</Button>
         </Link>
-        <Link href="/copilote">
-          <Button variant="secondary">Copilote</Button>
+        <Link href="/ely">
+          <Button variant="secondary">Ely</Button>
         </Link>
         <Link href="/situations">
           <Button variant="secondary">Parcourir</Button>
