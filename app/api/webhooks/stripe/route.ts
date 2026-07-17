@@ -40,11 +40,11 @@ export async function POST(request: Request): Promise<NextResponse> {
     const profileId = session.client_reference_id;
 
     if (profileId && session.subscription) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const subscription = (await stripe.subscriptions.retrieve(String(session.subscription))) as any;
-      const priceId = subscription.items.data[0].price.id;
+      const subscription = await stripe.subscriptions.retrieve(String(session.subscription));
+      const item = subscription.items.data[0];
+      const priceId = item.price.id;
 
-      await supabase.from("abonnements").upsert(
+      const { error } = await supabase.from("abonnements").upsert(
         {
           profile_id: profileId,
           plan: getPlan(priceId),
@@ -54,24 +54,32 @@ export async function POST(request: Request): Promise<NextResponse> {
           essai_fin: subscription.trial_end
             ? new Date(subscription.trial_end * 1000).toISOString()
             : null,
-          periode_fin: new Date(subscription.current_period_end * 1000).toISOString(),
+          periode_fin: new Date(item.current_period_end * 1000).toISOString(),
         },
         { onConflict: "profile_id" }
       );
+
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+      }
     }
   }
 
   if (event.type === "customer.subscription.updated" || event.type === "customer.subscription.deleted") {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const subscription = event.data.object as any;
+    const subscription = event.data.object as Stripe.Subscription;
+    const item = subscription.items.data[0];
 
-    await supabase
+    const { error } = await supabase
       .from("abonnements")
       .update({
         statut: STATUT_PAR_STRIPE[subscription.status] ?? "annule",
-        periode_fin: new Date(subscription.current_period_end * 1000).toISOString(),
+        periode_fin: new Date(item.current_period_end * 1000).toISOString(),
       })
       .eq("stripe_subscription_id", subscription.id);
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
   }
 
   return NextResponse.json({ received: true });

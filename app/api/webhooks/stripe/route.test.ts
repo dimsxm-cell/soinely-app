@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type Stripe from "stripe";
 
 const constructEventMock = vi.fn();
 const subscriptionsRetrieveMock = vi.fn();
@@ -6,7 +7,7 @@ vi.mock("stripe", () => ({
   default: class {
     webhooks = { constructEvent: constructEventMock };
     subscriptions = { retrieve: subscriptionsRetrieveMock };
-  } as any,
+  } as unknown as typeof Stripe,
 }));
 
 const upsertMock = vi.fn(() => Promise.resolve({ error: null }));
@@ -70,8 +71,7 @@ describe("POST /api/webhooks/stripe", () => {
     subscriptionsRetrieveMock.mockResolvedValue({
       status: "trialing",
       trial_end: 1750000000,
-      current_period_end: 1751000000,
-      items: { data: [{ price: { id: "price_cabinet_test" } }] },
+      items: { data: [{ price: { id: "price_cabinet_test" }, current_period_end: 1751000000 }] },
     });
 
     const { POST } = await import("./route");
@@ -99,7 +99,7 @@ describe("POST /api/webhooks/stripe", () => {
         object: {
           id: "sub_1",
           status: "past_due",
-          current_period_end: 1751000000,
+          items: { data: [{ current_period_end: 1751000000 }] },
         },
       },
     });
@@ -122,7 +122,7 @@ describe("POST /api/webhooks/stripe", () => {
         object: {
           id: "sub_1",
           status: "canceled",
-          current_period_end: 1751000000,
+          items: { data: [{ current_period_end: 1751000000 }] },
         },
       },
     });
@@ -135,5 +135,50 @@ describe("POST /api/webhooks/stripe", () => {
     expect(updateMock).toHaveBeenCalledWith(
       expect.objectContaining({ statut: "annule" })
     );
+  });
+
+  it("checkout.session.completed : retourne 500 si l'écriture en base échoue (pour que Stripe réessaie)", async () => {
+    constructEventMock.mockReturnValue({
+      type: "checkout.session.completed",
+      data: {
+        object: {
+          client_reference_id: "u1",
+          customer: "cus_1",
+          subscription: "sub_1",
+        },
+      },
+    });
+    subscriptionsRetrieveMock.mockResolvedValue({
+      status: "trialing",
+      trial_end: 1750000000,
+      items: { data: [{ price: { id: "price_solo_test" }, current_period_end: 1751000000 }] },
+    });
+    upsertMock.mockResolvedValueOnce({ error: { message: "boom" } });
+
+    const { POST } = await import("./route");
+
+    const response = await POST(fakeRequest("{}", "sig_valide"));
+
+    expect(response.status).toBe(500);
+  });
+
+  it("customer.subscription.updated : retourne 500 si la mise à jour en base échoue", async () => {
+    constructEventMock.mockReturnValue({
+      type: "customer.subscription.updated",
+      data: {
+        object: {
+          id: "sub_1",
+          status: "active",
+          items: { data: [{ current_period_end: 1751000000 }] },
+        },
+      },
+    });
+    eqUpdateMock.mockResolvedValueOnce({ error: { message: "boom" } });
+
+    const { POST } = await import("./route");
+
+    const response = await POST(fakeRequest("{}", "sig_valide"));
+
+    expect(response.status).toBe(500);
   });
 });
