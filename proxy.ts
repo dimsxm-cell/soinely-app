@@ -2,7 +2,15 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { getAbonnement } from "@/lib/data/abonnement";
 
-const PROTECTED_PATHS = ["/ma-journee", "/recherche", "/situations", "/ely"];
+// Routes nécessitant une connexion. "/compte" en fait partie mais est
+// volontairement absente de SUBSCRIPTION_REQUIRED_PATHS ci-dessous : une
+// IDEL dont le paiement échoue doit toujours pouvoir atteindre son compte
+// pour le corriger (portail Stripe), sinon la garde d'abonnement
+// l'enfermerait hors de la seule page qui le lui permet.
+const AUTH_REQUIRED_PATHS = ["/ma-journee", "/recherche", "/situations", "/ely", "/compte"];
+
+// Routes nécessitant en plus un abonnement essai/actif.
+const SUBSCRIPTION_REQUIRED_PATHS = ["/ma-journee", "/recherche", "/situations", "/ely"];
 
 export async function proxy(request: NextRequest) {
   const response = NextResponse.next({ request });
@@ -25,11 +33,9 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  const isProtected = PROTECTED_PATHS.some((path) =>
-    request.nextUrl.pathname.startsWith(path)
-  );
+  const needsAuth = AUTH_REQUIRED_PATHS.some((path) => request.nextUrl.pathname.startsWith(path));
 
-  if (!isProtected) {
+  if (!needsAuth) {
     return response;
   }
 
@@ -41,11 +47,17 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  const abonnement = await getAbonnement(supabase, user.id);
-  const acces = abonnement?.statut === "essai" || abonnement?.statut === "actif";
+  const needsSubscription = SUBSCRIPTION_REQUIRED_PATHS.some((path) =>
+    request.nextUrl.pathname.startsWith(path)
+  );
 
-  if (!acces) {
-    return NextResponse.redirect(new URL("/abonnement", request.url));
+  if (needsSubscription) {
+    const abonnement = await getAbonnement(supabase, user.id);
+    const acces = abonnement?.statut === "essai" || abonnement?.statut === "actif";
+
+    if (!acces) {
+      return NextResponse.redirect(new URL("/abonnement", request.url));
+    }
   }
 
   return response;
@@ -57,5 +69,6 @@ export const config = {
     "/recherche/:path*",
     "/situations/:path*",
     "/ely/:path*",
+    "/compte/:path*",
   ],
 };

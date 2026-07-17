@@ -8,7 +8,7 @@ export async function getAbonnement(
 ): Promise<Abonnement | null> {
   const { data, error } = await supabase
     .from("abonnements")
-    .select("plan, statut")
+    .select("plan, statut, essai_fin, periode_fin, stripe_customer_id")
     .eq("profile_id", profileId)
     .maybeSingle();
 
@@ -17,5 +17,8 @@ export async function getAbonnement(
   return {
     plan: data.plan as PlanAbonnement,
     statut: data.statut as StatutAbonnement,
+    essaiFin: data.essai_fin,
+    periodeFin: data.periode_fin,
+    stripeCustomerId: data.stripe_customer_id,
   };
 }

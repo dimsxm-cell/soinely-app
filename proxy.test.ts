@@ -81,6 +81,30 @@ describe("proxy", () => {
     expect(response.status).toBe(200);
   });
 
+  it("redirige vers /login si non connecté sur /compte", async () => {
+    getUserMock.mockResolvedValue({ data: { user: null } });
+
+    const { proxy } = await import("./proxy");
+    const request = new NextRequest("https://soinely.app/compte");
+
+    const response = await proxy(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toContain("/login");
+  });
+
+  it("laisse passer sur /compte même sans abonnement essai/actif", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } } });
+    eqSelectMock.mockResolvedValue({ data: { statut: "impaye" }, error: null });
+
+    const { proxy } = await import("./proxy");
+    const request = new NextRequest("https://soinely.app/compte");
+
+    const response = await proxy(request);
+
+    expect(response.status).toBe(200);
+  });
+
   it("ne vérifie pas l'abonnement sur une route non protégée", async () => {
     const { proxy } = await import("./proxy");
     const request = new NextRequest("https://soinely.app/login");

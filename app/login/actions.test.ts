@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 const signInWithPasswordMock = vi.fn().mockResolvedValue({ error: null });
 const signUpMock = vi.fn().mockResolvedValue({ error: null });
 const resetPasswordForEmailMock = vi.fn().mockResolvedValue({ error: null });
+const signOutMock = vi.fn().mockResolvedValue({ error: null });
 
 vi.mock("@/lib/supabase/server", () => ({
   createClient: () => ({
@@ -10,12 +11,18 @@ vi.mock("@/lib/supabase/server", () => ({
       signInWithPassword: signInWithPasswordMock,
       signUp: signUpMock,
       resetPasswordForEmail: resetPasswordForEmailMock,
+      signOut: signOutMock,
     },
   }),
 }));
 
 vi.mock("next/headers", () => ({
   headers: () => new Map([["origin", "https://soinely.app"]]),
+}));
+
+const redirectMock = vi.fn();
+vi.mock("next/navigation", () => ({
+  redirect: redirectMock,
 }));
 
 describe("signInAction", () => {
@@ -82,6 +89,19 @@ describe("signUpAction", () => {
     const result = await signUpAction(formData);
 
     expect(result).toEqual({ success: false, error: "User already registered" });
+  });
+});
+
+describe("signOutAction", () => {
+  it("déconnecte l'utilisateur et redirige vers /login", async () => {
+    signOutMock.mockResolvedValueOnce({ error: null });
+
+    const { signOutAction } = await import("./actions");
+
+    await signOutAction();
+
+    expect(signOutMock).toHaveBeenCalled();
+    expect(redirectMock).toHaveBeenCalledWith("/login");
   });
 });
 

@@ -17,10 +17,12 @@ vi.mock("next/headers", () => ({
 }));
 
 const checkoutSessionsCreateMock = vi.fn();
+const billingPortalSessionsCreateMock = vi.fn();
 vi.mock("stripe", () => ({
   default: vi.fn().mockImplementation(function() {
     return {
       checkout: { sessions: { create: checkoutSessionsCreateMock } },
+      billingPortal: { sessions: { create: billingPortalSessionsCreateMock } },
     };
   }),
 }));
@@ -119,5 +121,55 @@ describe("createCheckoutSessionAction", () => {
     await createCheckoutSessionAction(formData);
 
     expect(checkoutSessionsCreateMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("createBillingPortalSessionAction", () => {
+  it("crée une session de portail client et redirige vers son URL", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } } });
+    eqSelectMock.mockResolvedValue({
+      data: {
+        plan: "solo",
+        statut: "actif",
+        essai_fin: null,
+        periode_fin: "2026-08-17T00:00:00.000Z",
+        stripe_customer_id: "cus_1",
+      },
+      error: null,
+    });
+    billingPortalSessionsCreateMock.mockResolvedValue({ url: "https://billing.stripe.com/session_1" });
+
+    const { createBillingPortalSessionAction } = await import("./abonnement-actions");
+
+    await createBillingPortalSessionAction();
+
+    expect(billingPortalSessionsCreateMock).toHaveBeenCalledWith({
+      customer: "cus_1",
+      return_url: "https://soinely.app/compte",
+    });
+    expect(redirectMock).toHaveBeenCalledWith("https://billing.stripe.com/session_1");
+  });
+
+  it("ne fait rien si l'utilisateur n'est pas authentifié", async () => {
+    getUserMock.mockResolvedValue({ data: { user: null } });
+
+    const { createBillingPortalSessionAction } = await import("./abonnement-actions");
+
+    await createBillingPortalSessionAction();
+
+    expect(billingPortalSessionsCreateMock).not.toHaveBeenCalled();
+    expect(redirectMock).not.toHaveBeenCalled();
+  });
+
+  it("ne fait rien si l'abonnement n'a pas encore de stripe_customer_id", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } } });
+    eqSelectMock.mockResolvedValue({ data: null, error: null });
+
+    const { createBillingPortalSessionAction } = await import("./abonnement-actions");
+
+    await createBillingPortalSessionAction();
+
+    expect(billingPortalSessionsCreateMock).not.toHaveBeenCalled();
+    expect(redirectMock).not.toHaveBeenCalled();
   });
 });

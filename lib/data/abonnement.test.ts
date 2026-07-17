@@ -7,7 +7,17 @@ describe("getAbonnement", () => {
       from: () => ({
         select: () => ({
           eq: () => ({
-            maybeSingle: () => Promise.resolve({ data: { plan: "solo", statut: "essai" }, error: null }),
+            maybeSingle: () =>
+              Promise.resolve({
+                data: {
+                  plan: "solo",
+                  statut: "essai",
+                  essai_fin: "2026-07-31T00:00:00.000Z",
+                  periode_fin: "2026-07-31T00:00:00.000Z",
+                  stripe_customer_id: "cus_1",
+                },
+                error: null,
+              }),
           }),
         }),
       }),
@@ -16,7 +26,13 @@ describe("getAbonnement", () => {
     const { getAbonnement } = await import("./abonnement");
     const abonnement = await getAbonnement(fakeClient, "p1");
 
-    expect(abonnement).toEqual({ plan: "solo", statut: "essai" });
+    expect(abonnement).toEqual({
+      plan: "solo",
+      statut: "essai",
+      essaiFin: "2026-07-31T00:00:00.000Z",
+      periodeFin: "2026-07-31T00:00:00.000Z",
+      stripeCustomerId: "cus_1",
+    });
   });
 
   it("retourne null si le profil n'a pas encore d'abonnement", async () => {
