@@ -56,6 +56,8 @@ export interface MissionDetail extends MissionDuJour {
   patient: Patient;
   transmission: string | null;
   derniereTransmission: string | null;
+  rappel: string | null;
+  dernierRappel: string | null;
   prochaineMission: ProchaineMission | null;
 }
 

@@ -83,6 +83,7 @@ export type Database = {
           id: string
           mission_clinique_id: string | null
           patient_id: string
+          rappel: string | null
           statut: string
           tournee_id: string
           transmission: string | null
@@ -93,6 +94,7 @@ export type Database = {
           id?: string
           mission_clinique_id?: string | null
           patient_id: string
+          rappel?: string | null
           statut?: string
           tournee_id: string
           transmission?: string | null
@@ -103,6 +105,7 @@ export type Database = {
           id?: string
           mission_clinique_id?: string | null
           patient_id?: string
+          rappel?: string | null
           statut?: string
           tournee_id?: string
           transmission?: string | null

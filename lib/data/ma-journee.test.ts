@@ -164,7 +164,8 @@ describe("getMissionsDuJour", () => {
 describe("getMissionDetail", () => {
   function fakeClientAvecCandidats(
     missionRow: unknown,
-    candidats: unknown[],
+    candidatsTransmission: unknown[],
+    candidatsRappel: unknown[] = [],
     prochaineRows: unknown[] = []
   ) {
     return {
@@ -177,11 +178,20 @@ describe("getMissionDetail", () => {
               }),
             };
           }
-          if (colonnes.includes("tournees(date)")) {
+          if (colonnes.includes("transmission")) {
             return {
               eq: () => ({
                 neq: () => ({
-                  not: () => Promise.resolve({ data: candidats, error: null }),
+                  not: () => Promise.resolve({ data: candidatsTransmission, error: null }),
+                }),
+              }),
+            };
+          }
+          if (colonnes.includes("rappel")) {
+            return {
+              eq: () => ({
+                neq: () => ({
+                  not: () => Promise.resolve({ data: candidatsRappel, error: null }),
                 }),
               }),
             };
@@ -209,6 +219,7 @@ describe("getMissionDetail", () => {
     statut: "a_faire",
     mission_clinique_id: null,
     transmission: "Vu ce jour, tout va bien.",
+    rappel: "Pense à vérifier la tension.",
     patients: {
       id: "p1",
       nom_complet: "Mme Dupont",
@@ -220,11 +231,18 @@ describe("getMissionDetail", () => {
     },
   };
 
-  it("mappe la mission et le patient joint, avec la dernière transmission la plus récente", async () => {
-    const fakeClient = fakeClientAvecCandidats(missionRow, [
-      { transmission: "Ancienne visite, RAS.", heure_prevue: "09:00:00", tournees: { date: "2026-07-01" } },
-      { transmission: "Pansement refait, rougeur à surveiller.", heure_prevue: "10:00:00", tournees: { date: "2026-07-14" } },
-    ]);
+  it("mappe la mission et le patient joint, avec la dernière transmission et le dernier rappel les plus récents", async () => {
+    const fakeClient = fakeClientAvecCandidats(
+      missionRow,
+      [
+        { transmission: "Ancienne visite, RAS.", heure_prevue: "09:00:00", tournees: { date: "2026-07-01" } },
+        { transmission: "Pansement refait, rougeur à surveiller.", heure_prevue: "10:00:00", tournees: { date: "2026-07-14" } },
+      ],
+      [
+        { rappel: "Ancien rappel, déjà traité.", heure_prevue: "09:00:00", tournees: { date: "2026-07-01" } },
+        { rappel: "Vérifier la cicatrisation dans 3 jours.", heure_prevue: "10:00:00", tournees: { date: "2026-07-14" } },
+      ]
+    );
 
     const { getMissionDetail } = await import("./ma-journee");
     const detail = await getMissionDetail(fakeClient, "m1");
@@ -239,6 +257,8 @@ describe("getMissionDetail", () => {
       missionCliniqueId: null,
       transmission: "Vu ce jour, tout va bien.",
       derniereTransmission: "Pansement refait, rougeur à surveiller.",
+      rappel: "Pense à vérifier la tension.",
+      dernierRappel: "Vérifier la cicatrisation dans 3 jours.",
       prochaineMission: null,
       patient: {
         id: "p1",
@@ -259,6 +279,15 @@ describe("getMissionDetail", () => {
     const detail = await getMissionDetail(fakeClient, "m1");
 
     expect(detail?.derniereTransmission).toBeNull();
+  });
+
+  it("retourne dernierRappel à null si aucune visite précédente n'a de rappel", async () => {
+    const fakeClient = fakeClientAvecCandidats(missionRow, [], []);
+
+    const { getMissionDetail } = await import("./ma-journee");
+    const detail = await getMissionDetail(fakeClient, "m1");
+
+    expect(detail?.dernierRappel).toBeNull();
   });
 
   it("retourne null si la mission n'existe pas", async () => {
@@ -282,6 +311,7 @@ describe("getMissionDetail", () => {
     const fakeClient = fakeClientAvecCandidats(
       { ...missionRow, statut: "terminee" },
       [],
+      [],
       [{ id: "m2", heure_prevue: "15:00:00", patients: { nom_complet: "M. Martin" } }]
     );
 
@@ -296,7 +326,7 @@ describe("getMissionDetail", () => {
   });
 
   it("retourne prochaineMission à null si aucune mission à faire ne reste dans la tournée, statut terminee", async () => {
-    const fakeClient = fakeClientAvecCandidats({ ...missionRow, statut: "terminee" }, [], []);
+    const fakeClient = fakeClientAvecCandidats({ ...missionRow, statut: "terminee" }, [], [], []);
 
     const { getMissionDetail } = await import("./ma-journee");
     const detail = await getMissionDetail(fakeClient, "m1");
@@ -307,6 +337,7 @@ describe("getMissionDetail", () => {
   it("retourne aussi la prochaine mission à faire quand le statut est absent, y compris avec un embed patients en tableau", async () => {
     const fakeClient = fakeClientAvecCandidats(
       { ...missionRow, statut: "absent" },
+      [],
       [],
       [{ id: "m3", heure_prevue: "16:00:00", patients: [{ nom_complet: "Mme Bernard" }] }]
     );
