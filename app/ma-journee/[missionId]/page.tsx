@@ -5,6 +5,7 @@ import { getMissionDetail } from "@/lib/data/ma-journee";
 import {
   updateConsignesAction,
   updateMissionStatutAction,
+  updateRappelAction,
   updateTransmissionAction,
 } from "@/lib/data/ma-journee-actions";
 import { Button } from "@/components/ui/Button";
@@ -117,6 +118,13 @@ export default async function ArriveePatientPage({
         </section>
       )}
 
+      {mission.dernierRappel && (
+        <section className="rounded-card border border-warning/30 bg-warning/5 p-6">
+          <p className="text-xs font-medium uppercase text-warning">Rappel de la dernière visite</p>
+          <p className="mt-1 text-navy">{mission.dernierRappel}</p>
+        </section>
+      )}
+
       {mission.derniereTransmission && (
         <section className="rounded-card border border-navy/10 bg-navy/5 p-6">
           <p className="text-xs font-medium uppercase text-navy/60">Dernière transmission</p>
@@ -148,6 +156,24 @@ export default async function ArriveePatientPage({
             <textarea
               name="transmission"
               defaultValue={mission.transmission ?? ""}
+              rows={3}
+              className="rounded-card border border-navy/10 p-3 text-navy"
+            />
+            <Button type="submit" variant="tertiary" className="self-start">
+              Enregistrer
+            </Button>
+          </form>
+        </section>
+      )}
+
+      {peutEcrireTransmission && (
+        <section className="rounded-card border border-navy/10 bg-white p-6">
+          <p className="text-xs font-medium uppercase text-navy/60">Rappel pour la prochaine visite</p>
+          <form action={updateRappelAction} className="mt-2 flex flex-col gap-3">
+            <input type="hidden" name="missionId" value={mission.id} />
+            <textarea
+              name="rappel"
+              defaultValue={mission.rappel ?? ""}
               rows={3}
               className="rounded-card border border-navy/10 p-3 text-navy"
             />
