@@ -158,7 +158,7 @@ export default async function ArriveePatientPage({
         </section>
       )}
 
-      {prochainStatut && (
+      {prochainStatut ? (
         <div className="flex gap-3">
           {peutMarquerAbsent && (
             <form action={updateMissionStatutAction} className="flex-1">
@@ -177,6 +177,22 @@ export default async function ArriveePatientPage({
             </Button>
           </form>
         </div>
+      ) : (
+        <section className="rounded-card border border-navy/10 bg-white p-6">
+          {mission.prochaineMission ? (
+            <>
+              <p className="text-xs font-medium uppercase text-navy/60">Patient suivant</p>
+              <p className="mt-1 text-navy">
+                {mission.prochaineMission.patientNom} · {mission.prochaineMission.heurePrevue}
+              </p>
+              <Link href={`/ma-journee/${mission.prochaineMission.id}`} className="mt-3 inline-block">
+                <Button variant="primary">Voir la fiche</Button>
+              </Link>
+            </>
+          ) : (
+            <p className="text-navy/60">Aucun autre patient à voir aujourd&apos;hui.</p>
+          )}
+        </section>
       )}
     </main>
   );

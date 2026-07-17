@@ -162,21 +162,36 @@ describe("getMissionsDuJour", () => {
 });
 
 describe("getMissionDetail", () => {
-  function fakeClientAvecCandidats(missionRow: unknown, candidats: unknown[]) {
+  function fakeClientAvecCandidats(
+    missionRow: unknown,
+    candidats: unknown[],
+    prochaineRows: unknown[] = []
+  ) {
     return {
       from: () => ({
         select: (colonnes: string) => {
-          if (colonnes.includes("patients(")) {
+          if (colonnes.includes("tournee_id")) {
             return {
               eq: () => ({
                 maybeSingle: () => Promise.resolve({ data: missionRow, error: null }),
               }),
             };
           }
+          if (colonnes.includes("tournees(date)")) {
+            return {
+              eq: () => ({
+                neq: () => ({
+                  not: () => Promise.resolve({ data: candidats, error: null }),
+                }),
+              }),
+            };
+          }
           return {
             eq: () => ({
-              neq: () => ({
-                not: () => Promise.resolve({ data: candidats, error: null }),
+              eq: () => ({
+                order: () => ({
+                  limit: () => Promise.resolve({ data: prochaineRows, error: null }),
+                }),
               }),
             }),
           };
@@ -188,6 +203,7 @@ describe("getMissionDetail", () => {
   const missionRow = {
     id: "m1",
     patient_id: "p1",
+    tournee_id: "t1",
     type_soin: "Injection Lovenox",
     heure_prevue: "14:30:00",
     statut: "a_faire",
@@ -223,6 +239,7 @@ describe("getMissionDetail", () => {
       missionCliniqueId: null,
       transmission: "Vu ce jour, tout va bien.",
       derniereTransmission: "Pansement refait, rougeur à surveiller.",
+      prochaineMission: null,
       patient: {
         id: "p1",
         nomComplet: "Mme Dupont",
@@ -259,6 +276,49 @@ describe("getMissionDetail", () => {
     const detail = await getMissionDetail(fakeClient, "inconnue");
 
     expect(detail).toBeNull();
+  });
+
+  it("retourne la prochaine mission à faire (la plus proche par heure_prevue) quand le statut est terminee", async () => {
+    const fakeClient = fakeClientAvecCandidats(
+      { ...missionRow, statut: "terminee" },
+      [],
+      [{ id: "m2", heure_prevue: "15:00:00", patients: { nom_complet: "M. Martin" } }]
+    );
+
+    const { getMissionDetail } = await import("./ma-journee");
+    const detail = await getMissionDetail(fakeClient, "m1");
+
+    expect(detail?.prochaineMission).toEqual({
+      id: "m2",
+      patientNom: "M. Martin",
+      heurePrevue: "15:00:00",
+    });
+  });
+
+  it("retourne prochaineMission à null si aucune mission à faire ne reste dans la tournée, statut terminee", async () => {
+    const fakeClient = fakeClientAvecCandidats({ ...missionRow, statut: "terminee" }, [], []);
+
+    const { getMissionDetail } = await import("./ma-journee");
+    const detail = await getMissionDetail(fakeClient, "m1");
+
+    expect(detail?.prochaineMission).toBeNull();
+  });
+
+  it("retourne aussi la prochaine mission à faire quand le statut est absent, y compris avec un embed patients en tableau", async () => {
+    const fakeClient = fakeClientAvecCandidats(
+      { ...missionRow, statut: "absent" },
+      [],
+      [{ id: "m3", heure_prevue: "16:00:00", patients: [{ nom_complet: "Mme Bernard" }] }]
+    );
+
+    const { getMissionDetail } = await import("./ma-journee");
+    const detail = await getMissionDetail(fakeClient, "m1");
+
+    expect(detail?.prochaineMission).toEqual({
+      id: "m3",
+      patientNom: "Mme Bernard",
+      heurePrevue: "16:00:00",
+    });
   });
 });
 
