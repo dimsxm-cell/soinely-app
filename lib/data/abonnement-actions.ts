@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { PlanAbonnement } from "@/lib/types/abonnement";
 
 function getStripe(): Stripe {
-  return new Stripe(process.env.STRIPE_SECRET_KEY!);
+  return new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2026-06-24.dahlia" });
 }
 
 function getPriceId(plan: string): string | null {

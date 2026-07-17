@@ -24,7 +24,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     return NextResponse.json({ error: "Signature manquante" }, { status: 400 });
   }
 
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2026-06-24.dahlia" });
 
   let event: Stripe.Event;
   try {
@@ -42,6 +42,11 @@ export async function POST(request: Request): Promise<NextResponse> {
     if (profileId && session.subscription) {
       const subscription = await stripe.subscriptions.retrieve(String(session.subscription));
       const item = subscription.items.data[0];
+
+      if (!item || typeof item.current_period_end !== "number") {
+        return NextResponse.json({ error: "Forme d'abonnement Stripe inattendue" }, { status: 500 });
+      }
+
       const priceId = item.price.id;
 
       const { error } = await supabase.from("abonnements").upsert(
@@ -68,6 +73,10 @@ export async function POST(request: Request): Promise<NextResponse> {
   if (event.type === "customer.subscription.updated" || event.type === "customer.subscription.deleted") {
     const subscription = event.data.object as Stripe.Subscription;
     const item = subscription.items.data[0];
+
+    if (!item || typeof item.current_period_end !== "number") {
+      return NextResponse.json({ error: "Forme d'abonnement Stripe inattendue" }, { status: 500 });
+    }
 
     const { error } = await supabase
       .from("abonnements")
