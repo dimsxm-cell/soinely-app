@@ -1,12 +1,13 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { getMissionDetail } from "@/lib/data/ma-journee";
+import { getMissionDetail, getPhotoUrl } from "@/lib/data/ma-journee";
 import {
   updateConsignesAction,
   updateMissionStatutAction,
   updateRappelAction,
   updateTransmissionAction,
+  uploadPhotoAction,
 } from "@/lib/data/ma-journee-actions";
 import { Button } from "@/components/ui/Button";
 import type { StatutMission } from "@/lib/types/clinical";
@@ -49,6 +50,11 @@ export default async function ArriveePatientPage({
   const mission = await getMissionDetail(supabase, missionId);
 
   if (!mission) notFound();
+
+  const photoUrl = mission.photoPath ? await getPhotoUrl(supabase, mission.photoPath) : null;
+  const dernierePhotoUrl = mission.dernierePhotoPath
+    ? await getPhotoUrl(supabase, mission.dernierePhotoPath)
+    : null;
 
   const prochainStatut = PROCHAIN_STATUT[mission.statut];
   const peutMarquerAbsent = mission.statut === "a_faire";
@@ -132,6 +138,18 @@ export default async function ArriveePatientPage({
         </section>
       )}
 
+      {dernierePhotoUrl && (
+        <section className="rounded-card border border-navy/10 bg-navy/5 p-6">
+          <p className="text-xs font-medium uppercase text-navy/60">Dernière photo</p>
+          {/* eslint-disable-next-line @next/next/no-img-element -- URL signée à courte durée de vie, incompatible avec le cache de next/image */}
+          <img
+            src={dernierePhotoUrl}
+            alt="Photo de la visite précédente"
+            className="mt-2 max-w-full rounded-card"
+          />
+        </section>
+      )}
+
       <section className="rounded-card border border-navy/10 bg-white p-6">
         <p className="text-xs font-medium uppercase text-navy/60">Consignes</p>
         <form action={updateConsignesAction} className="mt-2 flex flex-col gap-3">
@@ -179,6 +197,27 @@ export default async function ArriveePatientPage({
             />
             <Button type="submit" variant="tertiary" className="self-start">
               Enregistrer
+            </Button>
+          </form>
+        </section>
+      )}
+
+      {peutEcrireTransmission && (
+        <section className="rounded-card border border-navy/10 bg-white p-6">
+          <p className="text-xs font-medium uppercase text-navy/60">Photo de cette visite</p>
+          {photoUrl && (
+            // eslint-disable-next-line @next/next/no-img-element -- URL signée à courte durée de vie, incompatible avec le cache de next/image
+            <img
+              src={photoUrl}
+              alt="Photo envoyée pour cette visite"
+              className="mt-2 max-w-full rounded-card"
+            />
+          )}
+          <form action={uploadPhotoAction} className="mt-2 flex flex-col gap-3">
+            <input type="hidden" name="missionId" value={mission.id} />
+            <input type="file" name="photo" accept="image/*" capture="environment" />
+            <Button type="submit" variant="tertiary" className="self-start">
+              Envoyer
             </Button>
           </form>
         </section>

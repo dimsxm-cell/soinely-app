@@ -83,6 +83,7 @@ export type Database = {
           id: string
           mission_clinique_id: string | null
           patient_id: string
+          photo_path: string | null
           rappel: string | null
           statut: string
           tournee_id: string
@@ -94,6 +95,7 @@ export type Database = {
           id?: string
           mission_clinique_id?: string | null
           patient_id: string
+          photo_path?: string | null
           rappel?: string | null
           statut?: string
           tournee_id: string
@@ -105,6 +107,7 @@ export type Database = {
           id?: string
           mission_clinique_id?: string | null
           patient_id?: string
+          photo_path?: string | null
           rappel?: string | null
           statut?: string
           tournee_id?: string

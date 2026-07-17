@@ -8,6 +8,8 @@ import type {
   Tournee,
 } from "@/lib/types/clinical";
 
+const BUCKET_PHOTOS = "photos-visites";
+
 export async function getTourneeDuJour(
   supabase: SupabaseClient<Database>,
   idelId: string
@@ -120,6 +122,34 @@ async function getDernierRappel(
   return avecDate[0].rappel;
 }
 
+async function getDernierePhoto(
+  supabase: SupabaseClient<Database>,
+  patientId: string,
+  missionIdActuelle: string
+): Promise<string | null> {
+  const { data } = await supabase
+    .from("missions_du_jour")
+    .select("photo_path, heure_prevue, tournees(date)")
+    .eq("patient_id", patientId)
+    .neq("id", missionIdActuelle)
+    .not("photo_path", "is", null);
+
+  if (!data || data.length === 0) return null;
+
+  type CandidatRow = { photo_path: string | null; heure_prevue: string; tournees: unknown };
+  const avecDate = (data as CandidatRow[]).map((row) => {
+    const tourneeEmbed = row.tournees;
+    const tournee = Array.isArray(tourneeEmbed)
+      ? (tourneeEmbed[0] as { date: string } | undefined)
+      : (tourneeEmbed as { date: string } | null);
+    return { photoPath: row.photo_path, dateHeure: `${tournee?.date ?? ""}T${row.heure_prevue}` };
+  });
+
+  avecDate.sort((a, b) => b.dateHeure.localeCompare(a.dateHeure));
+
+  return avecDate[0].photoPath;
+}
+
 async function getProchaineMission(
   supabase: SupabaseClient<Database>,
   tourneeId: string
@@ -154,7 +184,7 @@ export async function getMissionDetail(
   const { data, error } = await supabase
     .from("missions_du_jour")
     .select(
-      "id, patient_id, tournee_id, type_soin, heure_prevue, statut, mission_clinique_id, transmission, rappel, patients(id, nom_complet, adresse, telephone, allergies, consignes, date_naissance)"
+      "id, patient_id, tournee_id, type_soin, heure_prevue, statut, mission_clinique_id, transmission, rappel, photo_path, patients(id, nom_complet, adresse, telephone, allergies, consignes, date_naissance)"
     )
     .eq("id", missionId)
     .maybeSingle();
@@ -177,6 +207,7 @@ export async function getMissionDetail(
 
   const derniereTransmission = await getDerniereTransmission(supabase, data.patient_id, missionId);
   const dernierRappel = await getDernierRappel(supabase, data.patient_id, missionId);
+  const dernierePhotoPath = await getDernierePhoto(supabase, data.patient_id, missionId);
 
   const statut = data.statut as StatutMission;
   const prochaineMission =
@@ -196,6 +227,8 @@ export async function getMissionDetail(
     derniereTransmission,
     rappel: data.rappel,
     dernierRappel,
+    photoPath: data.photo_path,
+    dernierePhotoPath,
     prochaineMission,
     patient: {
       id: patientRow.id,
@@ -207,6 +240,17 @@ export async function getMissionDetail(
       dateNaissance: patientRow.date_naissance,
     },
   };
+}
+
+export async function getPhotoUrl(
+  supabase: SupabaseClient<Database>,
+  path: string
+): Promise<string | null> {
+  const { data, error } = await supabase.storage.from(BUCKET_PHOTOS).createSignedUrl(path, 300);
+
+  if (error || !data) return null;
+
+  return data.signedUrl;
 }
 
 export async function getMissionEnCoursHref(
