@@ -10,8 +10,8 @@ vi.mock("stripe", () => ({
   } as unknown as typeof Stripe,
 }));
 
-const upsertMock = vi.fn(() => Promise.resolve({ error: null }));
-const eqUpdateMock = vi.fn(() => Promise.resolve({ error: null }));
+const upsertMock = vi.fn().mockResolvedValue({ error: null });
+const eqUpdateMock = vi.fn().mockResolvedValue({ error: null });
 const updateMock = vi.fn(() => ({ eq: eqUpdateMock }));
 const fromMock = vi.fn(() => ({ upsert: upsertMock, update: updateMock }));
 
