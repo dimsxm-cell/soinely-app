@@ -1,6 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/types/database.types";
-import type { MissionDetail, MissionDuJour, StatutMission, Tournee } from "@/lib/types/clinical";
+import type {
+  MissionDetail,
+  MissionDuJour,
+  ProchaineMission,
+  StatutMission,
+  Tournee,
+} from "@/lib/types/clinical";
 
 export async function getTourneeDuJour(
   supabase: SupabaseClient<Database>,
@@ -86,6 +92,33 @@ async function getDerniereTransmission(
   return avecDate[0].transmission;
 }
 
+async function getProchaineMission(
+  supabase: SupabaseClient<Database>,
+  tourneeId: string
+): Promise<ProchaineMission | null> {
+  const { data, error } = await supabase
+    .from("missions_du_jour")
+    .select("id, heure_prevue, patients(nom_complet)")
+    .eq("tournee_id", tourneeId)
+    .eq("statut", "a_faire")
+    .order("heure_prevue")
+    .limit(1);
+
+  if (error || !data || data.length === 0) return null;
+
+  const row = data[0];
+  const patientEmbed = row.patients as unknown;
+  const patient = Array.isArray(patientEmbed)
+    ? (patientEmbed[0] as { nom_complet: string })
+    : (patientEmbed as { nom_complet: string });
+
+  return {
+    id: row.id,
+    patientNom: patient.nom_complet,
+    heurePrevue: row.heure_prevue,
+  };
+}
+
 export async function getMissionDetail(
   supabase: SupabaseClient<Database>,
   missionId: string
@@ -93,7 +126,7 @@ export async function getMissionDetail(
   const { data, error } = await supabase
     .from("missions_du_jour")
     .select(
-      "id, patient_id, type_soin, heure_prevue, statut, mission_clinique_id, transmission, patients(id, nom_complet, adresse, telephone, allergies, consignes, date_naissance)"
+      "id, patient_id, tournee_id, type_soin, heure_prevue, statut, mission_clinique_id, transmission, patients(id, nom_complet, adresse, telephone, allergies, consignes, date_naissance)"
     )
     .eq("id", missionId)
     .maybeSingle();
@@ -116,16 +149,23 @@ export async function getMissionDetail(
 
   const derniereTransmission = await getDerniereTransmission(supabase, data.patient_id, missionId);
 
+  const statut = data.statut as StatutMission;
+  const prochaineMission =
+    statut === "terminee" || statut === "absent"
+      ? await getProchaineMission(supabase, data.tournee_id)
+      : null;
+
   return {
     id: data.id,
     patientId: data.patient_id,
     patientNom: patientRow.nom_complet,
     typeSoin: data.type_soin,
     heurePrevue: data.heure_prevue,
-    statut: data.statut as StatutMission,
+    statut,
     missionCliniqueId: data.mission_clinique_id,
     transmission: data.transmission,
     derniereTransmission,
+    prochaineMission,
     patient: {
       id: patientRow.id,
       nomComplet: patientRow.nom_complet,

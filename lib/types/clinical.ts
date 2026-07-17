@@ -36,6 +36,12 @@ export interface Patient {
   dateNaissance: string | null;
 }
 
+export interface ProchaineMission {
+  id: string;
+  patientNom: string;
+  heurePrevue: string;
+}
+
 export interface MissionDuJour {
   id: string;
   patientId: string;
@@ -50,6 +56,7 @@ export interface MissionDetail extends MissionDuJour {
   patient: Patient;
   transmission: string | null;
   derniereTransmission: string | null;
+  prochaineMission: ProchaineMission | null;
 }
 
 export interface Tournee {
