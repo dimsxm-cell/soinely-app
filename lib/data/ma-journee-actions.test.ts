@@ -5,9 +5,16 @@ const selectMock = vi.fn(() => ({ eq: () => ({ maybeSingle: eqSelectMock }) }));
 const eqUpdateMock = vi.fn();
 const updateMock = vi.fn(() => ({ eq: eqUpdateMock }));
 const fromMock = vi.fn(() => ({ select: selectMock, update: updateMock }));
+const getUserMock = vi.fn();
+const uploadMock = vi.fn();
+const storageFromMock = vi.fn(() => ({ upload: uploadMock }));
 
 vi.mock("@/lib/supabase/server", () => ({
-  createClient: () => ({ from: fromMock }),
+  createClient: () => ({
+    from: fromMock,
+    auth: { getUser: getUserMock },
+    storage: { from: storageFromMock },
+  }),
 }));
 
 vi.mock("next/cache", () => ({
@@ -258,6 +265,83 @@ describe("updateRappelAction", () => {
     formData.set("rappel", "Peu importe");
 
     await updateRappelAction(formData);
+
+    expect(updateMock).not.toHaveBeenCalled();
+    expect(revalidatePath).not.toHaveBeenCalled();
+  });
+});
+
+describe("uploadPhotoAction", () => {
+  it("envoie la photo, met à jour photo_path et invalide le cache", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
+    eqSelectMock.mockResolvedValue({ data: { id: "m1" }, error: null });
+    uploadMock.mockResolvedValue({ data: { path: "u1/m1.jpg" }, error: null });
+    eqUpdateMock.mockResolvedValue({ error: null });
+
+    const { uploadPhotoAction } = await import("./ma-journee-actions");
+    const { revalidatePath } = await import("next/cache");
+
+    const photo = new File(["contenu"], "plaie.jpg", { type: "image/jpeg" });
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("photo", photo);
+
+    await uploadPhotoAction(formData);
+
+    expect(storageFromMock).toHaveBeenCalledWith("photos-visites");
+    expect(uploadMock).toHaveBeenCalledWith("u1/m1.jpg", photo, { upsert: true, contentType: "image/jpeg" });
+    expect(updateMock).toHaveBeenCalledWith({ photo_path: "u1/m1.jpg" });
+    expect(eqUpdateMock).toHaveBeenCalledWith("id", "m1");
+    expect(revalidatePath).toHaveBeenCalledWith("/ma-journee/m1");
+  });
+
+  it("ne fait rien si aucun fichier n'est fourni", async () => {
+    const { uploadPhotoAction } = await import("./ma-journee-actions");
+    const { revalidatePath } = await import("next/cache");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+
+    await uploadPhotoAction(formData);
+
+    expect(uploadMock).not.toHaveBeenCalled();
+    expect(updateMock).not.toHaveBeenCalled();
+    expect(revalidatePath).not.toHaveBeenCalled();
+  });
+
+  it("ne fait rien si la mission n'existe pas", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
+    eqSelectMock.mockResolvedValue({ data: null, error: null });
+
+    const { uploadPhotoAction } = await import("./ma-journee-actions");
+    const { revalidatePath } = await import("next/cache");
+
+    const photo = new File(["contenu"], "plaie.jpg", { type: "image/jpeg" });
+    const formData = new FormData();
+    formData.set("missionId", "inconnue");
+    formData.set("photo", photo);
+
+    await uploadPhotoAction(formData);
+
+    expect(uploadMock).not.toHaveBeenCalled();
+    expect(updateMock).not.toHaveBeenCalled();
+    expect(revalidatePath).not.toHaveBeenCalled();
+  });
+
+  it("ne met rien à jour si l'envoi Storage échoue", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
+    eqSelectMock.mockResolvedValue({ data: { id: "m1" }, error: null });
+    uploadMock.mockResolvedValue({ data: null, error: { message: "boom" } });
+
+    const { uploadPhotoAction } = await import("./ma-journee-actions");
+    const { revalidatePath } = await import("next/cache");
+
+    const photo = new File(["contenu"], "plaie.jpg", { type: "image/jpeg" });
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("photo", photo);
+
+    await uploadPhotoAction(formData);
 
     expect(updateMock).not.toHaveBeenCalled();
     expect(revalidatePath).not.toHaveBeenCalled();
