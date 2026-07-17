@@ -73,3 +73,22 @@ export async function updateTransmissionAction(formData: FormData): Promise<void
 
   revalidatePath(`/ma-journee/${missionId}`);
 }
+
+export async function updateRappelAction(formData: FormData): Promise<void> {
+  const missionId = String(formData.get("missionId"));
+  const rappel = String(formData.get("rappel"));
+
+  const supabase = await createClient();
+
+  const { data: mission } = await supabase
+    .from("missions_du_jour")
+    .select("id")
+    .eq("id", missionId)
+    .maybeSingle();
+
+  if (!mission) return;
+
+  await supabase.from("missions_du_jour").update({ rappel }).eq("id", missionId);
+
+  revalidatePath(`/ma-journee/${missionId}`);
+}

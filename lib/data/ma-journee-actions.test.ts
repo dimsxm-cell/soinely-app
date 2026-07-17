@@ -227,3 +227,39 @@ describe("updateTransmissionAction", () => {
     expect(revalidatePath).not.toHaveBeenCalled();
   });
 });
+
+describe("updateRappelAction", () => {
+  it("met à jour le rappel de la mission et invalide le cache", async () => {
+    eqSelectMock.mockResolvedValue({ data: { id: "m1" }, error: null });
+    eqUpdateMock.mockResolvedValue({ error: null });
+
+    const { updateRappelAction } = await import("./ma-journee-actions");
+    const { revalidatePath } = await import("next/cache");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("rappel", "Vérifier la cicatrisation dans 3 jours.");
+
+    await updateRappelAction(formData);
+
+    expect(updateMock).toHaveBeenCalledWith({ rappel: "Vérifier la cicatrisation dans 3 jours." });
+    expect(eqUpdateMock).toHaveBeenCalledWith("id", "m1");
+    expect(revalidatePath).toHaveBeenCalledWith("/ma-journee/m1");
+  });
+
+  it("ne fait rien si la mission n'existe pas", async () => {
+    eqSelectMock.mockResolvedValue({ data: null, error: null });
+
+    const { updateRappelAction } = await import("./ma-journee-actions");
+    const { revalidatePath } = await import("next/cache");
+
+    const formData = new FormData();
+    formData.set("missionId", "inconnue");
+    formData.set("rappel", "Peu importe");
+
+    await updateRappelAction(formData);
+
+    expect(updateMock).not.toHaveBeenCalled();
+    expect(revalidatePath).not.toHaveBeenCalled();
+  });
+});
