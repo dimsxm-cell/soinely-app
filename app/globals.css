@@ -8,6 +8,7 @@
   --color-warning: #F59E0B;
   --color-danger: #EF4444;
   --radius-card: 16px;
+  --font-display: Charter, "Iowan Old Style", Georgia, "Times New Roman", serif;
 }
 
 :root {
