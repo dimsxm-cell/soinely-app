@@ -58,6 +58,8 @@ export interface MissionDetail extends MissionDuJour {
   derniereTransmission: string | null;
   rappel: string | null;
   dernierRappel: string | null;
+  photoPath: string | null;
+  dernierePhotoPath: string | null;
   prochaineMission: ProchaineMission | null;
 }
 

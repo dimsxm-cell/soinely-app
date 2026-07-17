@@ -166,6 +166,7 @@ describe("getMissionDetail", () => {
     missionRow: unknown,
     candidatsTransmission: unknown[],
     candidatsRappel: unknown[] = [],
+    candidatsPhoto: unknown[] = [],
     prochaineRows: unknown[] = []
   ) {
     return {
@@ -196,6 +197,15 @@ describe("getMissionDetail", () => {
               }),
             };
           }
+          if (colonnes.includes("photo_path")) {
+            return {
+              eq: () => ({
+                neq: () => ({
+                  not: () => Promise.resolve({ data: candidatsPhoto, error: null }),
+                }),
+              }),
+            };
+          }
           return {
             eq: () => ({
               eq: () => ({
@@ -220,6 +230,7 @@ describe("getMissionDetail", () => {
     mission_clinique_id: null,
     transmission: "Vu ce jour, tout va bien.",
     rappel: "Pense à vérifier la tension.",
+    photo_path: "u1/m1.jpg",
     patients: {
       id: "p1",
       nom_complet: "Mme Dupont",
@@ -231,7 +242,7 @@ describe("getMissionDetail", () => {
     },
   };
 
-  it("mappe la mission et le patient joint, avec la dernière transmission et le dernier rappel les plus récents", async () => {
+  it("mappe la mission et le patient joint, avec la dernière transmission, le dernier rappel et la dernière photo les plus récents", async () => {
     const fakeClient = fakeClientAvecCandidats(
       missionRow,
       [
@@ -241,6 +252,10 @@ describe("getMissionDetail", () => {
       [
         { rappel: "Ancien rappel, déjà traité.", heure_prevue: "09:00:00", tournees: { date: "2026-07-01" } },
         { rappel: "Vérifier la cicatrisation dans 3 jours.", heure_prevue: "10:00:00", tournees: { date: "2026-07-14" } },
+      ],
+      [
+        { photo_path: "u1/m0-ancienne.jpg", heure_prevue: "09:00:00", tournees: { date: "2026-07-01" } },
+        { photo_path: "u1/m0-recente.jpg", heure_prevue: "10:00:00", tournees: { date: "2026-07-14" } },
       ]
     );
 
@@ -259,6 +274,8 @@ describe("getMissionDetail", () => {
       derniereTransmission: "Pansement refait, rougeur à surveiller.",
       rappel: "Pense à vérifier la tension.",
       dernierRappel: "Vérifier la cicatrisation dans 3 jours.",
+      photoPath: "u1/m1.jpg",
+      dernierePhotoPath: "u1/m0-recente.jpg",
       prochaineMission: null,
       patient: {
         id: "p1",
@@ -290,6 +307,15 @@ describe("getMissionDetail", () => {
     expect(detail?.dernierRappel).toBeNull();
   });
 
+  it("retourne dernierePhotoPath à null si aucune visite précédente n'a de photo", async () => {
+    const fakeClient = fakeClientAvecCandidats(missionRow, [], [], []);
+
+    const { getMissionDetail } = await import("./ma-journee");
+    const detail = await getMissionDetail(fakeClient, "m1");
+
+    expect(detail?.dernierePhotoPath).toBeNull();
+  });
+
   it("retourne null si la mission n'existe pas", async () => {
     const fakeClient = {
       from: () => ({
@@ -312,6 +338,7 @@ describe("getMissionDetail", () => {
       { ...missionRow, statut: "terminee" },
       [],
       [],
+      [],
       [{ id: "m2", heure_prevue: "15:00:00", patients: { nom_complet: "M. Martin" } }]
     );
 
@@ -326,7 +353,7 @@ describe("getMissionDetail", () => {
   });
 
   it("retourne prochaineMission à null si aucune mission à faire ne reste dans la tournée, statut terminee", async () => {
-    const fakeClient = fakeClientAvecCandidats({ ...missionRow, statut: "terminee" }, [], [], []);
+    const fakeClient = fakeClientAvecCandidats({ ...missionRow, statut: "terminee" }, [], [], [], []);
 
     const { getMissionDetail } = await import("./ma-journee");
     const detail = await getMissionDetail(fakeClient, "m1");
@@ -337,6 +364,7 @@ describe("getMissionDetail", () => {
   it("retourne aussi la prochaine mission à faire quand le statut est absent, y compris avec un embed patients en tableau", async () => {
     const fakeClient = fakeClientAvecCandidats(
       { ...missionRow, statut: "absent" },
+      [],
       [],
       [],
       [{ id: "m3", heure_prevue: "16:00:00", patients: [{ nom_complet: "Mme Bernard" }] }]
@@ -350,6 +378,39 @@ describe("getMissionDetail", () => {
       patientNom: "Mme Bernard",
       heurePrevue: "16:00:00",
     });
+  });
+});
+
+describe("getPhotoUrl", () => {
+  it("retourne l'URL signée si Supabase Storage répond sans erreur", async () => {
+    const fakeClient = {
+      storage: {
+        from: () => ({
+          createSignedUrl: () =>
+            Promise.resolve({ data: { signedUrl: "https://example.supabase.co/signed/u1/m1.jpg" }, error: null }),
+        }),
+      },
+    } as unknown as SupabaseClient;
+
+    const { getPhotoUrl } = await import("./ma-journee");
+    const url = await getPhotoUrl(fakeClient, "u1/m1.jpg");
+
+    expect(url).toBe("https://example.supabase.co/signed/u1/m1.jpg");
+  });
+
+  it("retourne null si Supabase Storage renvoie une erreur", async () => {
+    const fakeClient = {
+      storage: {
+        from: () => ({
+          createSignedUrl: () => Promise.resolve({ data: null, error: { message: "not found" } }),
+        }),
+      },
+    } as unknown as SupabaseClient;
+
+    const { getPhotoUrl } = await import("./ma-journee");
+    const url = await getPhotoUrl(fakeClient, "u1/inconnue.jpg");
+
+    expect(url).toBeNull();
   });
 });
 
