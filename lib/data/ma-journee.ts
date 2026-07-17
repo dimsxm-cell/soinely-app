@@ -92,6 +92,34 @@ async function getDerniereTransmission(
   return avecDate[0].transmission;
 }
 
+async function getDernierRappel(
+  supabase: SupabaseClient<Database>,
+  patientId: string,
+  missionIdActuelle: string
+): Promise<string | null> {
+  const { data } = await supabase
+    .from("missions_du_jour")
+    .select("rappel, heure_prevue, tournees(date)")
+    .eq("patient_id", patientId)
+    .neq("id", missionIdActuelle)
+    .not("rappel", "is", null);
+
+  if (!data || data.length === 0) return null;
+
+  type CandidatRow = { rappel: string | null; heure_prevue: string; tournees: unknown };
+  const avecDate = (data as CandidatRow[]).map((row) => {
+    const tourneeEmbed = row.tournees;
+    const tournee = Array.isArray(tourneeEmbed)
+      ? (tourneeEmbed[0] as { date: string } | undefined)
+      : (tourneeEmbed as { date: string } | null);
+    return { rappel: row.rappel, dateHeure: `${tournee?.date ?? ""}T${row.heure_prevue}` };
+  });
+
+  avecDate.sort((a, b) => b.dateHeure.localeCompare(a.dateHeure));
+
+  return avecDate[0].rappel;
+}
+
 async function getProchaineMission(
   supabase: SupabaseClient<Database>,
   tourneeId: string
@@ -126,7 +154,7 @@ export async function getMissionDetail(
   const { data, error } = await supabase
     .from("missions_du_jour")
     .select(
-      "id, patient_id, tournee_id, type_soin, heure_prevue, statut, mission_clinique_id, transmission, patients(id, nom_complet, adresse, telephone, allergies, consignes, date_naissance)"
+      "id, patient_id, tournee_id, type_soin, heure_prevue, statut, mission_clinique_id, transmission, rappel, patients(id, nom_complet, adresse, telephone, allergies, consignes, date_naissance)"
     )
     .eq("id", missionId)
     .maybeSingle();
@@ -148,6 +176,7 @@ export async function getMissionDetail(
     : (patientEmbed as PatientRow);
 
   const derniereTransmission = await getDerniereTransmission(supabase, data.patient_id, missionId);
+  const dernierRappel = await getDernierRappel(supabase, data.patient_id, missionId);
 
   const statut = data.statut as StatutMission;
   const prochaineMission =
@@ -165,6 +194,8 @@ export async function getMissionDetail(
     missionCliniqueId: data.mission_clinique_id,
     transmission: data.transmission,
     derniereTransmission,
+    rappel: data.rappel,
+    dernierRappel,
     prochaineMission,
     patient: {
       id: patientRow.id,
