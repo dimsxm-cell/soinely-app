@@ -92,7 +92,7 @@ export async function createSoinPrescritAction(formData: FormData): Promise<void
   const dateDebut = String(formData.get("dateDebut") ?? "");
   const dateFin = champTexteOuNull(formData, "dateFin");
 
-  const heuresValides = heuresBrut.length > 0 && heuresBrut.every((h) => /^\d{2}:\d{2}$/.test(h));
+  const heuresValides = heuresBrut.length > 0 && heuresBrut.every((h) => /^([01]\d|2[0-3]):[0-5]\d$/.test(h));
 
   if (!patientId || !typeSoin || !frequenceType || !dateDebut || !heuresValides) return;
   if (dateFin && dateFin < dateDebut) return;
@@ -116,7 +116,7 @@ export async function createSoinPrescritAction(formData: FormData): Promise<void
 
   if (!user) return;
 
-  await supabase
+  const { error } = await supabase
     .from("soins_prescrits")
     .insert({
       patient_id: patientId,
@@ -131,6 +131,8 @@ export async function createSoinPrescritAction(formData: FormData): Promise<void
     })
     .select("id")
     .single();
+
+  if (error) return;
 
   revalidatePath(`/patients/${patientId}`);
 }

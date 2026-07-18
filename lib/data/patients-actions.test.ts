@@ -288,6 +288,43 @@ describe("createSoinPrescritAction", () => {
 
     expect(insertMock).not.toHaveBeenCalled();
   });
+
+  it("rejette une heure hors plage (99:99)", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } } });
+
+    const { createSoinPrescritAction } = await import("./patients-actions");
+
+    const formData = new FormData();
+    formData.set("patientId", "p1");
+    formData.set("typeSoin", "Pansement");
+    formData.set("frequenceType", "quotidien");
+    formData.set("heures", "99:99");
+    formData.set("dateDebut", "2026-07-15");
+
+    await createSoinPrescritAction(formData);
+
+    expect(insertMock).not.toHaveBeenCalled();
+  });
+
+  it("ne revalide pas le cache si l'insertion échoue", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } } });
+    singleInsertMock.mockResolvedValue({ data: null, error: { message: "boom" } });
+
+    const { createSoinPrescritAction } = await import("./patients-actions");
+    const { revalidatePath } = await import("next/cache");
+
+    const formData = new FormData();
+    formData.set("patientId", "p1");
+    formData.set("typeSoin", "Pansement");
+    formData.set("frequenceType", "quotidien");
+    formData.set("heures", "10:00");
+    formData.set("dateDebut", "2026-07-15");
+
+    await createSoinPrescritAction(formData);
+
+    expect(insertMock).toHaveBeenCalled();
+    expect(revalidatePath).not.toHaveBeenCalled();
+  });
 });
 
 describe("arreterSoinPrescritAction", () => {
