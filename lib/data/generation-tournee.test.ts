@@ -116,17 +116,26 @@ describe("genererTourneeDuJour", () => {
       }),
     }));
     const missionsInsertMock = vi.fn().mockResolvedValue({ error: null });
+    const tourneeDeleteEqMock = vi.fn().mockResolvedValue({ error: null });
+    const tourneeDeleteMock = vi.fn(() => ({ eq: tourneeDeleteEqMock }));
 
     const fromMock = vi.fn((table: string) => {
       if (table === "soins_prescrits") return { select: soinsSelectMock };
-      if (table === "tournees") return { insert: tourneeInsertMock };
+      if (table === "tournees") return { insert: tourneeInsertMock, delete: tourneeDeleteMock };
       if (table === "missions_du_jour") return { insert: missionsInsertMock };
       throw new Error(`table inattendue : ${table}`);
     });
 
     const fakeClient = { from: fromMock } as unknown as SupabaseClient;
 
-    return { fakeClient, soinsEqIdelMock, soinsEqActifMock, tourneeInsertMock, missionsInsertMock };
+    return {
+      fakeClient,
+      soinsEqIdelMock,
+      soinsEqActifMock,
+      tourneeInsertMock,
+      missionsInsertMock,
+      tourneeDeleteEqMock,
+    };
   }
 
   it("filtre les soins par idel_id et par actif=true", async () => {
@@ -285,5 +294,45 @@ describe("genererTourneeDuJour", () => {
       temps_estime_min: 0,
     });
     expect(missionsInsertMock).not.toHaveBeenCalled();
+  });
+
+  it("n'insère aucune tournée si la lecture des soins échoue", async () => {
+    const soinsEqActifMock = vi.fn(() => Promise.resolve({ data: null, error: { message: "boom" } }));
+    const soinsEqIdelMock = vi.fn(() => ({ eq: soinsEqActifMock }));
+    const soinsSelectMock = vi.fn(() => ({ eq: soinsEqIdelMock }));
+    const tourneeInsertMock = vi.fn();
+    const fromMock = vi.fn((table: string) => {
+      if (table === "soins_prescrits") return { select: soinsSelectMock };
+      if (table === "tournees") return { insert: tourneeInsertMock };
+      throw new Error(`table inattendue : ${table}`);
+    });
+    const fakeClient = { from: fromMock } as unknown as SupabaseClient;
+
+    const { genererTourneeDuJour } = await import("./generation-tournee");
+    await genererTourneeDuJour(fakeClient, "u1", "2026-07-15");
+
+    expect(tourneeInsertMock).not.toHaveBeenCalled();
+  });
+
+  it("supprime la tournée si l'insertion des missions échoue", async () => {
+    const soins = [
+      {
+        patient_id: "p1",
+        type_soin: "Pansement",
+        frequence_type: "quotidien",
+        jours_semaine: null,
+        intervalle_jours: null,
+        heures: ["10:00:00"],
+        date_debut: "2026-07-01",
+        date_fin: null,
+      },
+    ];
+    const { fakeClient, missionsInsertMock, tourneeDeleteEqMock } = buildFakeClient(soins);
+    missionsInsertMock.mockResolvedValueOnce({ error: { message: "boom" } });
+
+    const { genererTourneeDuJour } = await import("./generation-tournee");
+    await genererTourneeDuJour(fakeClient, "u1", "2026-07-15");
+
+    expect(tourneeDeleteEqMock).toHaveBeenCalledWith("id", "t-nouvelle");
   });
 });

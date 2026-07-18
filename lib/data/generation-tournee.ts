@@ -55,11 +55,13 @@ export async function genererTourneeDuJour(
   idelId: string,
   date: string
 ): Promise<void> {
-  const { data: soins } = await supabase
+  const { data: soins, error: soinsError } = await supabase
     .from("soins_prescrits")
     .select("patient_id, type_soin, frequence_type, jours_semaine, intervalle_jours, heures, date_debut, date_fin")
     .eq("idel_id", idelId)
     .eq("actif", true);
+
+  if (soinsError) return;
 
   const missionsAGenerer: MissionAGenerer[] = [];
   const patientsDistincts = new Set<string>();
@@ -108,7 +110,7 @@ export async function genererTourneeDuJour(
   if (error || !tournee) return;
 
   if (missionsAGenerer.length > 0) {
-    await supabase.from("missions_du_jour").insert(
+    const { error: missionsError } = await supabase.from("missions_du_jour").insert(
       missionsAGenerer.map((mission) => ({
         tournee_id: tournee.id,
         patient_id: mission.patient_id,
@@ -117,5 +119,9 @@ export async function genererTourneeDuJour(
         statut: "a_faire",
       }))
     );
+
+    if (missionsError) {
+      await supabase.from("tournees").delete().eq("id", tournee.id);
+    }
   }
 }
