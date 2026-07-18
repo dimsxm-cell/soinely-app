@@ -1389,17 +1389,26 @@ describe("genererTourneeDuJour", () => {
       }),
     }));
     const missionsInsertMock = vi.fn().mockResolvedValue({ error: null });
+    const tourneeDeleteEqMock = vi.fn().mockResolvedValue({ error: null });
+    const tourneeDeleteMock = vi.fn(() => ({ eq: tourneeDeleteEqMock }));
 
     const fromMock = vi.fn((table: string) => {
       if (table === "soins_prescrits") return { select: soinsSelectMock };
-      if (table === "tournees") return { insert: tourneeInsertMock };
+      if (table === "tournees") return { insert: tourneeInsertMock, delete: tourneeDeleteMock };
       if (table === "missions_du_jour") return { insert: missionsInsertMock };
       throw new Error(`table inattendue : ${table}`);
     });
 
     const fakeClient = { from: fromMock } as unknown as SupabaseClient;
 
-    return { fakeClient, soinsEqIdelMock, soinsEqActifMock, tourneeInsertMock, missionsInsertMock };
+    return {
+      fakeClient,
+      soinsEqIdelMock,
+      soinsEqActifMock,
+      tourneeInsertMock,
+      missionsInsertMock,
+      tourneeDeleteEqMock,
+    };
   }
 
   it("filtre les soins par idel_id et par actif=true", async () => {
@@ -1559,6 +1568,46 @@ describe("genererTourneeDuJour", () => {
     });
     expect(missionsInsertMock).not.toHaveBeenCalled();
   });
+
+  it("n'insère aucune tournée si la lecture des soins échoue", async () => {
+    const soinsEqActifMock = vi.fn(() => Promise.resolve({ data: null, error: { message: "boom" } }));
+    const soinsEqIdelMock = vi.fn(() => ({ eq: soinsEqActifMock }));
+    const soinsSelectMock = vi.fn(() => ({ eq: soinsEqIdelMock }));
+    const tourneeInsertMock = vi.fn();
+    const fromMock = vi.fn((table: string) => {
+      if (table === "soins_prescrits") return { select: soinsSelectMock };
+      if (table === "tournees") return { insert: tourneeInsertMock };
+      throw new Error(`table inattendue : ${table}`);
+    });
+    const fakeClient = { from: fromMock } as unknown as SupabaseClient;
+
+    const { genererTourneeDuJour } = await import("./generation-tournee");
+    await genererTourneeDuJour(fakeClient, "u1", "2026-07-15");
+
+    expect(tourneeInsertMock).not.toHaveBeenCalled();
+  });
+
+  it("supprime la tournée si l'insertion des missions échoue", async () => {
+    const soins = [
+      {
+        patient_id: "p1",
+        type_soin: "Pansement",
+        frequence_type: "quotidien",
+        jours_semaine: null,
+        intervalle_jours: null,
+        heures: ["10:00:00"],
+        date_debut: "2026-07-01",
+        date_fin: null,
+      },
+    ];
+    const { fakeClient, missionsInsertMock, tourneeDeleteEqMock } = buildFakeClient(soins);
+    missionsInsertMock.mockResolvedValueOnce({ error: { message: "boom" } });
+
+    const { genererTourneeDuJour } = await import("./generation-tournee");
+    await genererTourneeDuJour(fakeClient, "u1", "2026-07-15");
+
+    expect(tourneeDeleteEqMock).toHaveBeenCalledWith("id", "t-nouvelle");
+  });
 });
 ```
 
@@ -1596,11 +1645,13 @@ export async function genererTourneeDuJour(
   idelId: string,
   date: string
 ): Promise<void> {
-  const { data: soins } = await supabase
+  const { data: soins, error: soinsError } = await supabase
     .from("soins_prescrits")
     .select("patient_id, type_soin, frequence_type, jours_semaine, intervalle_jours, heures, date_debut, date_fin")
     .eq("idel_id", idelId)
     .eq("actif", true);
+
+  if (soinsError) return;
 
   const missionsAGenerer: MissionAGenerer[] = [];
   const patientsDistincts = new Set<string>();
@@ -1649,7 +1700,7 @@ export async function genererTourneeDuJour(
   if (error || !tournee) return;
 
   if (missionsAGenerer.length > 0) {
-    await supabase.from("missions_du_jour").insert(
+    const { error: missionsError } = await supabase.from("missions_du_jour").insert(
       missionsAGenerer.map((mission) => ({
         tournee_id: tournee.id,
         patient_id: mission.patient_id,
@@ -1658,6 +1709,10 @@ export async function genererTourneeDuJour(
         statut: "a_faire",
       }))
     );
+
+    if (missionsError) {
+      await supabase.from("tournees").delete().eq("id", tournee.id);
+    }
   }
 }
 ```
@@ -1665,7 +1720,7 @@ export async function genererTourneeDuJour(
 - [ ] **Step 4: Run pour confirmer le succès**
 
 Run: `npx vitest run lib/data/generation-tournee.test.ts`
-Expected: PASS (14 tests)
+Expected: PASS (16 tests)
 
 - [ ] **Step 5: Commit**
 
