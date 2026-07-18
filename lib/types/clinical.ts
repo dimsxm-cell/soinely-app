@@ -36,6 +36,30 @@ export interface Patient {
   dateNaissance: string | null;
 }
 
+export interface PatientComplet extends Patient {
+  medecinNom: string | null;
+  medecinTelephone: string | null;
+  contactUrgenceNom: string | null;
+  contactUrgenceTelephone: string | null;
+  antecedents: string | null;
+  traitementsEnCours: string | null;
+}
+
+export type FrequenceSoin = "jours_semaine" | "tous_les_x_jours" | "quotidien" | "ponctuel";
+
+export interface SoinPrescrit {
+  id: string;
+  patientId: string;
+  typeSoin: string;
+  frequenceType: FrequenceSoin;
+  joursSemaine: number[] | null;
+  intervalleJours: number | null;
+  heures: string[];
+  dateDebut: string;
+  dateFin: string | null;
+  actif: boolean;
+}
+
 export interface ProchaineMission {
   id: string;
   patientNom: string;
