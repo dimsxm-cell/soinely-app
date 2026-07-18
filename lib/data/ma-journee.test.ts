@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+vi.mock("./generation-tournee", () => ({
+  genererTourneeDuJour: vi.fn().mockResolvedValue(undefined),
+}));
+
 describe("getTourneeDuJour", () => {
   it("mappe les colonnes snake_case Supabase vers le type Tournee", async () => {
     const fakeClient = {
@@ -30,6 +34,8 @@ describe("getTourneeDuJour", () => {
     const { getTourneeDuJour } = await import("./ma-journee");
     const tournee = await getTourneeDuJour(fakeClient, "user-1");
 
+    const { genererTourneeDuJour } = await import("./generation-tournee");
+    expect(genererTourneeDuJour).not.toHaveBeenCalled();
     expect(tournee).toEqual({
       id: "t1",
       date: "2026-07-13",
@@ -38,6 +44,53 @@ describe("getTourneeDuJour", () => {
       nbPansements: 8,
       nbGlycemies: 6,
       tempsEstimeMin: 435,
+    });
+  });
+
+  it("génère la tournée du jour si elle n'existe pas encore, puis la relit", async () => {
+    const maybeSingleMock = vi
+      .fn()
+      .mockResolvedValueOnce({ data: null, error: null })
+      .mockResolvedValueOnce({
+        data: {
+          id: "t-nouvelle",
+          date: "2026-07-15",
+          nb_patients: 1,
+          nb_injections: 0,
+          nb_pansements: 1,
+          nb_glycemies: 0,
+          temps_estime_min: 20,
+        },
+        error: null,
+      });
+
+    const fakeClient = {
+      from: () => ({
+        select: () => ({
+          eq: () => ({
+            eq: () => ({
+              maybeSingle: maybeSingleMock,
+            }),
+          }),
+        }),
+      }),
+    } as unknown as SupabaseClient;
+
+    const { genererTourneeDuJour } = await import("./generation-tournee");
+    const { getTourneeDuJour } = await import("./ma-journee");
+
+    const tournee = await getTourneeDuJour(fakeClient, "user-1");
+
+    expect(genererTourneeDuJour).toHaveBeenCalledWith(fakeClient, "user-1", expect.any(String));
+    expect(maybeSingleMock).toHaveBeenCalledTimes(2);
+    expect(tournee).toEqual({
+      id: "t-nouvelle",
+      date: "2026-07-15",
+      nbPatients: 1,
+      nbInjections: 0,
+      nbPansements: 1,
+      nbGlycemies: 0,
+      tempsEstimeMin: 20,
     });
   });
 });

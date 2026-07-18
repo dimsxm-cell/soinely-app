@@ -7,20 +7,20 @@ import type {
   StatutMission,
   Tournee,
 } from "@/lib/types/clinical";
+import { genererTourneeDuJour } from "@/lib/data/generation-tournee";
 
 const BUCKET_PHOTOS = "photos-visites";
 
-export async function getTourneeDuJour(
+async function lireTourneeDuJour(
   supabase: SupabaseClient<Database>,
-  idelId: string
+  idelId: string,
+  date: string
 ): Promise<Tournee | null> {
-  const today = new Date().toISOString().slice(0, 10);
-
   const { data, error } = await supabase
     .from("tournees")
     .select("id, date, nb_patients, nb_injections, nb_pansements, nb_glycemies, temps_estime_min")
     .eq("idel_id", idelId)
-    .eq("date", today)
+    .eq("date", date)
     .maybeSingle();
 
   if (error || !data) return null;
@@ -34,6 +34,20 @@ export async function getTourneeDuJour(
     nbGlycemies: data.nb_glycemies,
     tempsEstimeMin: data.temps_estime_min,
   };
+}
+
+export async function getTourneeDuJour(
+  supabase: SupabaseClient<Database>,
+  idelId: string
+): Promise<Tournee | null> {
+  const today = new Date().toISOString().slice(0, 10);
+
+  const tournee = await lireTourneeDuJour(supabase, idelId, today);
+  if (tournee) return tournee;
+
+  await genererTourneeDuJour(supabase, idelId, today);
+
+  return lireTourneeDuJour(supabase, idelId, today);
 }
 
 export async function getMissionsDuJour(
