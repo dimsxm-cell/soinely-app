@@ -1094,9 +1094,9 @@ import type { FrequenceSoin } from "@/lib/types/clinical";
 
 ```ts
 export async function createSoinPrescritAction(formData: FormData): Promise<void> {
-  const patientId = String(formData.get("patientId"));
-  const typeSoin = String(formData.get("typeSoin"));
-  const frequenceType = String(formData.get("frequenceType")) as FrequenceSoin;
+  const patientId = String(formData.get("patientId") ?? "");
+  const typeSoin = String(formData.get("typeSoin") ?? "");
+  const frequenceType = String(formData.get("frequenceType") ?? "") as FrequenceSoin;
   const heuresBrut = String(formData.get("heures") ?? "")
     .split(",")
     .map((h) => h.trim())
@@ -1106,7 +1106,7 @@ export async function createSoinPrescritAction(formData: FormData): Promise<void
 
   const heuresValides = heuresBrut.length > 0 && heuresBrut.every((h) => /^\d{2}:\d{2}$/.test(h));
 
-  if (!patientId || !typeSoin || !dateDebut || !heuresValides) return;
+  if (!patientId || !typeSoin || !frequenceType || !dateDebut || !heuresValides) return;
   if (dateFin && dateFin < dateDebut) return;
 
   let joursSemaine: number[] | null = null;
