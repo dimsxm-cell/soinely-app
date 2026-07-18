@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import type { FrequenceSoin } from "@/lib/types/clinical";
 
 function champTexteOuNull(formData: FormData, nom: string): string | null {
   const valeur = String(formData.get(nom) ?? "");
@@ -76,6 +77,71 @@ export async function updatePatientAction(formData: FormData): Promise<void> {
       traitements_en_cours: champTexteOuNull(formData, "traitementsEnCours"),
     })
     .eq("id", patientId);
+
+  revalidatePath(`/patients/${patientId}`);
+}
+
+export async function createSoinPrescritAction(formData: FormData): Promise<void> {
+  const patientId = String(formData.get("patientId") ?? "");
+  const typeSoin = String(formData.get("typeSoin") ?? "");
+  const frequenceType = String(formData.get("frequenceType") ?? "") as FrequenceSoin;
+  const heuresBrut = String(formData.get("heures") ?? "")
+    .split(",")
+    .map((h) => h.trim())
+    .filter(Boolean);
+  const dateDebut = String(formData.get("dateDebut") ?? "");
+  const dateFin = champTexteOuNull(formData, "dateFin");
+
+  const heuresValides = heuresBrut.length > 0 && heuresBrut.every((h) => /^\d{2}:\d{2}$/.test(h));
+
+  if (!patientId || !typeSoin || !frequenceType || !dateDebut || !heuresValides) return;
+  if (dateFin && dateFin < dateDebut) return;
+
+  let joursSemaine: number[] | null = null;
+  let intervalleJours: number | null = null;
+
+  if (frequenceType === "jours_semaine") {
+    joursSemaine = formData.getAll("joursSemaine").map(Number);
+    if (joursSemaine.length === 0) return;
+  } else if (frequenceType === "tous_les_x_jours") {
+    const valeur = Number(formData.get("intervalleJours"));
+    if (!valeur || valeur < 1) return;
+    intervalleJours = valeur;
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return;
+
+  await supabase
+    .from("soins_prescrits")
+    .insert({
+      patient_id: patientId,
+      idel_id: user.id,
+      type_soin: typeSoin,
+      frequence_type: frequenceType,
+      jours_semaine: joursSemaine,
+      intervalle_jours: intervalleJours,
+      heures: heuresBrut,
+      date_debut: dateDebut,
+      date_fin: dateFin,
+    })
+    .select("id")
+    .single();
+
+  revalidatePath(`/patients/${patientId}`);
+}
+
+export async function arreterSoinPrescritAction(formData: FormData): Promise<void> {
+  const soinId = String(formData.get("soinId"));
+  const patientId = String(formData.get("patientId"));
+
+  const supabase = await createClient();
+
+  await supabase.from("soins_prescrits").update({ actif: false }).eq("id", soinId);
 
   revalidatePath(`/patients/${patientId}`);
 }

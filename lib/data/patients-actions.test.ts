@@ -140,3 +140,172 @@ describe("updatePatientAction", () => {
     expect(updateMock).not.toHaveBeenCalled();
   });
 });
+
+describe("createSoinPrescritAction", () => {
+  it("crée un soin quotidien avec plusieurs heures", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } } });
+    singleInsertMock.mockResolvedValue({ data: { id: "s1" }, error: null });
+
+    const { createSoinPrescritAction } = await import("./patients-actions");
+    const { revalidatePath } = await import("next/cache");
+
+    const formData = new FormData();
+    formData.set("patientId", "p1");
+    formData.set("typeSoin", "Glycémie");
+    formData.set("frequenceType", "quotidien");
+    formData.set("heures", "07:00, 19:00");
+    formData.set("dateDebut", "2026-07-15");
+
+    await createSoinPrescritAction(formData);
+
+    expect(fromMock).toHaveBeenCalledWith("soins_prescrits");
+    expect(insertMock).toHaveBeenCalledWith({
+      patient_id: "p1",
+      idel_id: "u1",
+      type_soin: "Glycémie",
+      frequence_type: "quotidien",
+      jours_semaine: null,
+      intervalle_jours: null,
+      heures: ["07:00", "19:00"],
+      date_debut: "2026-07-15",
+      date_fin: null,
+    });
+    expect(revalidatePath).toHaveBeenCalledWith("/patients/p1");
+  });
+
+  it("crée un soin à jours de semaine précis avec les jours cochés", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } } });
+    singleInsertMock.mockResolvedValue({ data: { id: "s2" }, error: null });
+
+    const { createSoinPrescritAction } = await import("./patients-actions");
+
+    const formData = new FormData();
+    formData.set("patientId", "p1");
+    formData.set("typeSoin", "Pansement");
+    formData.set("frequenceType", "jours_semaine");
+    formData.append("joursSemaine", "1");
+    formData.append("joursSemaine", "3");
+    formData.append("joursSemaine", "5");
+    formData.set("heures", "10:00");
+    formData.set("dateDebut", "2026-07-15");
+
+    await createSoinPrescritAction(formData);
+
+    expect(insertMock).toHaveBeenCalledWith(
+      expect.objectContaining({ jours_semaine: [1, 3, 5], intervalle_jours: null })
+    );
+  });
+
+  it("crée un soin tous les X jours avec l'intervalle", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } } });
+    singleInsertMock.mockResolvedValue({ data: { id: "s3" }, error: null });
+
+    const { createSoinPrescritAction } = await import("./patients-actions");
+
+    const formData = new FormData();
+    formData.set("patientId", "p1");
+    formData.set("typeSoin", "Pansement");
+    formData.set("frequenceType", "tous_les_x_jours");
+    formData.set("intervalleJours", "2");
+    formData.set("heures", "10:00");
+    formData.set("dateDebut", "2026-07-15");
+
+    await createSoinPrescritAction(formData);
+
+    expect(insertMock).toHaveBeenCalledWith(
+      expect.objectContaining({ intervalle_jours: 2, jours_semaine: null })
+    );
+  });
+
+  it("crée un soin ponctuel", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } } });
+    singleInsertMock.mockResolvedValue({ data: { id: "s4" }, error: null });
+
+    const { createSoinPrescritAction } = await import("./patients-actions");
+
+    const formData = new FormData();
+    formData.set("patientId", "p1");
+    formData.set("typeSoin", "Prise de sang");
+    formData.set("frequenceType", "ponctuel");
+    formData.set("heures", "08:30");
+    formData.set("dateDebut", "2026-07-20");
+
+    await createSoinPrescritAction(formData);
+
+    expect(insertMock).toHaveBeenCalledWith(
+      expect.objectContaining({ frequence_type: "ponctuel", date_debut: "2026-07-20" })
+    );
+  });
+
+  it("rejette une date de fin antérieure à la date de début", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } } });
+
+    const { createSoinPrescritAction } = await import("./patients-actions");
+
+    const formData = new FormData();
+    formData.set("patientId", "p1");
+    formData.set("typeSoin", "Pansement");
+    formData.set("frequenceType", "quotidien");
+    formData.set("heures", "10:00");
+    formData.set("dateDebut", "2026-07-15");
+    formData.set("dateFin", "2026-07-01");
+
+    await createSoinPrescritAction(formData);
+
+    expect(insertMock).not.toHaveBeenCalled();
+  });
+
+  it("rejette un soin jours_semaine sans aucun jour coché", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } } });
+
+    const { createSoinPrescritAction } = await import("./patients-actions");
+
+    const formData = new FormData();
+    formData.set("patientId", "p1");
+    formData.set("typeSoin", "Pansement");
+    formData.set("frequenceType", "jours_semaine");
+    formData.set("heures", "10:00");
+    formData.set("dateDebut", "2026-07-15");
+
+    await createSoinPrescritAction(formData);
+
+    expect(insertMock).not.toHaveBeenCalled();
+  });
+
+  it("rejette un format d'heure invalide", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } } });
+
+    const { createSoinPrescritAction } = await import("./patients-actions");
+
+    const formData = new FormData();
+    formData.set("patientId", "p1");
+    formData.set("typeSoin", "Pansement");
+    formData.set("frequenceType", "quotidien");
+    formData.set("heures", "pas une heure");
+    formData.set("dateDebut", "2026-07-15");
+
+    await createSoinPrescritAction(formData);
+
+    expect(insertMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("arreterSoinPrescritAction", () => {
+  it("passe le soin à inactif et invalide le cache", async () => {
+    eqUpdateMock.mockResolvedValue({ error: null });
+
+    const { arreterSoinPrescritAction } = await import("./patients-actions");
+    const { revalidatePath } = await import("next/cache");
+
+    const formData = new FormData();
+    formData.set("soinId", "s1");
+    formData.set("patientId", "p1");
+
+    await arreterSoinPrescritAction(formData);
+
+    expect(fromMock).toHaveBeenCalledWith("soins_prescrits");
+    expect(updateMock).toHaveBeenCalledWith({ actif: false });
+    expect(eqUpdateMock).toHaveBeenCalledWith("id", "s1");
+    expect(revalidatePath).toHaveBeenCalledWith("/patients/p1");
+  });
+});
