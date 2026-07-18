@@ -31,6 +31,9 @@ export default async function MaJourneePage() {
         <Link href="/compte">
           <Button variant="secondary">Mon compte</Button>
         </Link>
+        <Link href="/patients">
+          <Button variant="secondary">Patients</Button>
+        </Link>
       </div>
       {tournee ? (
         <div className="grid grid-cols-2 gap-4">

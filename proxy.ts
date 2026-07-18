@@ -7,10 +7,10 @@ import { getAbonnement } from "@/lib/data/abonnement";
 // IDEL dont le paiement échoue doit toujours pouvoir atteindre son compte
 // pour le corriger (portail Stripe), sinon la garde d'abonnement
 // l'enfermerait hors de la seule page qui le lui permet.
-const AUTH_REQUIRED_PATHS = ["/ma-journee", "/recherche", "/situations", "/ely", "/compte"];
+const AUTH_REQUIRED_PATHS = ["/ma-journee", "/recherche", "/situations", "/ely", "/compte", "/patients"];
 
 // Routes nécessitant en plus un abonnement essai/actif.
-const SUBSCRIPTION_REQUIRED_PATHS = ["/ma-journee", "/recherche", "/situations", "/ely"];
+const SUBSCRIPTION_REQUIRED_PATHS = ["/ma-journee", "/recherche", "/situations", "/ely", "/patients"];
 
 export async function proxy(request: NextRequest) {
   const response = NextResponse.next({ request });
@@ -70,5 +70,6 @@ export const config = {
     "/situations/:path*",
     "/ely/:path*",
     "/compte/:path*",
+    "/patients/:path*",
   ],
 };
