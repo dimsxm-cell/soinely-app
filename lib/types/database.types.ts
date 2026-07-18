@@ -213,35 +213,53 @@ export type Database = {
         Row: {
           adresse: string
           allergies: string | null
+          antecedents: string | null
           consignes: string | null
+          contact_urgence_nom: string | null
+          contact_urgence_telephone: string | null
           created_at: string
           date_naissance: string | null
           id: string
           idel_id: string
+          medecin_nom: string | null
+          medecin_telephone: string | null
           nom_complet: string
           telephone: string
+          traitements_en_cours: string | null
         }
         Insert: {
           adresse: string
           allergies?: string | null
+          antecedents?: string | null
           consignes?: string | null
+          contact_urgence_nom?: string | null
+          contact_urgence_telephone?: string | null
           created_at?: string
           date_naissance?: string | null
           id?: string
           idel_id: string
+          medecin_nom?: string | null
+          medecin_telephone?: string | null
           nom_complet: string
           telephone: string
+          traitements_en_cours?: string | null
         }
         Update: {
           adresse?: string
           allergies?: string | null
+          antecedents?: string | null
           consignes?: string | null
+          contact_urgence_nom?: string | null
+          contact_urgence_telephone?: string | null
           created_at?: string
           date_naissance?: string | null
           id?: string
           idel_id?: string
+          medecin_nom?: string | null
+          medecin_telephone?: string | null
           nom_complet?: string
           telephone?: string
+          traitements_en_cours?: string | null
         }
         Relationships: [
           {
@@ -327,6 +345,66 @@ export type Database = {
           version?: number
         }
         Relationships: []
+      }
+      soins_prescrits: {
+        Row: {
+          actif: boolean
+          created_at: string
+          date_debut: string
+          date_fin: string | null
+          frequence_type: string
+          heures: string[]
+          id: string
+          idel_id: string
+          intervalle_jours: number | null
+          jours_semaine: number[] | null
+          patient_id: string
+          type_soin: string
+        }
+        Insert: {
+          actif?: boolean
+          created_at?: string
+          date_debut?: string
+          date_fin?: string | null
+          frequence_type: string
+          heures: string[]
+          id?: string
+          idel_id: string
+          intervalle_jours?: number | null
+          jours_semaine?: number[] | null
+          patient_id: string
+          type_soin: string
+        }
+        Update: {
+          actif?: boolean
+          created_at?: string
+          date_debut?: string
+          date_fin?: string | null
+          frequence_type?: string
+          heures?: string[]
+          id?: string
+          idel_id?: string
+          intervalle_jours?: number | null
+          jours_semaine?: number[] | null
+          patient_id?: string
+          type_soin?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "soins_prescrits_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "soins_prescrits_idel_id_fkey"
+            columns: ["idel_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tournees: {
         Row: {
