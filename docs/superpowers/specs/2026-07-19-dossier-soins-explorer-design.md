@@ -44,12 +44,19 @@ ici, traités dans des specs séparées.
   "conduite à tenir" ; les fiches d'échelle (Braden, EVA douleur...) et les
   fiches administratives ont une forme différente. Voir Alternatives
   écartées.
-- **Toutes les fiches sont publiées dès l'insertion** (`published = true`)
-  mais taguées `niveau_confiance = 'brouillon'` — visibles immédiatement dans
-  l'app pour que la fondatrice les valide elle-même (le badge
-  brouillon/relu/valide existe déjà dans l'UI des Situations Terrain). Elle
-  passera chaque fiche à `'valide'` (mise à jour SQL directe, comme pour le
-  contenu Situations Terrain existant) au fur et à mesure de sa relecture.
+- **Le contenu suit la convention déjà établie dans le projet** pour le
+  contenu clinique (voir `docs/contenu-clinique/2026-07-15-brouillons-lot-1.md`,
+  découvert en cours de route — non anticipé à l'écriture initiale de cette
+  section) : rédigé d'abord dans un document markdown brouillon
+  (`docs/contenu-clinique/`), explicitement marqué comme non validé, relu et
+  corrigé par la fondatrice fiche par fiche. **Rien n'est inséré en base tant
+  qu'une fiche n'a pas été validée explicitement.** Une fois une fiche
+  validée, elle est insérée avec `niveau_confiance = 'valide'` et
+  `published = true` directement (pas d'état intermédiaire "brouillon
+  publié" dans cette table, à la différence de ce qui avait été envisagé
+  initialement ici). Ce chantier livre l'écran et le document de brouillon ;
+  l'insertion en base du contenu validé est un suivi ultérieur, fiche par
+  fiche, hors scope de ce plan.
 - **Pas de PDF joint dans cette v1** : le contenu est retranscrit en texte
   structuré, pas de lien vers le PDF original (aucun stockage Supabase
   configuré pour ça aujourd'hui). Peut être ajouté plus tard comme complément
@@ -220,15 +227,15 @@ tout ce qui commence par `/situations`.
 
 ## Vérification manuelle
 
-Après la migration et l'insertion du contenu des 30 fiches, avec
-autorisation explicite de la fondatrice : ouvrir `/situations`, confirmer que
-la barre à deux onglets s'affiche et que "Situations Terrain" reste
-identique à avant ; cliquer sur "Dossier de soins", confirmer que les
-sections et fiches attendues apparaissent dans le bon ordre ; ouvrir une
-fiche de chaque forme de contenu (une CAT, une échelle comme Braden, une
-fiche administrative) et vérifier que les blocs s'affichent correctement ;
-confirmer que les deux sections vides (Allergies & alertes, Contacts utiles)
-n'apparaissent pas.
+Après la migration (avant tout contenu validé), avec autorisation explicite
+de la fondatrice : ouvrir `/situations`, confirmer que la barre à deux
+onglets s'affiche et que "Situations Terrain" reste identique à avant ;
+cliquer sur "Dossier de soins", confirmer le message "Aucune fiche
+disponible pour le moment." (aucun contenu encore validé/publié). Une fois
+qu'au moins une fiche de chaque forme de contenu aura été validée et insérée
+(suivi ultérieur, hors scope) : revérifier que les sections et fiches
+apparaissent dans le bon ordre, que les blocs s'affichent correctement, et
+que les sections sans fiche publiée n'apparaissent pas.
 
 ## Alternatives écartées
 
@@ -258,6 +265,10 @@ n'apparaissent pas.
 
 ## Hors scope (rappel)
 
+- Insertion en base du contenu clinique validé : ce chantier livre le
+  document brouillon dans `docs/contenu-clinique/` ; l'insertion
+  fiche par fiche se fait au fur et à mesure de la relecture de la
+  fondatrice, comme pour le contenu Situations Terrain existant.
 - Nom de l'infirmière dynamique affiché sur les fiches (chantier 2, spec
   séparée).
 - Personnalisation des couleurs (chantier 3, spec séparée).
