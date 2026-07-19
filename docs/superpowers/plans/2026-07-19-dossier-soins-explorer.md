@@ -549,26 +549,31 @@ git commit -m "feat: add CarteFicheDossier component"
 **Interfaces:**
 - Consumes: `OngletsExplorer` (Task 4).
 
+**Correction (2026-07-19, discovered during execution):** the plan originally
+modeled this page's "before" state on content read from the main checkout's
+*uncommitted* working tree (an unrelated, in-progress visual redesign
+touching many files — `app/globals.css`, several `Carte*` components, a
+`LienRetour` component, etc. — none of it committed). The task's isolated
+worktree correctly does not have any of that. The actual committed baseline
+(confirmed via `git show HEAD:"app/(app)/situations/page.tsx"`) is simpler.
+Steps below reflect the real committed file, verbatim.
+
 - [ ] **Step 1: Add the tab bar above the existing title**
 
 Change:
 
 ```tsx
-      <div className="mx-auto flex max-w-2xl flex-col gap-6 px-6 py-10 sm:py-14">
-        <h1 className="font-display text-[28px] font-medium leading-tight sm:text-[32px]">
-          Situations Terrain
-        </h1>
+    <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
+      <h1 className="text-2xl font-semibold text-navy">Situations Terrain</h1>
 ```
 
 to:
 
 ```tsx
-      <div className="mx-auto flex max-w-2xl flex-col gap-6 px-6 py-10 sm:py-14">
-        <OngletsExplorer actif="situations" />
+    <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
+      <OngletsExplorer actif="situations" />
 
-        <h1 className="font-display text-[28px] font-medium leading-tight sm:text-[32px]">
-          Situations Terrain
-        </h1>
+      <h1 className="text-2xl font-semibold text-navy">Situations Terrain</h1>
 ```
 
 And add the import at the top of the file:
@@ -590,24 +595,20 @@ export default async function SituationsPage() {
   const situations = await getAllSituationsTerrain(supabase);
 
   return (
-    <main className="min-h-screen bg-[#F6F7F5] text-navy">
-      <div className="mx-auto flex max-w-2xl flex-col gap-6 px-6 py-10 sm:py-14">
-        <OngletsExplorer actif="situations" />
+    <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
+      <OngletsExplorer actif="situations" />
 
-        <h1 className="font-display text-[28px] font-medium leading-tight sm:text-[32px]">
-          Situations Terrain
-        </h1>
+      <h1 className="text-2xl font-semibold text-navy">Situations Terrain</h1>
 
-        {situations.length > 0 ? (
-          <div className="flex flex-col gap-4">
-            {situations.map((situation) => (
-              <CarteSituationTerrain key={situation.id} situation={situation} />
-            ))}
-          </div>
-        ) : (
-          <p className="text-navy/60">Aucune situation disponible pour le moment.</p>
-        )}
-      </div>
+      {situations.length > 0 ? (
+        <div className="flex flex-col gap-4">
+          {situations.map((situation) => (
+            <CarteSituationTerrain key={situation.id} situation={situation} />
+          ))}
+        </div>
+      ) : (
+        <p className="text-navy/60">Aucune situation disponible pour le moment.</p>
+      )}
     </main>
   );
 }
@@ -635,6 +636,12 @@ git commit -m "feat: add Explorer tab bar to Situations Terrain page"
 **Interfaces:**
 - Consumes: `createClient` (`lib/supabase/server`), `getAllFichesDossierSoins`, `SECTIONS_DOSSIER_SOINS` (Task 3), `CarteFicheDossier` (Task 5), `OngletsExplorer` (Task 4).
 
+**Correction (2026-07-19):** matches the corrected Task 6 baseline — see
+that task's correction note. Uses the same `<main className="mx-auto flex
+max-w-2xl flex-col gap-6 p-6">` / `text-2xl font-semibold` style as the
+actual committed `/situations` page, not the uncommitted redesign styling
+originally drafted here.
+
 - [ ] **Step 1: Write the page**
 
 ```tsx
@@ -653,29 +660,25 @@ export default async function DossierSoinsPage() {
   })).filter((section) => section.fiches.length > 0);
 
   return (
-    <main className="min-h-screen bg-[#F6F7F5] text-navy">
-      <div className="mx-auto flex max-w-2xl flex-col gap-6 px-6 py-10 sm:py-14">
-        <OngletsExplorer actif="dossier" />
+    <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
+      <OngletsExplorer actif="dossier" />
 
-        <h1 className="font-display text-[28px] font-medium leading-tight sm:text-[32px]">
-          Dossier de soins
-        </h1>
+      <h1 className="text-2xl font-semibold text-navy">Dossier de soins</h1>
 
-        {sectionsAvecFiches.length > 0 ? (
-          <div className="flex flex-col gap-8">
-            {sectionsAvecFiches.map((section) => (
-              <div key={section.valeur} className="flex flex-col gap-4">
-                <h2 className="text-lg font-semibold text-navy">{section.label}</h2>
-                {section.fiches.map((fiche) => (
-                  <CarteFicheDossier key={fiche.id} fiche={fiche} />
-                ))}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-navy/60">Aucune fiche disponible pour le moment.</p>
-        )}
-      </div>
+      {sectionsAvecFiches.length > 0 ? (
+        <div className="flex flex-col gap-8">
+          {sectionsAvecFiches.map((section) => (
+            <div key={section.valeur} className="flex flex-col gap-4">
+              <h2 className="text-lg font-semibold text-navy">{section.label}</h2>
+              {section.fiches.map((fiche) => (
+                <CarteFicheDossier key={fiche.id} fiche={fiche} />
+              ))}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-navy/60">Aucune fiche disponible pour le moment.</p>
+      )}
     </main>
   );
 }
@@ -701,15 +704,23 @@ git commit -m "feat: add /situations/dossier list page"
 - Create: `app/(app)/situations/dossier/[id]/page.tsx`
 
 **Interfaces:**
-- Consumes: `createClient`, `getFicheDossierDetail` (Task 3), `LienRetour` (existing component, already used by `/situations/[id]`), `notFound` from `next/navigation`.
+- Consumes: `createClient`, `getFicheDossierDetail` (Task 3), `Link` from `next/link`, `notFound` from `next/navigation`.
+
+**Correction (2026-07-19):** matches the corrected Task 6/7 baseline. The
+original draft referenced a `LienRetour` component — that component does
+not exist in this worktree (part of the same uncommitted, unrelated
+redesign noted in Task 6's correction). The actual committed
+`/situations/[id]/page.tsx` (confirmed via `git show`) uses a plain
+`next/link` `<Link>` for its back-link, styled `text-primary
+hover:underline` — use that same pattern here instead.
 
 - [ ] **Step 1: Write the page**
 
 ```tsx
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getFicheDossierDetail } from "@/lib/data/dossierSoins";
-import { LienRetour } from "@/components/ui/LienRetour";
 
 export default async function FicheDossierDetailPage({
   params,
@@ -723,40 +734,38 @@ export default async function FicheDossierDetailPage({
   if (!fiche) notFound();
 
   return (
-    <main className="min-h-screen bg-[#F6F7F5] text-navy">
-      <div className="mx-auto flex max-w-2xl flex-col gap-6 px-6 py-10 sm:py-14">
-        <LienRetour href="/situations/dossier" label="Dossier de soins" />
+    <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
+      <Link href="/situations/dossier" className="text-primary hover:underline">
+        ← Retour au dossier de soins
+      </Link>
 
-        <span className="w-fit rounded-full bg-navy/10 px-4 py-2 text-sm text-navy">
-          {fiche.niveauConfiance}
-        </span>
+      <span className="w-fit rounded-full bg-navy/10 px-4 py-2 text-sm text-navy">
+        {fiche.niveauConfiance}
+      </span>
 
-        <h1 className="font-display text-[28px] font-medium leading-tight sm:text-[32px]">
-          {fiche.titre}
-        </h1>
+      <h1 className="text-2xl font-semibold text-navy">{fiche.titre}</h1>
 
-        <p className="text-navy/80">{fiche.resume}</p>
+      <p className="text-navy/80">{fiche.resume}</p>
 
-        {fiche.contenu.map((bloc) => (
-          <section key={bloc.titre}>
-            <h2 className="text-lg font-semibold text-navy">{bloc.titre}</h2>
-            <ul className="mt-2 list-disc pl-6 text-navy/80">
-              {bloc.items.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </section>
-        ))}
-
-        <section>
-          <h2 className="text-lg font-semibold text-navy">Sources</h2>
+      {fiche.contenu.map((bloc) => (
+        <section key={bloc.titre}>
+          <h2 className="text-lg font-semibold text-navy">{bloc.titre}</h2>
           <ul className="mt-2 list-disc pl-6 text-navy/80">
-            {fiche.sources.map((source) => (
-              <li key={source}>{source}</li>
+            {bloc.items.map((item) => (
+              <li key={item}>{item}</li>
             ))}
           </ul>
         </section>
-      </div>
+      ))}
+
+      <section>
+        <h2 className="text-lg font-semibold text-navy">Sources</h2>
+        <ul className="mt-2 list-disc pl-6 text-navy/80">
+          {fiche.sources.map((source) => (
+            <li key={source}>{source}</li>
+          ))}
+        </ul>
+      </section>
     </main>
   );
 }
