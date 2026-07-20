@@ -20,7 +20,7 @@ export function OngletsExplorer({ actif }: OngletsExplorerProps) {
             href={onglet.href}
             aria-current={estActif ? "page" : undefined}
             className={`-mb-px border-b-2 pb-3 text-sm font-medium transition-colors ${
-              estActif ? "border-brand-violet text-brand-violet" : "border-transparent text-navy/50"
+              estActif ? "border-primary text-primary" : "border-transparent text-navy/50"
             }`}
           >
             {onglet.label}
