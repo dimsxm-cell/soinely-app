@@ -424,7 +424,7 @@ export function OngletsExplorer({ actif }: OngletsExplorerProps) {
             href={onglet.href}
             aria-current={estActif ? "page" : undefined}
             className={`-mb-px border-b-2 pb-3 text-sm font-medium transition-colors ${
-              estActif ? "border-brand-violet text-brand-violet" : "border-transparent text-navy/50"
+              estActif ? "border-primary text-primary" : "border-transparent text-navy/50"
             }`}
           >
             {onglet.label}
@@ -515,7 +515,7 @@ export function CarteFicheDossier({ fiche }: CarteFicheDossierProps) {
   return (
     <Link
       href={`/situations/dossier/${fiche.id}`}
-      className="block rounded-card border border-navy/10 bg-white p-6 transition-colors hover:border-brand-violet"
+      className="block rounded-card border border-navy/10 bg-white p-6 transition-colors hover:border-primary"
     >
       <span className="rounded-full bg-navy/10 px-4 py-2 text-sm text-navy">
         {fiche.niveauConfiance}
