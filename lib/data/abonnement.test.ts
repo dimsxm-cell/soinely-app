@@ -1,6 +1,42 @@
 import { describe, expect, it, vi } from "vitest";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+describe("estDansEssaiGratuit", () => {
+  it("retourne true si le compte a été créé il y a moins de 15 jours", async () => {
+    const { estDansEssaiGratuit } = await import("./abonnement");
+
+    const ilYA5Jours = new Date(Date.now() - 5 * 86_400_000).toISOString();
+
+    expect(estDansEssaiGratuit(ilYA5Jours)).toBe(true);
+  });
+
+  it("retourne false si le compte a été créé il y a plus de 15 jours", async () => {
+    const { estDansEssaiGratuit } = await import("./abonnement");
+
+    const ilYA20Jours = new Date(Date.now() - 20 * 86_400_000).toISOString();
+
+    expect(estDansEssaiGratuit(ilYA20Jours)).toBe(false);
+  });
+});
+
+describe("getJoursRestantsEssaiGratuit", () => {
+  it("calcule les jours restants avant la fin de l'essai gratuit", async () => {
+    const { getJoursRestantsEssaiGratuit } = await import("./abonnement");
+
+    const ilYA5Jours = new Date(Date.now() - 5 * 86_400_000).toISOString();
+
+    expect(getJoursRestantsEssaiGratuit(ilYA5Jours)).toBe(10);
+  });
+
+  it("ne descend jamais en dessous de 0", async () => {
+    const { getJoursRestantsEssaiGratuit } = await import("./abonnement");
+
+    const ilYA30Jours = new Date(Date.now() - 30 * 86_400_000).toISOString();
+
+    expect(getJoursRestantsEssaiGratuit(ilYA30Jours)).toBe(0);
+  });
+});
+
 describe("getAbonnement", () => {
   it("retourne l'abonnement du profil s'il existe", async () => {
     const fakeClient = {

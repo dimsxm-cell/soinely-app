@@ -13,25 +13,29 @@ export default async function DossierSoinsPage() {
   })).filter((section) => section.fiches.length > 0);
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
-      <OngletsExplorer actif="dossier" />
+    <main className="min-h-screen bg-[#F6F7F5] text-navy">
+      <div className="mx-auto flex max-w-2xl flex-col gap-6 px-6 py-10 sm:py-14">
+        <OngletsExplorer actif="dossier" />
 
-      <h1 className="text-2xl font-semibold text-navy">Dossier de soins</h1>
+        <h1 className="font-display text-[28px] font-medium leading-tight sm:text-[32px]">
+          Dossier de soins
+        </h1>
 
-      {sectionsAvecFiches.length > 0 ? (
-        <div className="flex flex-col gap-8">
-          {sectionsAvecFiches.map((section) => (
-            <div key={section.valeur} className="flex flex-col gap-4">
-              <h2 className="text-lg font-semibold text-navy">{section.label}</h2>
-              {section.fiches.map((fiche) => (
-                <CarteFicheDossier key={fiche.id} fiche={fiche} />
-              ))}
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="text-navy/60">Aucune fiche disponible pour le moment.</p>
-      )}
+        {sectionsAvecFiches.length > 0 ? (
+          <div className="flex flex-col gap-8">
+            {sectionsAvecFiches.map((section) => (
+              <div key={section.valeur} className="flex flex-col gap-4">
+                <h2 className="text-lg font-semibold text-navy">{section.label}</h2>
+                {section.fiches.map((fiche) => (
+                  <CarteFicheDossier key={fiche.id} fiche={fiche} />
+                ))}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-navy/60">Aucune fiche disponible pour le moment.</p>
+        )}
+      </div>
     </main>
   );
 }

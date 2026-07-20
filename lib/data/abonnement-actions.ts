@@ -45,7 +45,6 @@ export async function createCheckoutSessionAction(formData: FormData): Promise<v
     customer_email: abonnementExistant?.stripe_customer_id ? undefined : user.email,
     client_reference_id: user.id,
     line_items: [{ price: priceId, quantity: 1 }],
-    subscription_data: { trial_period_days: 14 },
     success_url: `${origin}/abonnement/succes`,
     cancel_url: `${origin}/abonnement`,
   });

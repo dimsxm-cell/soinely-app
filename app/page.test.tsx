@@ -1,17 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import Page from "./page";
 
 describe("Home page", () => {
-  it("renders the Soinely name in the nav", () => {
+  it("renders the Soinely brand in the header", () => {
     render(<Page />);
-    expect(within(screen.getByRole("navigation")).getByText("Soinely")).toBeInTheDocument();
+    expect(screen.getByText("SOINELY")).toBeInTheDocument();
   });
 
-  it("links the signup CTA to /login", () => {
+  it("links the primary CTAs to /login", () => {
     render(<Page />);
-    const ctas = screen.getAllByRole("link", { name: /créer mon compte/i });
-    expect(ctas.length).toBeGreaterThan(0);
+    const ctas = [
+      screen.getByRole("link", { name: /demander une démo/i }),
+      screen.getByRole("link", { name: /essayer gratuitement/i }),
+      screen.getByRole("link", { name: /rejoindre la liste d'attente/i }),
+    ];
     for (const cta of ctas) {
       expect(cta).toHaveAttribute("href", "/login");
     }

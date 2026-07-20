@@ -10,6 +10,7 @@ import {
   uploadPhotoAction,
 } from "@/lib/data/ma-journee-actions";
 import { Button } from "@/components/ui/Button";
+import { LienRetour } from "@/components/ui/LienRetour";
 import type { StatutMission } from "@/lib/types/clinical";
 
 const STATUT_LABEL: Record<StatutMission, string> = {
@@ -17,6 +18,13 @@ const STATUT_LABEL: Record<StatutMission, string> = {
   en_cours: "En cours",
   terminee: "Terminée",
   absent: "Absente",
+};
+
+const STATUT_BADGE_CLASSES: Record<StatutMission, string> = {
+  a_faire: "bg-navy/5 text-navy/60",
+  en_cours: "bg-warning/15 text-warning",
+  terminee: "bg-teal/10 text-[#0E7E70]",
+  absent: "bg-navy/5 text-navy/40",
 };
 
 const PROCHAIN_STATUT: Partial<Record<StatutMission, StatutMission>> = {
@@ -60,27 +68,31 @@ export default async function ArriveePatientPage({
   const peutMarquerAbsent = mission.statut === "a_faire";
   const peutEcrireTransmission = mission.statut === "en_cours" || mission.statut === "terminee";
   const itineraireHref = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mission.patient.adresse)}`;
+  const wazeHref = `https://waze.com/ul?q=${encodeURIComponent(mission.patient.adresse)}&navigate=yes`;
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
-      <div className="flex items-center justify-between">
-        <Link href="/ma-journee" className="text-primary hover:underline">
-          ‹ Ma journée
-        </Link>
-        <span className="rounded-full bg-navy/5 px-3 py-1 text-xs font-medium text-navy">
-          {STATUT_LABEL[mission.statut]}
-        </span>
-      </div>
-
-      <div>
-        <div className="flex items-baseline gap-2">
-          <h1 className="text-2xl font-semibold text-navy">{mission.patientNom}</h1>
-          {mission.patient.dateNaissance && (
-            <span className="text-sm text-navy/60">{calculerAge(mission.patient.dateNaissance)} ans</span>
-          )}
+    <main className="min-h-screen bg-[#F6F7F5] text-navy">
+      <div className="mx-auto flex max-w-2xl flex-col gap-6 px-6 py-10 sm:py-14">
+        <div className="flex items-center justify-between">
+          <LienRetour href="/ma-journee" label="Ma journée" />
+          <span
+            className={`rounded-full px-2.5 py-1 text-[11.5px] font-semibold ${STATUT_BADGE_CLASSES[mission.statut]}`}
+          >
+            {STATUT_LABEL[mission.statut]}
+          </span>
         </div>
-        <p className="mt-1 text-navy/60">{mission.heurePrevue}</p>
-      </div>
+
+        <div>
+          <div className="flex items-baseline gap-2">
+            <h1 className="font-display text-[28px] font-medium leading-tight sm:text-[32px]">
+              {mission.patientNom}
+            </h1>
+            {mission.patient.dateNaissance && (
+              <span className="text-sm text-navy/60">{calculerAge(mission.patient.dateNaissance)} ans</span>
+            )}
+          </div>
+          <p className="mt-1 text-navy/60">{mission.heurePrevue}</p>
+        </div>
 
       <div className="flex gap-3">
         <a href={`tel:${mission.patient.telephone}`} className="flex-1">
@@ -101,9 +113,14 @@ export default async function ArriveePatientPage({
             <p className="text-xs font-medium uppercase text-navy/60">Adresse</p>
             <p className="mt-1 text-navy">{mission.patient.adresse}</p>
           </div>
-          <a href={itineraireHref} target="_blank" rel="noopener noreferrer">
-            <Button variant="secondary">Itinéraire</Button>
-          </a>
+          <div className="flex gap-2">
+            <a href={itineraireHref} target="_blank" rel="noopener noreferrer">
+              <Button variant="secondary">Google Maps</Button>
+            </a>
+            <a href={wazeHref} target="_blank" rel="noopener noreferrer">
+              <Button variant="secondary">Waze</Button>
+            </a>
+          </div>
         </div>
 
         <div className="mt-4">
@@ -259,6 +276,7 @@ export default async function ArriveePatientPage({
           )}
         </section>
       )}
+      </div>
     </main>
   );
 }

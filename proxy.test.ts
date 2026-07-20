@@ -57,6 +57,47 @@ describe("proxy", () => {
     expect(response.headers.get("location")).toContain("/abonnement");
   });
 
+  it("laisse passer si aucun abonnement mais le compte a moins de 15 jours (essai gratuit)", async () => {
+    const ilYA5Jours = new Date(Date.now() - 5 * 86_400_000).toISOString();
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1", created_at: ilYA5Jours } } });
+    eqSelectMock.mockResolvedValue({ data: null, error: null });
+
+    const { proxy } = await import("./proxy");
+    const request = new NextRequest("https://soinely.app/ma-journee");
+
+    const response = await proxy(request);
+
+    expect(response.status).toBe(200);
+  });
+
+  it("redirige vers /abonnement si aucun abonnement et le compte a plus de 15 jours", async () => {
+    const ilYA20Jours = new Date(Date.now() - 20 * 86_400_000).toISOString();
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1", created_at: ilYA20Jours } } });
+    eqSelectMock.mockResolvedValue({ data: null, error: null });
+
+    const { proxy } = await import("./proxy");
+    const request = new NextRequest("https://soinely.app/ma-journee");
+
+    const response = await proxy(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toContain("/abonnement");
+  });
+
+  it("redirige vers /abonnement même dans les 15 jours si l'abonnement existe avec un statut impayé", async () => {
+    const ilYA5Jours = new Date(Date.now() - 5 * 86_400_000).toISOString();
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1", created_at: ilYA5Jours } } });
+    eqSelectMock.mockResolvedValue({ data: { statut: "impaye" }, error: null });
+
+    const { proxy } = await import("./proxy");
+    const request = new NextRequest("https://soinely.app/ma-journee");
+
+    const response = await proxy(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toContain("/abonnement");
+  });
+
   it("laisse passer si connecté avec un abonnement en essai", async () => {
     getUserMock.mockResolvedValue({ data: { user: { id: "u1" } } });
     eqSelectMock.mockResolvedValue({ data: { statut: "essai" }, error: null });

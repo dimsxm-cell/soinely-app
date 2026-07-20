@@ -1,9 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/types/database.types";
-import type { FrequenceSoin, PatientComplet, SoinPrescrit } from "@/lib/types/clinical";
+import type { FrequenceSoin, PatientComplet, Sexe, SoinPrescrit } from "@/lib/types/clinical";
 
 const CHAMPS_PATIENT =
-  "id, nom_complet, adresse, telephone, allergies, consignes, date_naissance, medecin_nom, medecin_telephone, contact_urgence_nom, contact_urgence_telephone, antecedents, traitements_en_cours";
+  "id, nom_complet, adresse, telephone, allergies, consignes, date_naissance, numero_secu, sexe, medecin_nom, medecin_telephone, personne_confiance_nom, personne_confiance_telephone, note_soin, antecedents, traitements_en_cours";
 
 type PatientRow = {
   id: string;
@@ -13,10 +13,13 @@ type PatientRow = {
   allergies: string | null;
   consignes: string | null;
   date_naissance: string | null;
+  numero_secu: string | null;
+  sexe: string | null;
   medecin_nom: string | null;
   medecin_telephone: string | null;
-  contact_urgence_nom: string | null;
-  contact_urgence_telephone: string | null;
+  personne_confiance_nom: string | null;
+  personne_confiance_telephone: string | null;
+  note_soin: string | null;
   antecedents: string | null;
   traitements_en_cours: string | null;
 };
@@ -30,10 +33,13 @@ function mapPatientRow(row: PatientRow): PatientComplet {
     allergies: row.allergies,
     consignes: row.consignes,
     dateNaissance: row.date_naissance,
+    numeroSecu: row.numero_secu,
+    sexe: row.sexe as Sexe | null,
     medecinNom: row.medecin_nom,
     medecinTelephone: row.medecin_telephone,
-    contactUrgenceNom: row.contact_urgence_nom,
-    contactUrgenceTelephone: row.contact_urgence_telephone,
+    personneConfianceNom: row.personne_confiance_nom,
+    personneConfianceTelephone: row.personne_confiance_telephone,
+    noteSoin: row.note_soin,
     antecedents: row.antecedents,
     traitementsEnCours: row.traitements_en_cours,
   };
