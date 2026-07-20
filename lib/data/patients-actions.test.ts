@@ -41,6 +41,8 @@ describe("createPatientAction", () => {
     formData.set("adresse", "12 rue des Lilas");
     formData.set("telephone", "0601020304");
     formData.set("dateNaissance", "1950-03-12");
+    formData.set("numeroSecu", "1500375123456");
+    formData.set("sexe", "femme");
     formData.set("allergies", "Pénicilline");
     formData.set("medecinNom", "Dr Martin");
 
@@ -53,12 +55,15 @@ describe("createPatientAction", () => {
       adresse: "12 rue des Lilas",
       telephone: "0601020304",
       date_naissance: "1950-03-12",
+      numero_secu: "1500375123456",
+      sexe: "femme",
       allergies: "Pénicilline",
       consignes: null,
       medecin_nom: "Dr Martin",
       medecin_telephone: null,
-      contact_urgence_nom: null,
-      contact_urgence_telephone: null,
+      personne_confiance_nom: null,
+      personne_confiance_telephone: null,
+      note_soin: null,
       antecedents: null,
       traitements_en_cours: null,
     });
@@ -72,9 +77,13 @@ describe("createPatientAction", () => {
     const formData = new FormData();
     formData.set("nomComplet", "Mme Dupont");
 
-    await createPatientAction(formData);
+    const resultat = await createPatientAction(formData);
 
     expect(insertMock).not.toHaveBeenCalled();
+    expect(resultat).toEqual({
+      success: false,
+      error: "Le nom, l'adresse et le téléphone sont obligatoires.",
+    });
   });
 
   it("ne fait rien si l'utilisateur n'est pas authentifié", async () => {
@@ -87,9 +96,36 @@ describe("createPatientAction", () => {
     formData.set("adresse", "12 rue des Lilas");
     formData.set("telephone", "0601020304");
 
-    await createPatientAction(formData);
+    const resultat = await createPatientAction(formData);
 
     expect(insertMock).not.toHaveBeenCalled();
+    expect(resultat).toEqual({
+      success: false,
+      error: "Vous devez être connectée pour créer un patient.",
+    });
+  });
+
+  it("retourne le message d'erreur Supabase si l'insertion échoue", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } } });
+    singleInsertMock.mockResolvedValue({
+      data: null,
+      error: { message: "Could not find the 'antecedents' column of 'patients' in the schema cache" },
+    });
+
+    const { createPatientAction } = await import("./patients-actions");
+
+    const formData = new FormData();
+    formData.set("nomComplet", "Mme Dupont");
+    formData.set("adresse", "12 rue des Lilas");
+    formData.set("telephone", "0601020304");
+
+    const resultat = await createPatientAction(formData);
+
+    expect(resultat).toEqual({
+      success: false,
+      error: "Could not find the 'antecedents' column of 'patients' in the schema cache",
+    });
+    expect(redirectMock).not.toHaveBeenCalled();
   });
 });
 
@@ -115,12 +151,15 @@ describe("updatePatientAction", () => {
       adresse: "12 rue des Lilas",
       telephone: "0601020304",
       date_naissance: null,
+      numero_secu: null,
+      sexe: null,
       allergies: null,
       consignes: null,
       medecin_nom: "Dr Martin",
       medecin_telephone: null,
-      contact_urgence_nom: null,
-      contact_urgence_telephone: null,
+      personne_confiance_nom: null,
+      personne_confiance_telephone: null,
+      note_soin: null,
       antecedents: null,
       traitements_en_cours: null,
     });

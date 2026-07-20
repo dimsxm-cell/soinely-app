@@ -56,11 +56,11 @@ describe("createCheckoutSessionAction", () => {
         mode: "subscription",
         client_reference_id: "u1",
         line_items: [{ price: "price_solo_test", quantity: 1 }],
-        subscription_data: { trial_period_days: 14 },
         success_url: "https://soinely.app/abonnement/succes",
         cancel_url: "https://soinely.app/abonnement",
       })
     );
+    expect(checkoutSessionsCreateMock.mock.calls[0][0]).not.toHaveProperty("subscription_data");
     expect(redirectMock).toHaveBeenCalledWith("https://checkout.stripe.com/session_123");
   });
 

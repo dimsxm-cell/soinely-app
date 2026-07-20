@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { MissionDuJour, StatutMission } from "@/lib/types/clinical";
 import { updateMissionStatutAction } from "@/lib/data/ma-journee-actions";
-import { Button } from "@/components/ui/Button";
 
 const STATUT_LABEL: Record<MissionDuJour["statut"], string> = {
   a_faire: "À faire",
@@ -11,10 +10,10 @@ const STATUT_LABEL: Record<MissionDuJour["statut"], string> = {
 };
 
 const STATUT_CLASSES: Record<MissionDuJour["statut"], string> = {
-  a_faire: "bg-navy/5 text-navy",
-  en_cours: "bg-warning text-navy",
-  terminee: "bg-success text-navy",
-  absent: "bg-navy/10 text-navy/50",
+  a_faire: "bg-navy/5 text-navy/60",
+  en_cours: "bg-warning/15 text-warning",
+  terminee: "bg-teal/10 text-[#0E7E70]",
+  absent: "bg-navy/5 text-navy/40",
 };
 
 const PROCHAIN_STATUT: Partial<Record<StatutMission, StatutMission>> = {
@@ -36,29 +35,34 @@ export function CarteMission({ mission, contexteHref }: CarteMissionProps) {
   const prochainStatut = PROCHAIN_STATUT[mission.statut];
 
   return (
-    <div className="flex items-center justify-between rounded-card border border-navy/10 bg-white p-6">
-      <Link href={`/ma-journee/${mission.id}`} className="hover:underline">
-        <p className="font-medium text-navy">{mission.patientNom}</p>
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-[16px] border border-navy/10 bg-white p-4">
+      <Link href={`/ma-journee/${mission.id}`} className="min-w-0 flex-1 hover:opacity-80">
+        <p className="font-semibold text-navy">{mission.patientNom}</p>
         <p className="text-sm text-navy/60">
-          {mission.typeSoin} · {mission.heurePrevue}
+          {mission.typeSoin} · <span className="tabular-nums">{mission.heurePrevue}</span>
         </p>
       </Link>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         {contexteHref && (
-          <Link href={contexteHref}>
-            <Button variant="tertiary">Contexte clinique</Button>
+          <Link href={contexteHref} className="text-sm font-semibold text-brand-violet hover:underline">
+            Contexte clinique
           </Link>
         )}
-        <span className={`rounded-full px-2 py-2 text-xs font-medium ${STATUT_CLASSES[mission.statut]}`}>
+        <span
+          className={`rounded-full px-2.5 py-1 text-[11.5px] font-semibold ${STATUT_CLASSES[mission.statut]}`}
+        >
           {STATUT_LABEL[mission.statut]}
         </span>
         {prochainStatut && (
           <form action={updateMissionStatutAction}>
             <input type="hidden" name="missionId" value={mission.id} />
             <input type="hidden" name="nouveauStatut" value={prochainStatut} />
-            <Button type="submit" variant="secondary">
+            <button
+              type="submit"
+              className="rounded-full bg-gradient-to-r from-brand-violet to-brand-rose px-4 py-2 text-sm font-semibold text-white transition-colors hover:brightness-110"
+            >
               {LIBELLE_ACTION[mission.statut]}
-            </Button>
+            </button>
           </form>
         )}
       </div>

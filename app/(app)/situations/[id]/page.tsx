@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getSituationTerrainDetail } from "@/lib/data/recherche";
+import { LienRetour } from "@/components/ui/LienRetour";
 
 export default async function SituationDetailPage({
   params,
@@ -15,12 +15,13 @@ export default async function SituationDetailPage({
   if (!situation) notFound();
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
-      <Link href="/recherche" className="text-primary hover:underline">
-        ← Retour à la recherche
-      </Link>
+    <main className="min-h-screen bg-[#F6F7F5] text-navy">
+      <div className="mx-auto flex max-w-2xl flex-col gap-6 px-6 py-10 sm:py-14">
+        <LienRetour href="/recherche" label="Recherche" />
 
-      <h1 className="text-2xl font-semibold text-navy">{situation.titre}</h1>
+        <h1 className="font-display text-[28px] font-medium leading-tight sm:text-[32px]">
+          {situation.titre}
+        </h1>
 
       <section>
         <h2 className="text-lg font-semibold text-navy">Observation</h2>
@@ -90,6 +91,7 @@ export default async function SituationDetailPage({
           </div>
         </section>
       )}
+      </div>
     </main>
   );
 }

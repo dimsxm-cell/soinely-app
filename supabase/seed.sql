@@ -22,6 +22,50 @@ values
     '["SF2H - Prise en charge des plaies"]',
     'valide',
     true
+  ),
+  (
+    'Chute à domicile sans traumatisme apparent',
+    'Le patient a chuté à son domicile ; il ne rapporte pas de douleur ni de plaie visible mais reste inquiet.',
+    '["Interroger sur les circonstances de la chute (malaise, trébuchement)", "Rechercher une douleur, une déformation ou un hématome", "Vérifier la prise récente de médicaments hypotenseurs ou sédatifs"]',
+    '["Trouble de l''équilibre ou de la marche", "Hypotension orthostatique", "Environnement à risque (tapis, éclairage)"]',
+    '["Ne pas relever le patient en urgence si douleur ou suspicion de fracture", "Surveiller les constantes si disponible", "Noter la chute et les circonstances dans le dossier de soins"]',
+    'Si douleur, déformation, perte de connaissance ou confusion post-chute, ou chutes à répétition.',
+    '["HAS - Prévention des chutes chez la personne âgée"]',
+    'valide',
+    true
+  ),
+  (
+    'Fièvre chez un patient âgé',
+    'Le patient présente une température supérieure à 38°C sans point d''appel évident.',
+    '["Mesurer la température avec un thermomètre fiable", "Rechercher des signes associés (toux, brûlures urinaires, rougeur cutanée)", "Vérifier l''hydratation et l''état général"]',
+    '["Infection urinaire", "Infection respiratoire", "Effet secondaire d''un traitement récent"]',
+    '["Favoriser l''hydratation", "Surveiller l''évolution de la température", "Noter la température et les signes associés dans le dossier"]',
+    'Si fièvre supérieure à 38,5°C persistante, confusion, ou altération de l''état général.',
+    '["HAS - Prise en charge de la fièvre chez la personne âgée"]',
+    'valide',
+    true
+  ),
+  (
+    'Constipation chez un patient alité',
+    'Le patient n''a pas eu de selles depuis plus de 3 jours et signale une gêne abdominale.',
+    '["Interroger sur la fréquence habituelle du transit", "Rechercher une douleur ou un ballonnement abdominal", "Vérifier l''hydratation et les traitements en cours (opioïdes, fer)"]',
+    '["Alitement prolongé", "Traitement constipant (opioïdes, certains antalgiques)", "Hydratation insuffisante"]',
+    '["Favoriser l''hydratation et, si possible, la mobilisation", "Signaler au médecin traitant pour envisager un traitement laxatif", "Noter la date des dernières selles dans le dossier"]',
+    'Si douleur abdominale intense, vomissements, ou absence de selles depuis plus de 5 jours.',
+    '["HAS - Prise en charge de la constipation chez la personne âgée"]',
+    'valide',
+    true
+  ),
+  (
+    'Douleur thoracique',
+    'Le patient signale une douleur thoracique apparue brutalement.',
+    '["Évaluer la localisation, l''intensité et l''irradiation de la douleur", "Rechercher une dyspnée, des sueurs ou des nausées associées", "Prendre le pouls et la tension artérielle si disponible"]',
+    '["Origine cardiaque (à ne jamais exclure en premier)", "Origine musculo-squelettique", "Anxiété ou crise d''angoisse"]',
+    '["Installer le patient en position semi-assise, au repos", "Ne jamais laisser le patient seul", "Appeler le 15 sans délai en cas de doute"]',
+    'Systématiquement et en urgence — toute douleur thoracique brutale doit être considérée comme potentiellement grave jusqu''à preuve du contraire.',
+    '["HAS - Douleur thoracique aiguë"]',
+    'valide',
+    true
   );
 
 insert into public.missions_cliniques (titre, situation_terrain_id, etapes, duree_estimee_min, published)

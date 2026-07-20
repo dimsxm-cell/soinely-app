@@ -10,8 +10,8 @@ export function CarteReponse({ situation }: CarteReponseProps) {
   const apercu = situation.conduiteATenir.slice(0, 3);
 
   return (
-    <div className="rounded-card border border-primary/30 bg-primary/5 p-6">
-      <p className="text-sm font-medium text-primary">Réponse la plus proche</p>
+    <div className="rounded-card border border-brand-violet/25 bg-brand-violet/5 p-6">
+      <p className="text-sm font-medium text-brand-violet">Réponse la plus proche</p>
       <h2 className="mt-2 text-xl font-semibold text-navy">{situation.titre}</h2>
       <p className="mt-2 text-navy/80">{situation.observation}</p>
       {apercu.length > 0 && (

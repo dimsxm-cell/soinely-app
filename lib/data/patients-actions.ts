@@ -10,19 +10,25 @@ function champTexteOuNull(formData: FormData, nom: string): string | null {
   return valeur || null;
 }
 
-export async function createPatientAction(formData: FormData): Promise<void> {
+export async function createPatientAction(
+  formData: FormData
+): Promise<{ success: true } | { success: false; error: string }> {
   const nomComplet = String(formData.get("nomComplet") ?? "");
   const adresse = String(formData.get("adresse") ?? "");
   const telephone = String(formData.get("telephone") ?? "");
 
-  if (!nomComplet || !adresse || !telephone) return;
+  if (!nomComplet || !adresse || !telephone) {
+    return { success: false, error: "Le nom, l'adresse et le téléphone sont obligatoires." };
+  }
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return;
+  if (!user) {
+    return { success: false, error: "Vous devez être connectée pour créer un patient." };
+  }
 
   const { data: patient, error } = await supabase
     .from("patients")
@@ -32,19 +38,24 @@ export async function createPatientAction(formData: FormData): Promise<void> {
       adresse,
       telephone,
       date_naissance: champTexteOuNull(formData, "dateNaissance"),
+      numero_secu: champTexteOuNull(formData, "numeroSecu"),
+      sexe: champTexteOuNull(formData, "sexe"),
       allergies: champTexteOuNull(formData, "allergies"),
       consignes: champTexteOuNull(formData, "consignes"),
       medecin_nom: champTexteOuNull(formData, "medecinNom"),
       medecin_telephone: champTexteOuNull(formData, "medecinTelephone"),
-      contact_urgence_nom: champTexteOuNull(formData, "contactUrgenceNom"),
-      contact_urgence_telephone: champTexteOuNull(formData, "contactUrgenceTelephone"),
+      personne_confiance_nom: champTexteOuNull(formData, "personneConfianceNom"),
+      personne_confiance_telephone: champTexteOuNull(formData, "personneConfianceTelephone"),
+      note_soin: champTexteOuNull(formData, "noteSoin"),
       antecedents: champTexteOuNull(formData, "antecedents"),
       traitements_en_cours: champTexteOuNull(formData, "traitementsEnCours"),
     })
     .select("id")
     .single();
 
-  if (error || !patient) return;
+  if (error || !patient) {
+    return { success: false, error: error?.message ?? "La création du patient a échoué." };
+  }
 
   revalidatePath("/patients");
   redirect(`/patients/${patient.id}`);
@@ -67,12 +78,15 @@ export async function updatePatientAction(formData: FormData): Promise<void> {
       adresse,
       telephone,
       date_naissance: champTexteOuNull(formData, "dateNaissance"),
+      numero_secu: champTexteOuNull(formData, "numeroSecu"),
+      sexe: champTexteOuNull(formData, "sexe"),
       allergies: champTexteOuNull(formData, "allergies"),
       consignes: champTexteOuNull(formData, "consignes"),
       medecin_nom: champTexteOuNull(formData, "medecinNom"),
       medecin_telephone: champTexteOuNull(formData, "medecinTelephone"),
-      contact_urgence_nom: champTexteOuNull(formData, "contactUrgenceNom"),
-      contact_urgence_telephone: champTexteOuNull(formData, "contactUrgenceTelephone"),
+      personne_confiance_nom: champTexteOuNull(formData, "personneConfianceNom"),
+      personne_confiance_telephone: champTexteOuNull(formData, "personneConfianceTelephone"),
+      note_soin: champTexteOuNull(formData, "noteSoin"),
       antecedents: champTexteOuNull(formData, "antecedents"),
       traitements_en_cours: champTexteOuNull(formData, "traitementsEnCours"),
     })

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getAbonnement } from "@/lib/data/abonnement";
+import { getAbonnement, getJoursRestantsEssaiGratuit } from "@/lib/data/abonnement";
 import { createBillingPortalSessionAction } from "@/lib/data/abonnement-actions";
 import { signOutAction } from "@/app/login/actions";
 import type { PlanAbonnement, StatutAbonnement } from "@/lib/types/abonnement";
@@ -41,23 +41,39 @@ export default async function ComptePage() {
 
   const abonnement = await getAbonnement(supabase, user.id);
   const nom = (user.user_metadata?.full_name as string | undefined) ?? user.email ?? "";
+  const joursRestantsEssai = abonnement ? 0 : getJoursRestantsEssaiGratuit(user.created_at);
 
   return (
     <main className="min-h-screen bg-[#F6F7F5] text-navy">
       <div className="mx-auto w-full max-w-[560px] px-6 py-14 sm:py-20">
-        <Link href="/ma-journee" className="text-sm font-medium text-primary hover:underline">
-          ‹ Ma journée
-        </Link>
-
-        <h1 className="mt-6 font-display text-[28px] font-medium leading-tight sm:text-[32px]">
-          Mon compte
-        </h1>
+        <h1 className="font-display text-[28px] font-medium leading-tight sm:text-[32px]">Mon compte</h1>
 
         <div className="mt-8 flex flex-col gap-5">
           <section className="rounded-[20px] border border-navy/10 bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,.04),0_18px_40px_rgba(15,23,42,.06)]">
             <p className="text-[12.5px] font-bold uppercase tracking-wider text-navy/45">Profil</p>
             <p className="mt-2 text-[15px] font-semibold text-navy">{nom}</p>
             <p className="text-sm text-navy/60">{user.email}</p>
+          </section>
+
+          <section className="rounded-[20px] border border-navy/10 bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,.04),0_18px_40px_rgba(15,23,42,.06)]">
+            <p className="text-[12.5px] font-bold uppercase tracking-wider text-navy/45">Patients</p>
+            <p className="mt-2 text-sm text-navy/60">
+              Créez et gérez vos fiches patients, visibles ensuite dans votre tournée du jour.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Link
+                href="/patients/nouveau"
+                className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-brand-violet to-brand-rose px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:brightness-110"
+              >
+                Ajouter un patient
+              </Link>
+              <Link
+                href="/patients"
+                className="inline-flex items-center justify-center rounded-full border border-navy/20 bg-white px-5 py-2.5 text-sm font-semibold text-navy transition-colors hover:bg-navy/5"
+              >
+                Voir mes patients
+              </Link>
+            </div>
           </section>
 
           <section className="rounded-[20px] border border-navy/10 bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,.04),0_18px_40px_rgba(15,23,42,.06)]">
@@ -99,12 +115,31 @@ export default async function ComptePage() {
                   </form>
                 )}
               </>
-            ) : (
+            ) : joursRestantsEssai > 0 ? (
               <>
-                <p className="mt-2 text-sm text-navy/60">Aucun abonnement actif.</p>
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-[15px] font-semibold text-navy">Essai gratuit</span>
+                  <span className="rounded-full bg-teal/10 px-2.5 py-1 text-[11.5px] font-semibold text-[#0E7E70]">
+                    {joursRestantsEssai} jour{joursRestantsEssai > 1 ? "s" : ""} restant
+                    {joursRestantsEssai > 1 ? "s" : ""}
+                  </span>
+                </div>
+                <p className="mt-2 text-sm text-navy/60">
+                  Aucune carte requise pendant l&apos;essai. Choisissez une offre quand vous êtes prête.
+                </p>
                 <Link
                   href="/abonnement"
-                  className="mt-4 inline-flex items-center justify-center rounded-full bg-navy px-5 py-2.5 text-sm font-semibold text-[#F6F7F5] transition-colors hover:bg-navy/90"
+                  className="mt-4 inline-flex items-center justify-center rounded-full border border-navy/20 bg-white px-5 py-2.5 text-sm font-semibold text-navy transition-colors hover:bg-navy/5"
+                >
+                  Choisir une offre
+                </Link>
+              </>
+            ) : (
+              <>
+                <p className="mt-2 text-sm text-navy/60">Votre essai gratuit est terminé.</p>
+                <Link
+                  href="/abonnement"
+                  className="mt-4 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-brand-violet to-brand-rose px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:brightness-110"
                 >
                   Choisir une offre
                 </Link>

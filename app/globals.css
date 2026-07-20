@@ -7,13 +7,15 @@
   --color-success: #22C55E;
   --color-warning: #F59E0B;
   --color-danger: #EF4444;
+  --color-brand-violet: #7C3AED;
+  --color-brand-rose: #EC4899;
   --radius-card: 16px;
   --font-display: Charter, "Iowan Old Style", Georgia, "Times New Roman", serif;
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F6F7F5;
+  --foreground: #0F172A;
 }
 
 @theme inline {
@@ -23,15 +25,24 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+}
+
+@keyframes wiggle {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-12deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

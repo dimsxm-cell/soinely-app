@@ -36,11 +36,16 @@ export interface Patient {
   dateNaissance: string | null;
 }
 
+export type Sexe = "homme" | "femme";
+
 export interface PatientComplet extends Patient {
+  numeroSecu: string | null;
+  sexe: Sexe | null;
   medecinNom: string | null;
   medecinTelephone: string | null;
-  contactUrgenceNom: string | null;
-  contactUrgenceTelephone: string | null;
+  personneConfianceNom: string | null;
+  personneConfianceTelephone: string | null;
+  noteSoin: string | null;
   antecedents: string | null;
   traitementsEnCours: string | null;
 }

@@ -1,10 +1,13 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getPatient, getSoinsPrescrits } from "@/lib/data/patients";
 import { createSoinPrescritAction, arreterSoinPrescritAction, updatePatientAction } from "@/lib/data/patients-actions";
 import type { SoinPrescrit } from "@/lib/types/clinical";
 import { Button } from "@/components/ui/Button";
+import { ChampAvecDictee } from "@/components/ui/ChampAvecDictee";
+import { ChampsIdentite } from "@/components/ui/ChampsIdentite";
+import { ChampTelephone } from "@/components/ui/ChampTelephone";
+import { LienRetour } from "@/components/ui/LienRetour";
 
 const JOUR_LABEL = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
 
@@ -27,122 +30,66 @@ export default async function PatientPage({ params }: { params: Promise<{ id: st
   const soinsArretes = soins.filter((soin) => !soin.actif);
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
-      <div>
-        <Link href="/patients" className="text-primary hover:underline">
-          ‹ Patients
-        </Link>
-        <h1 className="mt-2 text-2xl font-semibold text-navy">{patient.nomComplet}</h1>
-      </div>
+    <main className="min-h-screen bg-[#F6F7F5] text-navy">
+      <div className="mx-auto flex max-w-2xl flex-col gap-6 px-6 py-10 sm:py-14">
+        <div>
+          <LienRetour href="/patients" label="Patients" />
+          <h1 className="mt-4 text-center font-display text-[28px] font-medium leading-tight sm:text-[32px]">
+            {patient.nomComplet}
+          </h1>
+        </div>
 
-      <section className="rounded-card border border-navy/10 bg-white p-6">
+        <section className="rounded-card border border-navy/10 bg-white p-6">
         <p className="text-xs font-medium uppercase text-navy/60">Fiche patient</p>
         <form action={updatePatientAction} className="mt-3 flex flex-col gap-3">
           <input type="hidden" name="patientId" value={patient.id} />
-          <label className="flex flex-col gap-1 text-sm text-navy">
-            Nom complet
-            <input
-              name="nomComplet"
-              defaultValue={patient.nomComplet}
-              required
-              className="rounded-card border border-navy/20 p-2"
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm text-navy">
-            Adresse
-            <input
-              name="adresse"
-              defaultValue={patient.adresse}
-              required
-              className="rounded-card border border-navy/20 p-2"
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm text-navy">
-            Téléphone
-            <input
-              name="telephone"
-              defaultValue={patient.telephone}
-              required
-              className="rounded-card border border-navy/20 p-2"
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm text-navy">
-            Date de naissance
-            <input
-              type="date"
-              name="dateNaissance"
-              defaultValue={patient.dateNaissance ?? ""}
-              className="rounded-card border border-navy/20 p-2"
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm text-navy">
-            Allergies
-            <textarea
-              name="allergies"
-              defaultValue={patient.allergies ?? ""}
-              rows={2}
-              className="rounded-card border border-navy/20 p-2"
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm text-navy">
-            Consignes
-            <textarea
-              name="consignes"
-              defaultValue={patient.consignes ?? ""}
-              rows={2}
-              className="rounded-card border border-navy/20 p-2"
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm text-navy">
-            Médecin traitant
-            <input
-              name="medecinNom"
-              defaultValue={patient.medecinNom ?? ""}
-              className="rounded-card border border-navy/20 p-2"
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm text-navy">
-            Téléphone du médecin traitant
-            <input
-              name="medecinTelephone"
-              defaultValue={patient.medecinTelephone ?? ""}
-              className="rounded-card border border-navy/20 p-2"
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm text-navy">
-            Contact d&apos;urgence
-            <input
-              name="contactUrgenceNom"
-              defaultValue={patient.contactUrgenceNom ?? ""}
-              className="rounded-card border border-navy/20 p-2"
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm text-navy">
-            Téléphone du contact d&apos;urgence
-            <input
-              name="contactUrgenceTelephone"
-              defaultValue={patient.contactUrgenceTelephone ?? ""}
-              className="rounded-card border border-navy/20 p-2"
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm text-navy">
-            Antécédents / pathologies
-            <textarea
-              name="antecedents"
-              defaultValue={patient.antecedents ?? ""}
-              rows={2}
-              className="rounded-card border border-navy/20 p-2"
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm text-navy">
-            Traitements en cours
-            <textarea
-              name="traitementsEnCours"
-              defaultValue={patient.traitementsEnCours ?? ""}
-              rows={2}
-              className="rounded-card border border-navy/20 p-2"
-            />
-          </label>
+          <ChampAvecDictee name="nomComplet" label="Nom et prénom" defaultValue={patient.nomComplet} required />
+          <ChampsIdentite
+            defaultNumeroSecu={patient.numeroSecu}
+            defaultDateNaissance={patient.dateNaissance}
+            defaultSexe={patient.sexe}
+          />
+          <ChampAvecDictee name="adresse" label="Adresse" defaultValue={patient.adresse} required />
+          <ChampTelephone name="telephone" label="Téléphone" defaultValue={patient.telephone} required />
+          <ChampAvecDictee name="medecinNom" label="Médecin traitant" defaultValue={patient.medecinNom} />
+          <ChampTelephone
+            name="medecinTelephone"
+            label="Téléphone du médecin traitant"
+            defaultValue={patient.medecinTelephone}
+          />
+          <ChampAvecDictee
+            name="personneConfianceNom"
+            label="Personne de confiance"
+            defaultValue={patient.personneConfianceNom}
+          />
+          <ChampTelephone
+            name="personneConfianceTelephone"
+            label="Téléphone de la personne de confiance"
+            defaultValue={patient.personneConfianceTelephone}
+          />
+          <ChampAvecDictee
+            name="noteSoin"
+            label="Soin"
+            defaultValue={patient.noteSoin}
+            multiligne
+            rows={2}
+            placeholder="Ex. : pansement quotidien, injection le matin"
+          />
+          <ChampAvecDictee
+            name="antecedents"
+            label="Antécédents médicaux"
+            defaultValue={patient.antecedents}
+            multiligne
+            rows={2}
+          />
+          <ChampAvecDictee name="allergies" label="Allergies" defaultValue={patient.allergies} multiligne rows={2} />
+          <ChampAvecDictee
+            name="consignes"
+            label="Consignes spécifiques"
+            defaultValue={patient.consignes}
+            multiligne
+            rows={2}
+          />
           <Button type="submit" variant="tertiary" className="self-start">
             Enregistrer
           </Button>
@@ -253,7 +200,8 @@ export default async function PatientPage({ params }: { params: Promise<{ id: st
             Ajouter le soin
           </Button>
         </form>
-      </section>
+        </section>
+      </div>
     </main>
   );
 }

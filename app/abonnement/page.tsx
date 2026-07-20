@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { createCheckoutSessionAction } from "@/lib/data/abonnement-actions";
+import { LienRetour } from "@/components/ui/LienRetour";
 
 const PLANS = [
   {
@@ -41,13 +41,11 @@ export default function AbonnementPage() {
   return (
     <main className="min-h-screen bg-[#F6F7F5] text-navy">
       <div className="mx-auto w-full max-w-[720px] px-6 py-14 sm:py-20">
-        <Link href="/compte" className="text-sm font-medium text-primary hover:underline">
-          ‹ Mon compte
-        </Link>
+        <LienRetour href="/compte" label="Mon compte" />
 
         <div className="mt-8 text-center">
-          <p className="mb-3 text-[12.5px] font-bold uppercase tracking-wider text-[#0E7E70]">
-            Essai gratuit 14 jours
+          <p className="mb-3 text-[12.5px] font-bold uppercase tracking-wider text-brand-violet">
+            Abonnement mensuel
           </p>
           <h1 className="text-balance font-display text-[32px] font-medium leading-tight sm:text-[38px]">
             Choisissez votre offre
@@ -93,13 +91,13 @@ export default function AbonnementPage() {
                 <input type="hidden" name="plan" value={plan.id} />
                 <button
                   type="submit"
-                  className="flex w-full items-center justify-center rounded-full bg-navy px-5 py-3.5 text-[15px] font-semibold text-[#F6F7F5] transition-colors hover:bg-navy/90"
+                  className="flex w-full items-center justify-center rounded-full bg-gradient-to-r from-brand-violet to-brand-rose px-5 py-3.5 text-[15px] font-semibold text-white transition-colors hover:brightness-110"
                 >
-                  Commencer l&apos;essai gratuit
+                  S&apos;abonner
                 </button>
               </form>
               <p className="mt-3 text-center text-[12px] text-navy/45">
-                Carte bancaire requise, aucun prélèvement avant la fin de l&apos;essai.
+                Le prélèvement démarre dès la validation du paiement.
               </p>
             </div>
           ))}

@@ -1,6 +1,6 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { getAbonnement } from "@/lib/data/abonnement";
+import { estDansEssaiGratuit, getAbonnement } from "@/lib/data/abonnement";
 
 // Routes nécessitant une connexion. "/compte" en fait partie mais est
 // volontairement absente de SUBSCRIPTION_REQUIRED_PATHS ci-dessous : une
@@ -53,9 +53,10 @@ export async function proxy(request: NextRequest) {
 
   if (needsSubscription) {
     const abonnement = await getAbonnement(supabase, user.id);
-    const acces = abonnement?.statut === "essai" || abonnement?.statut === "actif";
+    const accesViaAbonnement = abonnement?.statut === "essai" || abonnement?.statut === "actif";
+    const accesViaEssaiGratuit = !abonnement && estDansEssaiGratuit(user.created_at);
 
-    if (!acces) {
+    if (!accesViaAbonnement && !accesViaEssaiGratuit) {
       return NextResponse.redirect(new URL("/abonnement", request.url));
     }
   }

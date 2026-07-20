@@ -9,7 +9,7 @@ export function CarteSituationTerrain({ situation }: CarteSituationTerrainProps)
   return (
     <Link
       href={`/situations/${situation.id}`}
-      className="block rounded-card border border-navy/10 bg-white p-6 hover:border-primary"
+      className="block rounded-card border border-navy/10 bg-white p-6 transition-colors hover:border-brand-violet"
     >
       <div className="flex gap-4">
         <span className="rounded-full bg-navy/10 px-4 py-2 text-sm text-navy">

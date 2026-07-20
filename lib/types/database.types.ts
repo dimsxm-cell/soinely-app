@@ -215,8 +215,6 @@ export type Database = {
           allergies: string | null
           antecedents: string | null
           consignes: string | null
-          contact_urgence_nom: string | null
-          contact_urgence_telephone: string | null
           created_at: string
           date_naissance: string | null
           id: string
@@ -224,6 +222,11 @@ export type Database = {
           medecin_nom: string | null
           medecin_telephone: string | null
           nom_complet: string
+          note_soin: string | null
+          numero_secu: string | null
+          personne_confiance_nom: string | null
+          personne_confiance_telephone: string | null
+          sexe: string | null
           telephone: string
           traitements_en_cours: string | null
         }
@@ -232,8 +235,6 @@ export type Database = {
           allergies?: string | null
           antecedents?: string | null
           consignes?: string | null
-          contact_urgence_nom?: string | null
-          contact_urgence_telephone?: string | null
           created_at?: string
           date_naissance?: string | null
           id?: string
@@ -241,6 +242,11 @@ export type Database = {
           medecin_nom?: string | null
           medecin_telephone?: string | null
           nom_complet: string
+          note_soin?: string | null
+          numero_secu?: string | null
+          personne_confiance_nom?: string | null
+          personne_confiance_telephone?: string | null
+          sexe?: string | null
           telephone: string
           traitements_en_cours?: string | null
         }
@@ -249,8 +255,6 @@ export type Database = {
           allergies?: string | null
           antecedents?: string | null
           consignes?: string | null
-          contact_urgence_nom?: string | null
-          contact_urgence_telephone?: string | null
           created_at?: string
           date_naissance?: string | null
           id?: string
@@ -258,6 +262,11 @@ export type Database = {
           medecin_nom?: string | null
           medecin_telephone?: string | null
           nom_complet?: string
+          note_soin?: string | null
+          numero_secu?: string | null
+          personne_confiance_nom?: string | null
+          personne_confiance_telephone?: string | null
+          sexe?: string | null
           telephone?: string
           traitements_en_cours?: string | null
         }
