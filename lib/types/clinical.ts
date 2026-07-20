@@ -105,3 +105,32 @@ export interface Tournee {
 export interface SituationTerrainDetail extends SituationTerrain {
   missions: MissionClinique[];
 }
+
+export type SectionDossierSoin =
+  | "identification_patient"
+  | "traitements"
+  | "surveillance_clinique"
+  | "protocoles_urgence"
+  | "transmissions_infirmieres"
+  | "prescriptions_liaisons_medicales"
+  | "administratif"
+  | "allergies_alertes"
+  | "contacts_utiles";
+
+export interface BlocContenuFiche {
+  titre: string;
+  items: string[];
+}
+
+export interface FicheDossierSoin {
+  id: string;
+  section: SectionDossierSoin;
+  titre: string;
+  resume: string;
+  contenu: BlocContenuFiche[];
+  sources: string[];
+  ordre: number;
+  niveauConfiance: NiveauConfiance;
+  version: number;
+  published: boolean;
+}

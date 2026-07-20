@@ -86,6 +86,51 @@ export type Database = {
           },
         ]
       }
+      fiches_dossier_soins: {
+        Row: {
+          contenu: Json
+          created_at: string
+          id: string
+          niveau_confiance: string
+          ordre: number
+          published: boolean
+          resume: string
+          section: string
+          sources: Json
+          titre: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          contenu?: Json
+          created_at?: string
+          id?: string
+          niveau_confiance?: string
+          ordre?: number
+          published?: boolean
+          resume: string
+          section: string
+          sources?: Json
+          titre: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          contenu?: Json
+          created_at?: string
+          id?: string
+          niveau_confiance?: string
+          ordre?: number
+          published?: boolean
+          resume?: string
+          section?: string
+          sources?: Json
+          titre?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: []
+      }
       missions_cliniques: {
         Row: {
           created_at: string
