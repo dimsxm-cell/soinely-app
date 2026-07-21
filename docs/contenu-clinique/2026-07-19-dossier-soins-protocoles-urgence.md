@@ -321,3 +321,50 @@ Corrige directement dans ce fichier (ou dis-moi les changements) — quand une f
 **Sources** — HAS
 
 ---
+
+## 7. Récapitulatif des protocoles d'urgence
+
+**Résumé** — Carte-résumé pour les situations d'urgence les plus fréquentes à domicile : premiers gestes, hypoglycémie et hyperglycémie.
+
+**Appel des secours**
+- Composer le 15
+- Préciser : lieu — situation — état du patient
+
+**Arrêt cardio-respiratoire**
+- Alerter — Masser — Défibriller
+- Suivre le chariot d'urgence
+
+**Détresse respiratoire**
+- Position demi-assise
+- Oxygène si prescrit
+- Surveillance rapprochée — Alerter le médecin
+
+**Choc / Hypotension**
+- Allonger — Surélever les jambes
+- Surveillance des paramètres
+- Alerter le médecin
+
+**Convulsions**
+- Sécuriser l'environnement
+- Protéger les voies aériennes
+- Noter l'heure de début — Alerter
+
+**Autres situations d'urgence**
+- Se référer aux protocoles spécifiques
+- Informer et tracer
+
+**Conduite à tenir — hypoglycémie**
+- < 0,70 g/L ou signes d'hypoglycémie
+- 15 g de glucides rapides (sucre, jus de fruit...)
+- Recontrôler la glycémie à 15 min
+- Si persistance : renouveler — Alerter le médecin
+
+**Conduite à tenir — hyperglycémie**
+- > 1,30 g/L
+- Hydrater le patient — Rechercher une cause
+- Contrôler la glycémie — Alerter le médecin
+- Suivre la prescription (insuline si prescrit)
+
+**Sources** — Cabinet infirmier Vaïtilingon Marie-Christine
+
+---

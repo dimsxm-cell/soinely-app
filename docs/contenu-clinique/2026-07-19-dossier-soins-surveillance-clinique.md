@@ -330,3 +330,19 @@ Corrige directement dans ce fichier (ou dis-moi les changements) — quand une f
 **Sources** — Cabinet infirmier Vaïtilingon Marie-Christine
 
 ---
+
+## 14. Sommaire — Surveillance clinique
+
+**Résumé** — Vue d'ensemble des informations regroupées dans la section Surveillance clinique du dossier de soins.
+
+**Contenu de cette section**
+- Glycémie
+- Tension
+- Poids
+- Température
+- Saturation en oxygène
+- Fréquence cardiaque
+
+**Sources** — Cabinet infirmier Vaïtilingon Marie-Christine
+
+---

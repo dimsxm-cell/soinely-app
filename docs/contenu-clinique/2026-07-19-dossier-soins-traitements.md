@@ -36,3 +36,17 @@ Corrige directement dans ce fichier (ou dis-moi les changements) — quand une f
 **Sources** — Cabinet infirmier Vaïtilingon Marie-Christine
 
 ---
+
+## 3. Sommaire — Traitements
+
+**Résumé** — Vue d'ensemble des informations regroupées dans la section Traitements du dossier de soins.
+
+**Contenu de cette section**
+- Traitement habituel
+- Insuline
+- Injections
+- Pansements
+
+**Sources** — Cabinet infirmier Vaïtilingon Marie-Christine
+
+---

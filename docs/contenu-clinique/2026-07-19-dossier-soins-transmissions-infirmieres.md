@@ -21,3 +21,17 @@ Corrige directement dans ce fichier (ou dis-moi les changements) — quand une f
 **Sources** — Cabinet infirmier Vaïtilingon Marie-Christine
 
 ---
+
+## 2. Sommaire — Transmissions infirmières
+
+**Résumé** — Vue d'ensemble des informations regroupées dans la section Transmissions infirmières du dossier de soins.
+
+**Contenu de cette section**
+- Observations
+- Transmissions ciblées
+- Évolution
+- Relais
+
+**Sources** — Cabinet infirmier Vaïtilingon Marie-Christine
+
+---
