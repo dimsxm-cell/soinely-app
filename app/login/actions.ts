@@ -28,7 +28,7 @@ export async function signUpAction(
   const password = String(formData.get("password"));
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: { data: { full_name: fullName } },
@@ -36,6 +36,17 @@ export async function signUpAction(
 
   if (error) {
     return { success: false, error: error.message };
+  }
+
+  // Supabase ne renvoie pas d'erreur pour un email déjà inscrit et confirmé
+  // (protection anti-énumération) : il renvoie un faux succès avec un tableau
+  // identities vide et n'envoie aucun email. On détecte ce cas pour ne pas
+  // afficher un message "vérifiez votre boîte mail" trompeur.
+  if (data?.user?.identities?.length === 0) {
+    return {
+      success: false,
+      error: "Un compte existe déjà avec cette adresse. Connectez-vous plutôt.",
+    };
   }
 
   return { success: true };
