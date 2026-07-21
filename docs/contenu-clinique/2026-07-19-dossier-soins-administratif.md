@@ -93,3 +93,18 @@ Corrige directement dans ce fichier (ou dis-moi les changements) — quand une f
 **Sources** — Cabinet infirmier Vaïtilingon Marie-Christine
 
 ---
+
+## 4. Sommaire — Administratif
+
+**Résumé** — Vue d'ensemble des informations regroupées dans la section Administratif du dossier de soins.
+
+**Contenu de cette section**
+- ALD
+- Mutuelle
+- Consentements
+- Directives anticipées
+- Divers
+
+**Sources** — Cabinet infirmier Vaïtilingon Marie-Christine
+
+---

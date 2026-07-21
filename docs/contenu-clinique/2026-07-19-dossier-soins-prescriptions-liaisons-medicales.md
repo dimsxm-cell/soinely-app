@@ -20,3 +20,16 @@ Corrige directement dans ce fichier (ou dis-moi les changements) — quand une f
 **Sources** — Cabinet infirmier Vaïtilingon Marie-Christine
 
 ---
+
+## 2. Sommaire — Prescriptions et liaisons médicales
+
+**Résumé** — Vue d'ensemble des informations regroupées dans la section Prescriptions et liaisons médicales du dossier de soins.
+
+**Contenu de cette section**
+- Ordonnances
+- Liaisons médicales
+- Protocoles
+
+**Sources** — Cabinet infirmier Vaïtilingon Marie-Christine
+
+---
