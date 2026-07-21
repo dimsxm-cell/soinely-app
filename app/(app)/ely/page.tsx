@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { searchSituationsTerrain } from "@/lib/data/recherche";
 import { CarteReponse } from "@/components/ui/CarteReponse";
+import { LectureVocaleReponse } from "@/components/ui/LectureVocaleReponse";
 import { CarteSituationTerrain } from "@/components/ui/CarteSituationTerrain";
 import { Button } from "@/components/ui/Button";
 import { ChampRechercheVocale } from "@/components/ui/ChampRechercheVocale";
@@ -40,7 +41,14 @@ export default async function ElyPage({
           </p>
         )}
 
-        {reponse && <CarteReponse situation={reponse} />}
+        {reponse && (
+          <>
+            <CarteReponse situation={reponse} />
+            <LectureVocaleReponse
+              texte={[reponse.titre, reponse.observation, ...reponse.conduiteATenir.slice(0, 3)].join(". ")}
+            />
+          </>
+        )}
 
         {autres.length > 0 && (
           <div className="flex flex-col gap-4">
