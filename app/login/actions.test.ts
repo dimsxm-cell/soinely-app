@@ -90,6 +90,30 @@ describe("signUpAction", () => {
 
     expect(result).toEqual({ success: false, error: "User already registered" });
   });
+
+  it("signale qu'un compte existe déjà quand Supabase renvoie une identité vide (email déjà inscrit et confirmé)", async () => {
+    // Supabase ne renvoie pas d'erreur pour ne pas révéler qu'un compte existe déjà
+    // (protection anti-énumération) : il renvoie un faux succès avec un user id
+    // fictif et un tableau identities vide. Aucun email n'est réellement envoyé.
+    signUpMock.mockResolvedValueOnce({
+      error: null,
+      data: { user: { id: "fictif", identities: [] }, session: null },
+    });
+
+    const { signUpAction } = await import("./actions");
+
+    const formData = new FormData();
+    formData.set("fullName", "Marie Dupont");
+    formData.set("email", "marie@example.com");
+    formData.set("password", "motdepasse123");
+
+    const result = await signUpAction(formData);
+
+    expect(result).toEqual({
+      success: false,
+      error: "Un compte existe déjà avec cette adresse. Connectez-vous plutôt.",
+    });
+  });
 });
 
 describe("signOutAction", () => {
