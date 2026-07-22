@@ -168,6 +168,27 @@ describe("OngletEly", () => {
     expect(speakMock).toHaveBeenCalledTimes(1);
   });
 
+  it("un second pointerDown avant le seuil remplace le minuteur précédent (un seul déclenchement)", () => {
+    render(<OngletEly actif={false} />);
+    const lien = screen.getByRole("link", { name: /Ely/ });
+
+    // Premier doigt pose un minuteur
+    fireEvent.pointerDown(lien);
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+
+    // Second doigt pose un minuteur sans relâcher le premier (multi-touch)
+    fireEvent.pointerDown(lien);
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+
+    // Seul le minuteur du second appui doit avoir survécu : une seule séquence démarre
+    expect(vibrateMock).toHaveBeenCalledTimes(1);
+    expect(speakMock).toHaveBeenCalledTimes(1);
+  });
+
   it("navigue vers /ely avec la question captée en paramètre", () => {
     render(<OngletEly actif={false} />);
     const lien = screen.getByRole("link", { name: /Ely/ });

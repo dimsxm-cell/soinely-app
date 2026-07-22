@@ -41,6 +41,7 @@ export function OngletEly({ actif }: OngletElyProps) {
   const [enSequence, setEnSequence] = useState(false);
 
   function demarrerMinuteur() {
+    annulerMinuteur();
     declencheRef.current = false;
     minuteurRef.current = setTimeout(() => {
       declencheRef.current = true;
@@ -121,7 +122,7 @@ export function OngletEly({ actif }: OngletElyProps) {
       onPointerLeave={annulerMinuteur}
       onClick={handleClick}
       aria-current={actif ? "page" : undefined}
-      className={`flex w-14 flex-col items-center gap-1 py-1 text-[11px] font-medium transition-colors ${
+      className={`flex w-14 flex-col items-center gap-1 py-1 text-[11px] font-medium transition-colors select-none [-webkit-touch-callout:none] [touch-action:manipulation] ${
         actif ? "text-brand-violet" : "text-navy/40"
       }`}
     >
