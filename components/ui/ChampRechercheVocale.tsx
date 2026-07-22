@@ -7,6 +7,7 @@ import {
   lireSupportVocalServeur,
   souscrireSupportVocal,
 } from "@/lib/reconnaissance-vocale";
+import { acquerirMicrophoneForce, relacherMicrophone } from "@/lib/verrou-microphone";
 
 interface ChampRechercheVocaleProps {
   defaultValue: string;
@@ -27,9 +28,17 @@ export function ChampRechercheVocale({ defaultValue, placeholder, ariaLabel }: C
     const recognition = creerReconnaissanceVocale();
     if (!recognition) return;
 
+    acquerirMicrophoneForce("dictee", () => recognition.stop());
+
     recognition.onstart = () => setEcoute(true);
-    recognition.onend = () => setEcoute(false);
-    recognition.onerror = () => setEcoute(false);
+    recognition.onend = () => {
+      relacherMicrophone("dictee");
+      setEcoute(false);
+    };
+    recognition.onerror = () => {
+      relacherMicrophone("dictee");
+      setEcoute(false);
+    };
     recognition.onresult = (event) => {
       const transcript = event.results[0]?.[0]?.transcript;
       if (transcript && inputRef.current) {

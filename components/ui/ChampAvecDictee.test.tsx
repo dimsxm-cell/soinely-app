@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ChampAvecDictee } from "./ChampAvecDictee";
+import { acquerirMicrophone, _reinitialiserVerrouPourTests } from "@/lib/verrou-microphone";
 import type { SpeechRecognitionEvent } from "@/lib/reconnaissance-vocale";
 
 let instances: FakeSpeechRecognition[] = [];
@@ -14,6 +15,7 @@ class FakeSpeechRecognition {
   onerror: (() => void) | null = null;
   onresult: ((event: SpeechRecognitionEvent) => void) | null = null;
   start = vi.fn();
+  stop = vi.fn();
 
   constructor() {
     instances.push(this);
@@ -30,6 +32,7 @@ function evenementTranscript(transcript: string): SpeechRecognitionEvent {
 
 describe("ChampAvecDictee", () => {
   beforeEach(() => {
+    _reinitialiserVerrouPourTests();
     instances = [];
   });
 
@@ -78,5 +81,29 @@ describe("ChampAvecDictee", () => {
     });
 
     expect(screen.getByLabelText("Consignes")).toHaveValue("Note existante nouvelle info");
+  });
+
+  it("vole le verrou micro à un autre détenteur au clic sur Dicter", () => {
+    window.SpeechRecognition = FakeSpeechRecognition as never;
+    const libererAutre = vi.fn();
+    acquerirMicrophone("ecoute-fond", libererAutre);
+
+    render(<ChampAvecDictee name="adresse" label="Adresse" />);
+    fireEvent.click(screen.getByRole("button", { name: "Dicter — Adresse" }));
+
+    expect(libererAutre).toHaveBeenCalledTimes(1);
+    expect(derniereInstance().start).toHaveBeenCalled();
+  });
+
+  it("libère le verrou micro une fois la dictée terminée", () => {
+    window.SpeechRecognition = FakeSpeechRecognition as never;
+
+    render(<ChampAvecDictee name="adresse" label="Adresse" />);
+    fireEvent.click(screen.getByRole("button", { name: "Dicter — Adresse" }));
+    act(() => {
+      derniereInstance().onend?.();
+    });
+
+    expect(acquerirMicrophone("dictee", vi.fn())).toBe(true);
   });
 });
