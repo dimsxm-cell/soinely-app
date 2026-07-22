@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getAbonnement, getJoursRestantsEssaiGratuit } from "@/lib/data/abonnement";
 import { createBillingPortalSessionAction } from "@/lib/data/abonnement-actions";
 import { signOutAction } from "@/app/login/actions";
+import { BasculeEcoutePermanenteEly } from "@/components/ui/BasculeEcoutePermanenteEly";
 import type { PlanAbonnement, StatutAbonnement } from "@/lib/types/abonnement";
 
 const PLAN_LABEL: Record<PlanAbonnement, string> = {
@@ -42,6 +43,7 @@ export default async function ComptePage() {
   const abonnement = await getAbonnement(supabase, user.id);
   const nom = (user.user_metadata?.full_name as string | undefined) ?? user.email ?? "";
   const joursRestantsEssai = abonnement ? 0 : getJoursRestantsEssaiGratuit(user.created_at);
+  const ecoutePermanenteActivee = Boolean(user.user_metadata?.ecoute_permanente_ely);
 
   return (
     <main className="min-h-screen bg-[#F6F7F5] text-navy">
@@ -73,6 +75,18 @@ export default async function ComptePage() {
               >
                 Voir mes patients
               </Link>
+            </div>
+          </section>
+
+          <section className="rounded-[20px] border border-navy/10 bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,.04),0_18px_40px_rgba(15,23,42,.06)]">
+            <p className="text-[12.5px] font-bold uppercase tracking-wider text-navy/45">Copilote vocal</p>
+            <p className="mt-2 text-sm text-navy/60">
+              Active l&apos;écoute permanente pour dire « Dis-moi Ely » sans les mains, où que tu sois dans
+              l&apos;app. Fonctionne uniquement sur Android/Chrome. Le micro reste actif tant que l&apos;app
+              est ouverte à l&apos;écran.
+            </p>
+            <div className="mt-4">
+              <BasculeEcoutePermanenteEly activeParDefaut={ecoutePermanenteActivee} />
             </div>
           </section>
 
