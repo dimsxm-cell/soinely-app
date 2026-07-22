@@ -3,7 +3,10 @@ export interface SpeechRecognitionResultItem {
 }
 
 export interface SpeechRecognitionEvent extends Event {
-  results: { [index: number]: { [index: number]: SpeechRecognitionResultItem } };
+  results: {
+    [index: number]: { [index: number]: SpeechRecognitionResultItem };
+    length: number;
+  };
 }
 
 export interface SpeechRecognitionErrorEventLike extends Event {
