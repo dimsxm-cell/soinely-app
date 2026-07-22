@@ -5,6 +5,7 @@ const usePathnameMock = vi.fn();
 
 vi.mock("next/navigation", () => ({
   usePathname: () => usePathnameMock(),
+  useRouter: () => ({ push: vi.fn() }),
 }));
 
 describe("BarreNavigationBasse", () => {
