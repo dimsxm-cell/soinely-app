@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { OngletEly } from "./OngletEly";
 
 function IconeAccueil() {
   return (
@@ -33,14 +34,6 @@ function IconeExplorer() {
   );
 }
 
-function IconeEly() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-[22px] w-[22px]">
-      <path d="M5 5h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H10l-4.5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z" />
-    </svg>
-  );
-}
-
 function IconePlus() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" className="h-6 w-6">
@@ -60,10 +53,7 @@ const ONGLETS_GAUCHE: Onglet[] = [
   { href: "/patients", label: "Patients", icone: <IconePatients /> },
 ];
 
-const ONGLETS_DROITE: Onglet[] = [
-  { href: "/situations", label: "Explorer", icone: <IconeExplorer /> },
-  { href: "/ely", label: "Ely", icone: <IconeEly /> },
-];
+const ONGLETS_DROITE: Onglet[] = [{ href: "/situations", label: "Explorer", icone: <IconeExplorer /> }];
 
 function estActif(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -108,6 +98,8 @@ export function BarreNavigationBasse() {
         {ONGLETS_DROITE.map((onglet) => (
           <OngletNav key={onglet.href} onglet={onglet} actif={estActif(pathname, onglet.href)} />
         ))}
+
+        <OngletEly actif={estActif(pathname, "/ely")} />
       </div>
     </nav>
   );
