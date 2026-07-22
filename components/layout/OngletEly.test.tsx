@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { OngletEly } from "./OngletEly";
 import type { SpeechRecognitionEvent } from "@/lib/reconnaissance-vocale";
+import { acquerirMicrophone, _reinitialiserVerrouPourTests } from "@/lib/verrou-microphone";
 
 const pushMock = vi.fn();
 vi.mock("next/navigation", () => ({
@@ -54,6 +55,7 @@ const cancelMock = vi.fn();
 const vibrateMock = vi.fn();
 
 beforeEach(() => {
+  _reinitialiserVerrouPourTests();
   vi.useFakeTimers();
   instances = [];
   currentUtterance = null;
@@ -266,5 +268,57 @@ describe("OngletEly", () => {
   it("affiche aria-current=page quand actif est vrai", () => {
     render(<OngletEly actif={true} />);
     expect(screen.getByRole("link", { name: /Ely/ })).toHaveAttribute("aria-current", "page");
+  });
+
+  it("acquiert le verrou micro pendant l'écoute de la question", () => {
+    render(<OngletEly actif={false} />);
+    const lien = screen.getByRole("link", { name: /Ely/ });
+
+    fireEvent.pointerDown(lien);
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+    act(() => {
+      currentUtterance?.onend?.();
+    });
+
+    expect(acquerirMicrophone("dictee", vi.fn())).toBe(false);
+  });
+
+  it("libère le verrou micro une fois l'écoute terminée", () => {
+    render(<OngletEly actif={false} />);
+    const lien = screen.getByRole("link", { name: /Ely/ });
+
+    fireEvent.pointerDown(lien);
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+    act(() => {
+      currentUtterance?.onend?.();
+    });
+    act(() => {
+      derniereInstance().onresult?.(evenementTranscript("test"));
+      derniereInstance().onend?.();
+    });
+
+    expect(acquerirMicrophone("dictee", vi.fn())).toBe(true);
+  });
+
+  it("vole le verrou micro à l'écoute de fond si elle le détient déjà", () => {
+    const libererEcouteDeFond = vi.fn();
+    acquerirMicrophone("ecoute-fond", libererEcouteDeFond);
+
+    render(<OngletEly actif={false} />);
+    const lien = screen.getByRole("link", { name: /Ely/ });
+
+    fireEvent.pointerDown(lien);
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+    act(() => {
+      currentUtterance?.onend?.();
+    });
+
+    expect(libererEcouteDeFond).toHaveBeenCalledTimes(1);
   });
 });

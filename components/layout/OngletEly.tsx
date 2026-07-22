@@ -9,6 +9,7 @@ import {
   lireSupportVocalClient,
   type SpeechRecognitionInstance,
 } from "@/lib/reconnaissance-vocale";
+import { acquerirMicrophoneForce, relacherMicrophone } from "@/lib/verrou-microphone";
 
 const SEUIL_APPUI_LONG_MS = 500;
 
@@ -76,6 +77,7 @@ export function OngletEly({ actif }: OngletElyProps) {
       setEnSequence(false);
       return;
     }
+    acquerirMicrophoneForce("declenchement-manuel", () => recognition.stop());
     recognitionRef.current = recognition;
     recognition.onresult = (event) => {
       const transcript = event.results[0]?.[0]?.transcript;
@@ -89,6 +91,7 @@ export function OngletEly({ actif }: OngletElyProps) {
       }
     };
     recognition.onend = () => {
+      relacherMicrophone("declenchement-manuel");
       setEnSequence(false);
       recognitionRef.current = null;
     };
@@ -99,6 +102,7 @@ export function OngletEly({ actif }: OngletElyProps) {
     annuleRef.current = true;
     couperLecture();
     recognitionRef.current?.stop();
+    relacherMicrophone("declenchement-manuel");
     setEnSequence(false);
   }
 
