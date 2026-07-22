@@ -144,6 +144,30 @@ describe("OngletEly", () => {
     expect(derniereInstance().start).toHaveBeenCalled();
   });
 
+  it("un second appui long pendant une séquence en cours est ignoré", () => {
+    render(<OngletEly actif={false} />);
+    const lien = screen.getByRole("link", { name: /Ely/ });
+
+    // Premier appui long
+    fireEvent.pointerDown(lien);
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+
+    expect(vibrateMock).toHaveBeenCalledTimes(1);
+    expect(speakMock).toHaveBeenCalledTimes(1);
+
+    // Second appui long pendant que la séquence est en cours
+    fireEvent.pointerDown(lien);
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+
+    // Vérifier que vibrate et speak n'ont pas été appelés une seconde fois
+    expect(vibrateMock).toHaveBeenCalledTimes(1);
+    expect(speakMock).toHaveBeenCalledTimes(1);
+  });
+
   it("navigue vers /ely avec la question captée en paramètre", () => {
     render(<OngletEly actif={false} />);
     const lien = screen.getByRole("link", { name: /Ely/ });

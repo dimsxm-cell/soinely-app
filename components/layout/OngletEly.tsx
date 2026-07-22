@@ -56,6 +56,7 @@ export function OngletEly({ actif }: OngletElyProps) {
   }
 
   function demarrerSequence() {
+    if (enSequence) return;
     if (!lireSupportVocalClient()) {
       declencheRef.current = false;
       return;
