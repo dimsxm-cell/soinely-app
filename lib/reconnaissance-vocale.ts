@@ -6,15 +6,20 @@ export interface SpeechRecognitionEvent extends Event {
   results: { [index: number]: { [index: number]: SpeechRecognitionResultItem } };
 }
 
+export interface SpeechRecognitionErrorEventLike extends Event {
+  error: string;
+}
+
 export interface SpeechRecognitionInstance extends EventTarget {
   lang: string;
   interimResults: boolean;
   maxAlternatives: number;
+  continuous: boolean;
   start: () => void;
   stop: () => void;
   onstart: (() => void) | null;
   onend: (() => void) | null;
-  onerror: (() => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEventLike) => void) | null;
   onresult: ((event: SpeechRecognitionEvent) => void) | null;
 }
 
@@ -39,7 +44,13 @@ export function lireSupportVocalServeur(): boolean {
   return false;
 }
 
-export function creerReconnaissanceVocale(): SpeechRecognitionInstance | null {
+export interface OptionsReconnaissanceVocale {
+  continuous?: boolean;
+}
+
+export function creerReconnaissanceVocale(
+  options: OptionsReconnaissanceVocale = {}
+): SpeechRecognitionInstance | null {
   const SpeechRecognitionClass = window.SpeechRecognition ?? window.webkitSpeechRecognition;
   if (!SpeechRecognitionClass) return null;
 
@@ -47,5 +58,6 @@ export function creerReconnaissanceVocale(): SpeechRecognitionInstance | null {
   recognition.lang = "fr-FR";
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
+  recognition.continuous = options.continuous ?? false;
   return recognition;
 }
