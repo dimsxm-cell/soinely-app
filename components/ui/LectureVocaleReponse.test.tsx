@@ -5,6 +5,7 @@ import { LectureVocaleReponse } from "./LectureVocaleReponse";
 class FakeSpeechSynthesisUtterance {
   text: string;
   lang = "";
+  onstart: (() => void) | null = null;
   onend: (() => void) | null = null;
   onerror: (() => void) | null = null;
 
@@ -36,15 +37,26 @@ afterEach(() => {
 });
 
 describe("LectureVocaleReponse", () => {
-  it("lance la lecture au montage et affiche le bouton Couper", async () => {
+  it("lance la lecture au montage et affiche le bouton Couper une fois démarrée (onstart)", async () => {
     render(<LectureVocaleReponse texte="Bonjour, ceci est un test." />);
 
     expect(speakMock).toHaveBeenCalledTimes(1);
-    expect(await screen.findByRole("button", { name: /Couper/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Couper/i })).not.toBeInTheDocument();
+
+    act(() => {
+      currentUtterance?.onstart?.();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /Couper/i })).toBeInTheDocument();
+    });
   });
 
   it("cache le bouton une fois la lecture terminée (onend)", async () => {
     render(<LectureVocaleReponse texte="Bonjour" />);
+    act(() => {
+      currentUtterance?.onstart?.();
+    });
     await screen.findByRole("button", { name: /Couper/i });
 
     act(() => {
@@ -58,6 +70,9 @@ describe("LectureVocaleReponse", () => {
 
   it("coupe la lecture au clic sur le bouton", async () => {
     render(<LectureVocaleReponse texte="Bonjour" />);
+    act(() => {
+      currentUtterance?.onstart?.();
+    });
     const bouton = await screen.findByRole("button", { name: /Couper/i });
 
     fireEvent.click(bouton);

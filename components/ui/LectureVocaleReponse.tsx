@@ -24,9 +24,11 @@ export function LectureVocaleReponse({ texte }: LectureVocaleReponseProps) {
   useEffect(() => {
     if (!supporte || !texte.trim()) return;
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- démarre la synthèse vocale (API navigateur impérative) et reflète aussitôt son état "en cours" ; le passage à false se fait bien via le callback onFin.
-    setEnCours(true);
-    lireTexteAVoixHaute(texte, () => setEnCours(false));
+    lireTexteAVoixHaute(
+      texte,
+      () => setEnCours(true),
+      () => setEnCours(false)
+    );
 
     return () => {
       if (lireSupportSyntheseClient()) {

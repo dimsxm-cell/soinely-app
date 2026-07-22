@@ -9,6 +9,7 @@ import {
 class FakeSpeechSynthesisUtterance {
   text: string;
   lang = "";
+  onstart: (() => void) | null = null;
   onend: (() => void) | null = null;
   onerror: (() => void) | null = null;
 
@@ -54,8 +55,9 @@ describe("lireSupportSyntheseServeur", () => {
 
 describe("lireTexteAVoixHaute", () => {
   it("crée un utterance en français et le passe à speechSynthesis.speak", () => {
+    const onDebut = vi.fn();
     const onFin = vi.fn();
-    lireTexteAVoixHaute("Bonjour", onFin);
+    lireTexteAVoixHaute("Bonjour", onDebut, onFin);
 
     expect(speakMock).toHaveBeenCalledTimes(1);
     const utterance = speakMock.mock.calls[0][0] as FakeSpeechSynthesisUtterance;
@@ -63,9 +65,21 @@ describe("lireTexteAVoixHaute", () => {
     expect(utterance.lang).toBe("fr-FR");
   });
 
-  it("appelle onFin quand la lecture se termine normalement (onend)", () => {
+  it("appelle onDebut quand la lecture démarre réellement (onstart)", () => {
+    const onDebut = vi.fn();
     const onFin = vi.fn();
-    lireTexteAVoixHaute("Bonjour", onFin);
+    lireTexteAVoixHaute("Bonjour", onDebut, onFin);
+
+    const utterance = speakMock.mock.calls[0][0] as FakeSpeechSynthesisUtterance;
+    utterance.onstart?.();
+
+    expect(onDebut).toHaveBeenCalledTimes(1);
+  });
+
+  it("appelle onFin quand la lecture se termine normalement (onend)", () => {
+    const onDebut = vi.fn();
+    const onFin = vi.fn();
+    lireTexteAVoixHaute("Bonjour", onDebut, onFin);
 
     const utterance = speakMock.mock.calls[0][0] as FakeSpeechSynthesisUtterance;
     utterance.onend?.();
@@ -74,8 +88,9 @@ describe("lireTexteAVoixHaute", () => {
   });
 
   it("appelle onFin aussi en cas d'erreur (onerror, ex. coupure manuelle)", () => {
+    const onDebut = vi.fn();
     const onFin = vi.fn();
-    lireTexteAVoixHaute("Bonjour", onFin);
+    lireTexteAVoixHaute("Bonjour", onDebut, onFin);
 
     const utterance = speakMock.mock.calls[0][0] as FakeSpeechSynthesisUtterance;
     utterance.onerror?.();
