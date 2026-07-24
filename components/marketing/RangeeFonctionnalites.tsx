@@ -1,7 +1,7 @@
 const FONCTIONNALITES = [
   {
     titre: "Jusqu'à 1 heure gagnée par jour",
-    texte: "Des tournées optimisées qui s'adaptent à votre rythme réel.",
+    texte: "Des tournées optimisées qui s'adaptent en temps réel.",
     icone: (
       <path d="M12 7v5l3.5 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" stroke="currentColor" strokeWidth="1.7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
     ),
@@ -29,14 +29,14 @@ const FONCTIONNALITES = [
   },
   {
     titre: "Toute votre expertise à portée de main",
-    texte: "Protocoles, constantes à tenir, codes NGAP, en un instant.",
+    texte: "Protocoles, cotations, conduites à tenir, NGAP…",
     icone: (
       <path d="M5 4.5h9A2.5 2.5 0 0 1 16.5 7v13l-5.5-2.5L5.5 20V7A2.5 2.5 0 0 1 5 4.5Z" stroke="currentColor" strokeWidth="1.7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
     ),
   },
   {
     titre: "Sécurisé et conforme",
-    texte: "Hébergé en France, conforme RGPD, données chiffrées.",
+    texte: "Hébergé HDS, chiffré de bout en bout, conforme RGPD.",
     icone: (
       <path d="M12 3l7 3v5.5c0 5-3.2 8.4-7 9.5-3.8-1.1-7-4.5-7-9.5V6l7-3Z" stroke="currentColor" strokeWidth="1.7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
     ),
@@ -48,13 +48,16 @@ export function RangeeFonctionnalites() {
     <section id="fonctionnalites" className="mx-auto w-full max-w-[1180px] px-6 pb-14 sm:pb-20">
       <div className="grid grid-cols-2 gap-8 rounded-[24px] border border-navy/5 bg-white px-6 py-10 shadow-[0_1px_2px_rgba(15,23,42,.04),0_18px_40px_-12px_rgba(15,23,42,.06)] sm:px-10 md:grid-cols-3 lg:grid-cols-6">
         {FONCTIONNALITES.map((item) => (
-          <div key={item.titre} className="flex flex-col items-center text-center">
-            <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-brand-violet/10 to-brand-rose/10 text-brand-violet">
+          <div
+            key={item.titre}
+            className="group flex flex-col items-center rounded-2xl px-1 py-2 text-center transition-transform duration-300 [transition-timing-function:cubic-bezier(.34,1.56,.64,1)] hover:-translate-y-1.5 hover:bg-[#faf8ff]"
+          >
+            <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-brand-violet/10 to-brand-rose/10 text-brand-violet transition-transform duration-300 [transition-timing-function:cubic-bezier(.34,1.56,.64,1)] group-hover:-rotate-6 group-hover:scale-110">
               <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
                 {item.icone}
               </svg>
             </span>
-            <p className="text-[13.5px] font-semibold leading-snug text-navy">{item.titre}</p>
+            <p className="text-[13.5px] font-semibold leading-snug text-navy transition-colors group-hover:text-brand-violet">{item.titre}</p>
             <p className="mt-1 text-[11.5px] leading-snug text-navy/50">{item.texte}</p>
           </div>
         ))}
