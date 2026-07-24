@@ -19,7 +19,7 @@ export function EnTeteMarketing() {
           </span>
           <span>
             <span className="block text-lg font-bold leading-none tracking-tight text-navy">SOINELY</span>
-            <span className="block text-[8.5px] font-semibold uppercase tracking-[0.12em] text-navy/40">
+            <span className="hidden text-[8.5px] font-semibold uppercase tracking-[0.12em] text-navy/40 sm:block">
               Le copilote des infirmiers libéraux
             </span>
           </span>

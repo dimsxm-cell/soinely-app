@@ -97,8 +97,8 @@ export function Hero() {
           </div>
         </div>
 
-        <div className="relative h-[500px] sm:h-[560px]">
-          <div className="slide-in-right absolute right-0 top-0 w-[264px]">
+        <div className="relative sm:h-[560px]">
+          <div className="slide-in-right mx-auto w-[264px] sm:absolute sm:right-0 sm:top-0 sm:mx-0">
             <div className="rounded-[42px] bg-[#111014] p-[9px] shadow-[0_26px_54px_-14px_rgba(30,27,60,0.35)]">
               <div className="relative overflow-hidden rounded-[34px] bg-[#f4f2f9] text-navy">
                 <div className="flex items-center justify-between px-4 pt-3 text-[10.5px] font-semibold text-navy/70">
@@ -210,7 +210,7 @@ export function Hero() {
             </div>
           </div>
 
-          <div className="slide-in-left absolute bottom-[-30px] left-0 w-[238px] rounded-[20px] border border-brand-violet/[0.08] bg-white p-4 text-left shadow-[0_20px_44px_-14px_rgba(109,40,217,0.28)]">
+          <div className="slide-in-left mx-auto mt-6 w-[238px] rounded-[20px] border border-brand-violet/[0.08] bg-white p-4 text-left shadow-[0_20px_44px_-14px_rgba(109,40,217,0.28)] sm:absolute sm:bottom-[-30px] sm:left-0 sm:mx-0 sm:mt-0">
             <div className="mb-2.5 flex items-center justify-between">
               <span className="flex items-center gap-2">
                 <span className="flex h-[34px] w-[34px] items-center justify-center overflow-hidden rounded-full bg-[radial-gradient(circle_at_50%_35%,#efe7fb,#fff)]">
