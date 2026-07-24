@@ -22,7 +22,7 @@ const AVANTAGES = [
 export function ListeAttente() {
   return (
     <section id="liste-attente" className="px-6 pb-20 sm:pb-28">
-      <div className="relative mx-auto grid w-full max-w-[1180px] grid-cols-1 items-center gap-8 overflow-hidden rounded-[26px] bg-gradient-to-br from-[#4c1d95] via-brand-violet via-40% to-[#ec4899] px-7 py-11 text-white sm:grid-cols-[0.55fr_1.2fr] sm:px-11 sm:py-11 lg:grid-cols-[0.5fr_1.15fr_repeat(3,0.72fr)]">
+      <div className="relative mx-auto grid w-full max-w-[1180px] grid-cols-1 items-center gap-8 overflow-hidden rounded-[26px] bg-[linear-gradient(115deg,#4c1d95_0%,#7c3aed_42%,#c026d3_78%,#ec4899_100%)] px-7 py-11 text-white sm:grid-cols-[0.55fr_1.2fr] sm:px-11 sm:py-11 lg:grid-cols-[0.5fr_1.15fr_repeat(3,0.72fr)]">
         <span className="mx-auto hidden h-[130px] w-[130px] overflow-hidden rounded-[20px] ring-4 ring-white/20 lg:block">
           <Image
             src="/marketing/ely-mascot.png"
@@ -40,7 +40,7 @@ export function ListeAttente() {
           <p className="mb-4 text-[14px] font-semibold text-white/80">Bêta privée · Ouverture bientôt</p>
           <Link
             href="/login"
-            className="btn-sheen mb-3 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-[15px] font-extrabold text-brand-violet shadow-lg"
+            className="mb-3 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-[15px] font-extrabold text-brand-violet shadow-lg transition-transform active:scale-95"
           >
             Rejoindre la liste d&apos;attente
             <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[17px] w-[17px]">

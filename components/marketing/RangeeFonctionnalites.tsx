@@ -48,16 +48,13 @@ export function RangeeFonctionnalites() {
     <section id="fonctionnalites" className="mx-auto w-full max-w-[1180px] px-6 pb-14 sm:pb-20">
       <div className="grid grid-cols-2 gap-8 rounded-[24px] border border-navy/5 bg-white px-6 py-10 shadow-[0_1px_2px_rgba(15,23,42,.04),0_18px_40px_-12px_rgba(15,23,42,.06)] sm:px-10 md:grid-cols-3 lg:grid-cols-6">
         {FONCTIONNALITES.map((item) => (
-          <div
-            key={item.titre}
-            className="group flex flex-col items-center rounded-2xl px-1 py-2 text-center transition-transform duration-300 [transition-timing-function:cubic-bezier(.34,1.56,.64,1)] hover:-translate-y-1.5 hover:bg-[#faf8ff]"
-          >
-            <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-brand-violet/10 to-brand-rose/10 text-brand-violet transition-transform duration-300 [transition-timing-function:cubic-bezier(.34,1.56,.64,1)] group-hover:-rotate-6 group-hover:scale-110">
+          <div key={item.titre} className="flex flex-col items-center text-center">
+            <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-brand-violet/10 to-brand-rose/10 text-brand-violet">
               <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
                 {item.icone}
               </svg>
             </span>
-            <p className="text-[13.5px] font-semibold leading-snug text-navy transition-colors group-hover:text-brand-violet">{item.titre}</p>
+            <p className="text-[13.5px] font-semibold leading-snug text-navy">{item.titre}</p>
             <p className="mt-1 text-[11.5px] leading-snug text-navy/50">{item.texte}</p>
           </div>
         ))}

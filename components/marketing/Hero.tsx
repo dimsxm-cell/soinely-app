@@ -67,7 +67,7 @@ export function Hero() {
           <div className="flex flex-wrap items-center gap-3.5">
             <Link
               href="/login"
-              className="btn-sheen inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-brand-violet to-purple-400 px-6 py-3.5 text-[15px] font-bold text-white shadow-[0_10px_26px_-8px_rgba(124,58,237,0.55)]"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-brand-violet to-purple-400 px-6 py-3.5 text-[15px] font-bold text-white shadow-[0_10px_26px_-8px_rgba(124,58,237,0.55)] transition-transform active:scale-95"
             >
               Essayer gratuitement
               <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[18px] w-[18px]">
@@ -76,11 +76,13 @@ export function Hero() {
             </Link>
             <a
               href="#demo"
-              className="inline-flex items-center gap-2 rounded-full border border-navy/15 bg-white px-6 py-3.5 text-[15px] font-semibold text-navy transition-colors hover:bg-navy/5"
+              className="inline-flex items-center gap-2.5 rounded-full border-[1.5px] border-brand-violet/15 bg-white px-6 py-[15px] text-[15px] font-bold text-[#4b3f6b] transition-transform active:scale-95"
             >
-              <svg viewBox="0 0 16 16" aria-hidden="true" className="h-3.5 w-3.5">
-                <path d="M4 2.5v11l9-5.5-9-5.5Z" fill="currentColor" />
-              </svg>
+              <span className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-brand-violet/10">
+                <svg viewBox="0 0 16 16" aria-hidden="true" className="ml-0.5 h-3.5 w-3.5">
+                  <path d="M4 2.5v11l9-5.5-9-5.5Z" fill="#7c3aed" />
+                </svg>
+              </span>
               Voir la démo
             </a>
           </div>
@@ -98,7 +100,7 @@ export function Hero() {
         </div>
 
         <div className="relative sm:h-[560px]">
-          <div className="slide-in-right mx-auto w-[264px] sm:absolute sm:right-0 sm:top-0 sm:mx-0">
+          <div className="mx-auto w-[264px] sm:absolute sm:right-0 sm:top-0 sm:mx-0">
             <div className="rounded-[42px] bg-[#111014] p-[9px] shadow-[0_26px_54px_-14px_rgba(30,27,60,0.35)]">
               <div className="relative overflow-hidden rounded-[34px] bg-[#f4f2f9] text-navy">
                 <div className="flex items-center justify-between px-4 pt-3 text-[10.5px] font-semibold text-navy/70">
@@ -198,9 +200,9 @@ export function Hero() {
                   ].map((tab) => (
                     <div key={tab.l} className="flex flex-col items-center gap-1">
                       {tab.active ? (
-                        <Image src="/marketing/ely-mascot.png" alt="ELY" width={44} height={44} className="h-[22px] w-[22px] rounded-full object-cover" />
+                        <span className="h-[16px] w-[16px] rounded-full bg-gradient-to-br from-brand-violet to-purple-400" />
                       ) : (
-                        <span className="h-[14px] w-[14px] rounded-full bg-navy/15" />
+                        <span className="h-[14px] w-[14px] rounded-[5px] border-2 border-navy/20" />
                       )}
                       <span className={tab.active ? "text-brand-violet" : "text-navy/40"}>{tab.l}</span>
                     </div>
@@ -210,7 +212,7 @@ export function Hero() {
             </div>
           </div>
 
-          <div className="slide-in-left mx-auto mt-6 w-[238px] rounded-[20px] border border-brand-violet/[0.08] bg-white p-4 text-left shadow-[0_20px_44px_-14px_rgba(109,40,217,0.28)] sm:absolute sm:bottom-[-30px] sm:left-0 sm:mx-0 sm:mt-0">
+          <div className="mx-auto mt-6 w-[238px] rounded-[20px] border border-brand-violet/[0.08] bg-white p-4 text-left shadow-[0_20px_44px_-14px_rgba(109,40,217,0.28)] sm:absolute sm:bottom-[-30px] sm:left-0 sm:mx-0 sm:mt-0">
             <div className="mb-2.5 flex items-center justify-between">
               <span className="flex items-center gap-2">
                 <span className="flex h-[34px] w-[34px] items-center justify-center overflow-hidden rounded-full bg-[radial-gradient(circle_at_50%_35%,#efe7fb,#fff)]">
@@ -226,7 +228,7 @@ export function Hero() {
               Un embouteillage est détecté sur votre route. Je peux réorganiser votre tournée
               et vous faire gagner <b>18 minutes</b>.
             </p>
-            <span className="btn-sheen mb-2 block rounded-[11px] bg-gradient-to-r from-brand-violet to-purple-400 py-2.5 text-center text-[12.5px] font-bold text-white">
+            <span className="mb-2 block rounded-[11px] bg-gradient-to-r from-brand-violet to-purple-400 py-2.5 text-center text-[12.5px] font-bold text-white">
               Optimiser ma tournée
             </span>
             <p className="flex items-center gap-1.5 text-[11px] font-bold text-teal">

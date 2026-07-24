@@ -27,7 +27,7 @@ export function EnTeteMarketing() {
 
         <nav aria-label="Navigation principale" className="hidden items-center gap-7 text-[14.5px] font-semibold text-navy/70 lg:flex">
           {LIENS_NAV.map((lien) => (
-            <a key={lien.href} href={lien.href} className="navlink relative pb-1.5 transition-colors hover:text-brand-violet">
+            <a key={lien.href} href={lien.href} className="transition-colors hover:text-brand-violet">
               {lien.label}
             </a>
           ))}
@@ -35,9 +35,9 @@ export function EnTeteMarketing() {
 
         <Link
           href="/login"
-          className="btn-sheen whitespace-nowrap rounded-full bg-gradient-to-r from-brand-violet to-purple-400 px-5 py-2.5 text-sm font-bold text-white shadow-[0_6px_18px_-4px_rgba(124,58,237,0.5)]"
+          className="whitespace-nowrap rounded-full bg-gradient-to-r from-brand-violet to-purple-400 px-5 py-3 text-sm font-bold text-white shadow-[0_6px_18px_-4px_rgba(124,58,237,0.5)] transition-transform active:scale-95"
         >
-          Se connecter
+          Demander une démo
         </Link>
       </div>
     </header>

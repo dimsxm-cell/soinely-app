@@ -35,7 +35,7 @@ export function VideoDemo() {
             <button
               type="button"
               aria-label="Regarder la vidéo de démonstration (00:45)"
-              className="btn-sheen inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/[0.14] px-5 py-3 text-[14px] font-bold text-white"
+              className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/[0.14] px-5 py-3 text-[14px] font-bold text-white transition-transform active:scale-95"
             >
               <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[15px] w-[15px]">
                 <path d="M8 5v14l11-7z" fill="currentColor" />
