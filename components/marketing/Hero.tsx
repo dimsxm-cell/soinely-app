@@ -37,14 +37,7 @@ export function Hero() {
       />
 
       {/* Contenu */}
-      <div
-        className="relative z-[2] mx-auto grid w-full max-w-[1180px] items-center gap-12 px-6"
-        style={{
-          gridTemplateColumns: "1fr 1fr",
-          paddingTop: 64,
-          paddingBottom: 72,
-        }}
-      >
+      <div className="relative z-[2] mx-auto grid w-full max-w-[1180px] grid-cols-1 items-center gap-10 px-6 py-10 sm:py-14 lg:grid-cols-2 lg:gap-12 lg:py-16">
         {/* Colonne gauche */}
         <div>
           {/* Badge */}
@@ -62,11 +55,10 @@ export function Hero() {
 
           {/* H1 */}
           <h1
-            className="font-extrabold"
+            className="text-[38px] font-extrabold sm:text-[50px] lg:text-[62px]"
             style={{
-              fontSize: 62,
               lineHeight: 1.02,
-              letterSpacing: "-2px",
+              letterSpacing: "-1.5px",
               margin: "0 0 22px",
             }}
           >
@@ -192,11 +184,9 @@ export function Hero() {
         </div>
 
         {/* Colonne droite — téléphone + carte ELY */}
-        <div className="relative h-[560px]">
+        <div className="relative lg:h-[560px]">
           {/* Téléphone */}
-          <div
-            className="slide-in-right absolute right-0 top-0 w-[264px]"
-          >
+          <div className="slide-in-right mx-auto w-[264px] lg:absolute lg:right-0 lg:top-0 lg:mx-0">
             <div
               className="rounded-[42px] p-[9px]"
               style={{
@@ -371,7 +361,7 @@ export function Hero() {
 
           {/* Card ELY flottante */}
           <div
-            className="slide-in-left absolute bottom-[-30px] left-0 w-[238px] rounded-[20px] bg-white p-[15px]"
+            className="slide-in-left mx-auto mt-6 w-[238px] rounded-[20px] bg-white p-[15px] lg:absolute lg:bottom-[-30px] lg:left-0 lg:mx-0 lg:mt-0"
             style={{
               border: "1px solid #f2eefb",
               boxShadow: "0 20px 44px rgba(109,40,217,.24)",

@@ -22,23 +22,20 @@ const TESTEURS = [
 export function ListeAttente() {
   return (
     <section
-      style={{ padding: "0 0 60px", background: "#fff" }}
+      className="pb-10 sm:pb-[60px]"
+      style={{ background: "#fff" }}
     >
       <div className="mx-auto w-full max-w-[1180px] px-6">
         <div
+          className="grid grid-cols-1 gap-7 px-6 py-9 text-center sm:grid-cols-[0.55fr_1.2fr] sm:text-left lg:grid-cols-[0.5fr_1.15fr_repeat(3,0.72fr)] lg:items-center lg:gap-[26px] lg:px-11 lg:py-10"
           style={{
             borderRadius: 26,
             overflow: "hidden",
             background: "linear-gradient(115deg,#4c1d95 0%,#7c3aed 42%,#c026d3 78%,#ec4899 100%)",
-            padding: "40px 44px",
-            display: "grid",
-            gridTemplateColumns: "0.5fr 1.15fr repeat(3, 0.72fr)",
-            gap: 26,
-            alignItems: "center",
           }}
         >
           {/* Mascotte ELY */}
-          <div style={{ width: 130, height: 150 }}>
+          <div className="mx-auto hidden sm:mx-0 sm:block" style={{ width: 130, height: 150 }}>
             <Image
               src="/marketing/ely-mascot-2.webp"
               alt="Mascotte ELY"
@@ -51,7 +48,7 @@ export function ListeAttente() {
 
           {/* Texte + CTA */}
           <div>
-            <h3 style={{ fontSize: 27, fontWeight: 800, letterSpacing: "-0.7px", lineHeight: 1.12, color: "#fff", margin: "0 0 6px" }}>
+            <h3 className="text-[22px] sm:text-[27px]" style={{ fontWeight: 800, letterSpacing: "-0.7px", lineHeight: 1.12, color: "#fff", margin: "0 0 6px" }}>
               Rejoignez les 100 premiers IDEL testeurs
             </h3>
             <div style={{ fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,.82)", marginBottom: 18 }}>

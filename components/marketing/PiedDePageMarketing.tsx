@@ -25,8 +25,8 @@ export function PiedDePageMarketing() {
   return (
     <footer style={{ borderTop: "1px solid #f0ecfb", background: "#fff", padding: "26px 0" }}>
       <div
-        className="mx-auto w-full max-w-[1180px] px-6"
-        style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 56, flexWrap: "wrap" }}
+        className="mx-auto w-full max-w-[1180px] gap-6 px-6 sm:gap-[56px]"
+        style={{ display: "flex", alignItems: "center", justifyContent: "center", flexWrap: "wrap" }}
       >
         {BADGES.map((badge) => (
           <div key={badge.t1} style={{ display: "flex", alignItems: "center", gap: 11 }}>

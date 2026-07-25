@@ -76,13 +76,10 @@ export function RangeeFonctionnalites() {
     >
       <div className="mx-auto w-full max-w-[1180px] px-6">
         <div
-          className="rounded-[20px] bg-white"
-          style={{ padding: "40px 30px", boxShadow: "0 12px 40px rgba(30,27,60,.06)" }}
+          className="rounded-[20px] bg-white px-5 py-8 sm:px-[30px] sm:py-10"
+          style={{ boxShadow: "0 12px 40px rgba(30,27,60,.06)" }}
         >
-          <div
-            className="grid"
-            style={{ gridTemplateColumns: "repeat(6,1fr)", gap: 22 }}
-          >
+          <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-6 lg:gap-[22px]">
             {FONCTIONNALITES.map((item) => (
               <div
                 key={item.titre}

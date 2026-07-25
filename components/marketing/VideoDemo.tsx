@@ -10,19 +10,16 @@ const VIDEO_BULLETS = [
 export function VideoDemo() {
   return (
     <section
-      style={{ padding: "56px 0", background: "#fff" }}
+      className="py-10 sm:py-14"
+      style={{ background: "#fff" }}
     >
       <div className="mx-auto w-full max-w-[1180px] px-6">
         <div
+          className="grid grid-cols-1 gap-8 px-6 py-9 lg:grid-cols-[0.85fr_1.5fr_0.7fr] lg:items-center lg:gap-[34px] lg:px-11 lg:py-11"
           style={{
             borderRadius: 26,
             overflow: "hidden",
             background: "linear-gradient(120deg,#3b1e6e 0%,#5b21b6 50%,#8b2fb0 100%)",
-            padding: 44,
-            display: "grid",
-            gridTemplateColumns: "0.85fr 1.5fr 0.7fr",
-            gap: 34,
-            alignItems: "center",
           }}
         >
           {/* Texte gauche */}

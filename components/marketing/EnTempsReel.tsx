@@ -15,10 +15,10 @@ export function EnTempsReel() {
     >
       <div className="mx-auto w-full max-w-[1180px] px-6">
         <div
-          className="rounded-[20px] bg-white"
-          style={{ padding: "38px 34px", boxShadow: "0 12px 40px rgba(30,27,60,.06)" }}
+          className="rounded-[20px] bg-white px-5 py-7 sm:px-[34px] sm:py-[38px]"
+          style={{ boxShadow: "0 12px 40px rgba(30,27,60,.06)" }}
         >
-          <div style={{ display: "grid", gridTemplateColumns: "0.85fr 2.4fr", gap: 40, alignItems: "center" }}>
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.85fr_2.4fr] lg:items-center lg:gap-10">
 
             {/* Texte gauche */}
             <div>
@@ -45,7 +45,7 @@ export function EnTempsReel() {
             </div>
 
             {/* Timeline 4 colonnes */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, alignItems: "stretch" }}>
+            <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-4" style={{ alignItems: "stretch" }}>
 
               {/* 08h17 — Embouteillage */}
               <div style={{ background: "#faf8ff", border: "1px solid #f0ecfb", borderRadius: 16, padding: "16px 15px", display: "flex", flexDirection: "column", minHeight: 242 }}>

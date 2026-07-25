@@ -53,13 +53,14 @@ export function JourneeAvecSoinely() {
   return (
     <section
       id="ely"
-      style={{ background: "#f5f2fc", padding: "80px 0 40px" }}
+      className="py-12 sm:py-20"
+      style={{ background: "#f5f2fc" }}
     >
       <div className="mx-auto w-full max-w-[1180px] px-6">
         {/* Titre centré */}
         <h2
-          className="font-extrabold"
-          style={{ textAlign: "center", fontSize: 38, letterSpacing: "-1px", margin: "0 0 10px" }}
+          className="text-[28px] font-extrabold sm:text-[38px]"
+          style={{ textAlign: "center", letterSpacing: "-1px", margin: "0 0 10px" }}
         >
           Une journée avec{" "}
           <span style={{ color: "#6d28d9" }}>SOINELY</span>
@@ -69,7 +70,7 @@ export function JourneeAvecSoinely() {
         </p>
 
         {/* 4 colonnes */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20, alignItems: "stretch" }}>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5" style={{ alignItems: "stretch" }}>
 
           {/* 1 · Avant la tournée */}
           <div style={{ background: "#fff", border: "1px solid #efeafb", borderRadius: 20, padding: "24px 22px", boxShadow: "0 10px 30px rgba(30,27,60,.05)", display: "flex", flexDirection: "column" }}>
