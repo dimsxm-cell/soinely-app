@@ -25,13 +25,13 @@ const ETAPES = [
 
 export function EnTempsReel() {
   return (
-    <section className="mx-auto w-full max-w-[1180px] px-6 pb-14 sm:pb-20">
-      <div className="grid grid-cols-1 gap-10 rounded-[28px] border border-navy/5 bg-white p-7 shadow-[0_12px_40px_-16px_rgba(30,27,60,0.1)] sm:p-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
+    <section className="bg-[#faf8ff] px-6 py-14 sm:py-20">
+      <div className="mx-auto grid w-full max-w-[1180px] grid-cols-1 gap-10 rounded-[28px] border border-navy/5 bg-white p-7 shadow-[0_12px_40px_-16px_rgba(30,27,60,0.1)] sm:p-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
         <div>
           <p className="mb-4 inline-block rounded-md bg-brand-violet/10 px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wider text-brand-violet">
             En temps réel
           </p>
-          <h2 className="mb-4 text-balance text-[24px] font-medium leading-tight sm:text-[28px]">
+          <h2 className="mb-3.5 text-balance text-[22px] font-extrabold leading-[1.15] tracking-tight sm:text-[26px]">
             Un imprévu survient…
             <br />
             <span className="text-brand-violet">ELY s&apos;occupe du reste.</span>

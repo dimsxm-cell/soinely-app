@@ -28,7 +28,7 @@ export function VideoDemo() {
             <span className="mb-4 inline-block rounded-md bg-white/15 px-2.5 py-1.5 text-[10.5px] font-extrabold uppercase tracking-wider">
               En 45 secondes
             </span>
-            <h2 className="mb-3.5 text-balance font-display text-[26px] font-medium leading-tight sm:text-[30px]">
+            <h2 className="mb-3.5 text-balance text-[24px] font-extrabold leading-[1.12] tracking-tight sm:text-[30px]">
               Découvrez SOINELY en action
             </h2>
             <p className="mb-5 text-[14px] leading-relaxed text-white/75">

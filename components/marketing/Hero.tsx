@@ -3,7 +3,7 @@ import Image from "next/image";
 
 const POINTS_CLES = [
   "Tournées optimisées en temps réel",
-  "Soins sécurisés et transmissions simplifiées",
+  "Soins sécurisés et transmissions fiables",
   "Rappels intelligents : rien n'est oublié",
   "ELY, votre copilote IA disponible à tout moment",
 ];
@@ -25,9 +25,9 @@ const BADGES_CONFIANCE = [
 
 function IconeCheck() {
   return (
-    <svg viewBox="0 0 20 20" aria-hidden="true" className="h-5 w-5 shrink-0 text-teal">
-      <circle cx="10" cy="10" r="10" fill="currentColor" opacity="0.15" />
-      <path d="M6 10.3l2.6 2.6L14 7.3" stroke="currentColor" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[21px] w-[21px] shrink-0 text-brand-violet">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2.2" fill="none" />
+      <path d="m9 12 2 2 4-4" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -46,22 +46,22 @@ export function Hero() {
             <span aria-hidden="true">💜</span>
           </span>
 
-          <h1 className="mb-5 text-balance font-display text-[38px] font-medium leading-[1.05] tracking-tight sm:text-[56px]">
+          <h1 className="mb-[22px] text-balance text-[38px] font-extrabold leading-[1.02] tracking-[-1.2px] sm:text-[62px] sm:tracking-[-2px]">
             Ne tournez
             <br />
-            <span className="bg-gradient-to-r from-brand-violet via-purple-400 to-brand-rose bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-brand-violet via-purple-500 to-brand-rose bg-clip-text text-transparent">
               plus jamais seul.
             </span>
           </h1>
 
-          <p className="mb-7 max-w-[48ch] text-lg leading-relaxed text-navy/65">
+          <p className="mb-[26px] max-w-[440px] text-[18px] leading-[1.55] text-[#5a5570]">
             SOINELY est le copilote intelligent qui vous accompagne avant, pendant et après
-            chaque soin. Pour une tournée plus fluide, plus sereine, et du temps retrouvé.
+            chaque soin. Pour une tournée plus fluide, plus sereine et du temps retrouvé.
           </p>
 
-          <ul className="mb-8 flex flex-col gap-3">
+          <ul className="mb-[34px] flex flex-col gap-[13px]">
             {POINTS_CLES.map((point) => (
-              <li key={point} className="flex items-center gap-2.5 text-[15px] font-semibold text-navy/80">
+              <li key={point} className="flex items-center gap-2.5 text-[15.5px] font-semibold text-[#3d3956]">
                 <IconeCheck />
                 {point}
               </li>
@@ -71,7 +71,7 @@ export function Hero() {
           <div className="flex flex-wrap items-center gap-3.5">
             <Link
               href="/login"
-              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-brand-violet to-purple-400 px-6 py-3.5 text-[15px] font-bold text-white shadow-[0_10px_26px_-8px_rgba(124,58,237,0.55)] transition-transform active:scale-95"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-brand-violet to-purple-500 px-6 py-3.5 text-[15px] font-bold text-white shadow-[0_10px_26px_-8px_rgba(124,58,237,0.55)] transition-transform active:scale-95"
             >
               Essayer gratuitement
               <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[18px] w-[18px]">
@@ -94,7 +94,7 @@ export function Hero() {
           <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 text-[12.5px] font-semibold text-navy/45">
             {BADGES_CONFIANCE.map((badge) => (
               <span key={badge.texte} className="inline-flex items-center gap-1.5">
-                <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[15px] w-[15px] text-purple-400">
+                <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[15px] w-[15px] text-purple-500">
                   <path d={badge.d} stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
                 {badge.texte}
@@ -170,21 +170,21 @@ export function Hero() {
                     <p className="text-[14px] font-extrabold leading-none">Mme Dupont</p>
                     <p className="mt-1 text-[11px] font-semibold text-navy/45">BSI + Injection</p>
                     <p className="mt-2 flex items-center gap-1.5 text-[10.5px] text-navy/60">
-                      <svg viewBox="0 0 24 24" aria-hidden="true" className="h-3 w-3 shrink-0 text-purple-400">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" className="h-3 w-3 shrink-0 text-purple-500">
                         <path d="M14 3v4a1 1 0 0 0 1 1h4" stroke="currentColor" strokeWidth="2" fill="none" />
                         <path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z" stroke="currentColor" strokeWidth="2" fill="none" />
                       </svg>
                       Ordonnance à récupérer
                     </p>
                     <p className="mb-2.5 mt-1 flex items-center gap-1.5 text-[10.5px] text-navy/60">
-                      <svg viewBox="0 0 24 24" aria-hidden="true" className="h-3 w-3 shrink-0 text-purple-400">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" className="h-3 w-3 shrink-0 text-purple-500">
                         <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
                         <circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="2" fill="none" />
                       </svg>
                       97190 Le Gosier
                     </p>
                     <div className="flex flex-col gap-1.5">
-                      <span className="rounded-[11px] bg-gradient-to-r from-brand-violet to-purple-400 py-2 text-center text-[12px] font-bold text-white">
+                      <span className="rounded-[11px] bg-gradient-to-r from-brand-violet to-purple-500 py-2 text-center text-[12px] font-bold text-white">
                         Ouvrir l&apos;itinéraire
                       </span>
                       <span className="rounded-[11px] bg-brand-violet/10 py-2 text-center text-[12px] font-bold text-brand-violet">
@@ -204,7 +204,7 @@ export function Hero() {
                   ].map((tab) => (
                     <div key={tab.l} className="flex flex-col items-center gap-1">
                       {tab.active ? (
-                        <span className="h-[16px] w-[16px] rounded-full bg-gradient-to-br from-brand-violet to-purple-400" />
+                        <span className="h-[16px] w-[16px] rounded-full bg-gradient-to-br from-brand-violet to-purple-500" />
                       ) : (
                         <span className="h-[14px] w-[14px] rounded-[5px] border-2 border-navy/20" />
                       )}
@@ -232,7 +232,7 @@ export function Hero() {
               Un embouteillage est détecté sur votre route. Je peux réorganiser votre tournée
               et vous faire gagner <b>18 minutes</b>.
             </p>
-            <span className="mb-2 block rounded-[11px] bg-gradient-to-r from-brand-violet to-purple-400 py-2.5 text-center text-[12.5px] font-bold text-white">
+            <span className="mb-2 block rounded-[11px] bg-gradient-to-r from-brand-violet to-purple-500 py-2.5 text-center text-[12.5px] font-bold text-white">
               Optimiser ma tournée
             </span>
             <p className="flex items-center gap-1.5 text-[11px] font-bold text-teal">

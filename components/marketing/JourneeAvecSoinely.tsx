@@ -45,10 +45,10 @@ export function JourneeAvecSoinely() {
   return (
     <section id="ely" className="mx-auto w-full max-w-[1180px] px-6 py-14 sm:py-20">
       <div className="mx-auto mb-12 max-w-[560px] text-center">
-        <h2 className="mb-3 text-balance text-[26px] font-medium leading-tight sm:text-[32px]">
-          Une journée avec SOINELY
+        <h2 className="mb-2.5 text-balance text-[28px] font-extrabold tracking-tight sm:text-[38px]">
+          Une journée avec <span className="text-brand-violet">SOINELY</span>
         </h2>
-        <p className="text-base leading-relaxed text-navy/60">S&apos;adapte à votre rythme, pas l&apos;inverse.</p>
+        <p className="text-[17px] leading-relaxed text-[#7a7391]">S&apos;adapte à votre rythme, pas l&apos;inverse.</p>
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">

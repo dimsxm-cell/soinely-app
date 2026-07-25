@@ -2,43 +2,67 @@ const FONCTIONNALITES = [
   {
     titre: "Jusqu'à 1 heure gagnée par jour",
     texte: "Des tournées optimisées qui s'adaptent en temps réel.",
+    bg: "#eef4ff",
+    couleur: "#2563eb",
     icone: (
-      <path d="M12 7v5l3.5 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" stroke="currentColor" strokeWidth="1.7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <>
+        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.7" fill="none" />
+        <path d="M12 7v5l3 2" stroke="currentColor" strokeWidth="1.7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      </>
     ),
   },
   {
     titre: "Moins de charge mentale",
     texte: "ELY anticipe, rappelle et simplifie votre quotidien.",
+    bg: "#f3eefe",
+    couleur: "#7c3aed",
     icone: (
-      <path d="M9.5 3a4.5 4.5 0 0 0-4.4 5.5A4 4 0 0 0 6 16h1M14.5 3a4.5 4.5 0 0 1 4.4 5.5A4 4 0 0 1 18 16h-1M9 3.2V17a3 3 0 0 0 6 0V3.2" stroke="currentColor" strokeWidth="1.7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 5a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 6 0 3 3 0 0 0 2-5 3 3 0 0 0-2-5 3 3 0 0 0-3-3z" stroke="currentColor" strokeWidth="1.7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
     ),
   },
   {
     titre: "Moins d'oublis, plus de sérénité",
-    texte: "Rappels intelligents, check-lists et alertes au bon moment.",
+    texte: "Rappels intelligents, check-lists et alertes.",
+    bg: "#fdf0f8",
+    couleur: "#db2777",
     icone: (
-      <path d="M12 3a5 5 0 0 0-5 5v3.2c0 .8-.3 1.6-.9 2.2L5 14.8c-.7.7-.2 1.9.8 1.9h12.4c1 0 1.5-1.2.8-1.9l-1.1-1.4a3.2 3.2 0 0 1-.9-2.2V8a5 5 0 0 0-5-5ZM9.5 19a2.5 2.5 0 0 0 5 0" stroke="currentColor" strokeWidth="1.7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <>
+        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" stroke="currentColor" strokeWidth="1.7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" stroke="currentColor" strokeWidth="1.7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      </>
     ),
   },
   {
     titre: "Une tournée qui s'adapte à tout",
-    texte: "Imprévus, trafic, urgences : ELY réorganise votre journée.",
+    texte: "Imprévu, trafic, urgences… ELY réorganise pour vous.",
+    bg: "#eefaf2",
+    couleur: "#16a34a",
     icone: (
-      <path d="M12 21s-7-5.5-7-11.2C5 6 8.1 3 12 3s7 3 7 6.8C19 15.5 12 21 12 21Zm0-8a2.8 2.8 0 1 0 0-5.6 2.8 2.8 0 0 0 0 5.6Z" stroke="currentColor" strokeWidth="1.7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <>
+        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z" stroke="currentColor" strokeWidth="1.7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M12 10.5a1 1 0 1 0 0-1 1 1 0 0 0 0 1z" stroke="currentColor" strokeWidth="1.7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      </>
     ),
   },
   {
     titre: "Toute votre expertise à portée de main",
     texte: "Protocoles, cotations, conduites à tenir, NGAP…",
+    bg: "#fef6e7",
+    couleur: "#d97706",
     icone: (
-      <path d="M5 4.5h9A2.5 2.5 0 0 1 16.5 7v13l-5.5-2.5L5.5 20V7A2.5 2.5 0 0 1 5 4.5Z" stroke="currentColor" strokeWidth="1.7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <>
+        <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z" stroke="currentColor" strokeWidth="1.7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M20 22H6.5a2.5 2.5 0 0 1 0-5H20" stroke="currentColor" strokeWidth="1.7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      </>
     ),
   },
   {
     titre: "Sécurisé et conforme",
     texte: "Hébergé HDS, chiffré de bout en bout, conforme RGPD.",
+    bg: "#fdeef0",
+    couleur: "#e11d48",
     icone: (
-      <path d="M12 3l7 3v5.5c0 5-3.2 8.4-7 9.5-3.8-1.1-7-4.5-7-9.5V6l7-3Z" stroke="currentColor" strokeWidth="1.7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" strokeWidth="1.7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
     ),
   },
 ];
@@ -49,13 +73,16 @@ export function RangeeFonctionnalites() {
       <div className="grid grid-cols-2 gap-8 rounded-[24px] border border-navy/5 bg-white px-6 py-10 shadow-[0_1px_2px_rgba(15,23,42,.04),0_18px_40px_-12px_rgba(15,23,42,.06)] sm:px-10 md:grid-cols-3 lg:grid-cols-6">
         {FONCTIONNALITES.map((item) => (
           <div key={item.titre} className="flex flex-col items-center text-center">
-            <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-brand-violet/10 to-brand-rose/10 text-brand-violet">
-              <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
+            <span
+              className="mb-3.5 flex h-14 w-14 items-center justify-center rounded-2xl"
+              style={{ background: item.bg, color: item.couleur }}
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6">
                 {item.icone}
               </svg>
             </span>
-            <p className="text-[13.5px] font-semibold leading-snug text-navy">{item.titre}</p>
-            <p className="mt-1 text-[11.5px] leading-snug text-navy/50">{item.texte}</p>
+            <p className="text-[14.5px] font-extrabold leading-tight tracking-tight text-navy">{item.titre}</p>
+            <p className="mt-2 text-[12px] leading-relaxed text-navy/55">{item.texte}</p>
           </div>
         ))}
       </div>

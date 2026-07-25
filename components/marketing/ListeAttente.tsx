@@ -34,7 +34,7 @@ export function ListeAttente() {
         </span>
 
         <div className="text-center sm:text-left">
-          <h2 className="mb-1.5 text-balance font-display text-[26px] font-medium leading-[1.15] sm:text-[28px]">
+          <h2 className="mb-1.5 text-balance text-[22px] font-extrabold leading-[1.12] tracking-tight sm:text-[27px]">
             Rejoignez les 100 premiers IDEL testeurs
           </h2>
           <p className="mb-4 text-[14px] font-semibold text-white/80">Bêta privée · Ouverture bientôt</p>
