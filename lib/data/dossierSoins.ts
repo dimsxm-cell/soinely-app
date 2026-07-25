@@ -19,6 +19,7 @@ export const SECTIONS_DOSSIER_SOINS: { valeur: SectionDossierSoin; label: string
   { valeur: "administratif", label: "Administratif" },
   { valeur: "allergies_alertes", label: "Allergies et alertes" },
   { valeur: "contacts_utiles", label: "Contacts utiles" },
+  { valeur: "informations_professionnelles", label: "Informations professionnelles" },
 ];
 
 function mapFicheDossierSoin(row: FicheDossierSoinRow): FicheDossierSoin {

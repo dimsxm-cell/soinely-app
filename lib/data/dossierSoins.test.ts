@@ -41,7 +41,7 @@ function buildSupabaseStub(rows: ReturnType<typeof buildRow>[], singleRow: Retur
 }
 
 describe("SECTIONS_DOSSIER_SOINS", () => {
-  it("lists all 9 sections in binder order", () => {
+  it("lists all 10 sections in binder order", () => {
     expect(SECTIONS_DOSSIER_SOINS.map((s) => s.valeur)).toEqual([
       "identification_patient",
       "traitements",
@@ -52,6 +52,7 @@ describe("SECTIONS_DOSSIER_SOINS", () => {
       "administratif",
       "allergies_alertes",
       "contacts_utiles",
+      "informations_professionnelles",
     ]);
   });
 });

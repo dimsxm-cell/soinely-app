@@ -115,7 +115,8 @@ export type SectionDossierSoin =
   | "prescriptions_liaisons_medicales"
   | "administratif"
   | "allergies_alertes"
-  | "contacts_utiles";
+  | "contacts_utiles"
+  | "informations_professionnelles";
 
 export interface BlocContenuFiche {
   titre: string;
