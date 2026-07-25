@@ -147,3 +147,75 @@ body {
 .btn-arrow { transition: transform 0.3s cubic-bezier(.34,1.56,.64,1); }
 a:hover .btn-arrow { transform: translateX(5px); }
 
+/* ── Glass pill générique (page Inscription/Connexion) ──────────────── */
+.glass-pill {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(.175,.885,.32,2.2);
+}
+.glass-pill:active { transform: scale(.96); }
+.glass-pill-effect {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  backdrop-filter: blur(3px) saturate(160%);
+  -webkit-backdrop-filter: blur(3px) saturate(160%);
+  filter: url(#glass-distortion-inscription);
+}
+.glass-pill-tint { position: absolute; inset: 0; z-index: 1; background: rgba(255,255,255,.32); }
+.glass-pill-shine {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  box-shadow: inset 2px 2px 1px 0 rgba(255,255,255,.5), inset -1px -1px 1px 1px rgba(255,255,255,.4);
+}
+.glass-pill-content { position: relative; z-index: 3; }
+
+/* appui bouton mobile */
+.appbtn { transition: transform 0.1s ease; }
+.appbtn:active { transform: scale(.95); }
+
+/* effet reflet au survol des boutons secondaires (Apple/Google) */
+.sheen { position: relative; overflow: hidden; transition: transform 0.1s ease, filter 0.2s ease; }
+.sheen:hover { filter: brightness(1.04); }
+.sheen::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.55), transparent);
+  transform: skewX(-18deg);
+  pointer-events: none;
+}
+.sheen:hover::after { animation: btn-sheen-ins 0.7s ease; }
+@keyframes btn-sheen-ins { 0% { left: -60%; opacity: 0; } 18% { opacity: 1; } 100% { left: 130%; opacity: 0; } }
+
+/* champ de formulaire — focus violet */
+.fld-input:focus {
+  outline: none;
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124,58,237,.16);
+}
+
+/* confettis à la création de compte */
+.confetti-piece {
+  position: absolute;
+  top: -14px;
+  will-change: transform, opacity;
+  animation: confetti-fall 1.5s cubic-bezier(.25,.46,.45,.94) forwards;
+}
+@keyframes confetti-fall {
+  0% { transform: translate(0,0) rotate(0deg); opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translate(var(--cx,0), 110vh) rotate(var(--cr,360deg)); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheen::after { display: none; }
+  .confetti-piece { display: none; }
+}
+

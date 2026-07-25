@@ -2,28 +2,70 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { LienRetour } from "@/components/ui/LienRetour";
+import Link from "next/link";
+import { Fraunces } from "next/font/google";
 import { LogoSoinely } from "@/components/ui/LogoSoinely";
+import { createClient } from "@/lib/supabase/client";
 import { signInAction, signUpAction, requestPasswordResetAction } from "./actions";
 
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: ["500", "600"],
+  variable: "--font-fraunces",
+});
+
 type Mode = "login" | "signup" | "forgot";
+type ConfettiPiece = { key: number; style: React.CSSProperties };
 
 const INPUT_CLASS =
-  "min-h-[44px] rounded-card border border-navy/20 px-3 text-navy placeholder:text-navy/40";
+  "fld-input min-h-[50px] w-full rounded-[14px] border border-[#e0dced] bg-[#faf8ff] px-4 text-[16px] text-[#1d1d1f] placeholder:text-[#8a8a8e] transition-[border-color,box-shadow]";
 
-const SUBMIT_BUTTON_CLASS =
-  "flex min-h-[44px] items-center justify-center rounded-full bg-gradient-to-r from-brand-violet to-brand-rose px-5 text-[15px] font-semibold text-white transition-colors hover:brightness-110";
+const LABEL_CLASS =
+  "mb-[7px] block text-[11.5px] font-semibold uppercase tracking-[0.06em] text-[#8a8a8e]";
+
+const CTA_CLASS =
+  "appbtn sheen mt-1 flex min-h-[52px] w-full items-center justify-center rounded-full bg-gradient-to-r from-brand-violet to-purple-500 text-[17px] font-semibold tracking-[-0.3px] text-white shadow-[0_8px_20px_rgba(124,58,237,0.32)]";
+
+const CONFETTI_COLORS = ["#7c3aed", "#a855f7", "#ec4899", "#5856d6", "#22c55e", "#f59e0b"];
 
 export default function LoginPage() {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>("login");
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [confetti, setConfetti] = useState<ConfettiPiece[]>([]);
 
   function switchMode(next: Mode) {
     setMode(next);
     setError(null);
     setMessage(null);
+  }
+
+  function fireConfetti() {
+    const pieces = Array.from({ length: 46 }, (_, i) => {
+      const x = Math.random() * 100;
+      const drift = (Math.random() - 0.5) * 160;
+      const size = 6 + Math.random() * 6;
+      const round = Math.random() > 0.5;
+      const color = CONFETTI_COLORS[i % CONFETTI_COLORS.length];
+      const delay = Math.random() * 0.25;
+      const rot = 250 + Math.random() * 400;
+      return {
+        key: i,
+        style: {
+          left: `${x}%`,
+          width: size,
+          height: size * (round ? 1 : 0.4),
+          background: color,
+          borderRadius: round ? "50%" : 2,
+          animationDelay: `${delay}s`,
+          ["--cx" as string]: `${drift}px`,
+          ["--cr" as string]: `${rot}deg`,
+        } as React.CSSProperties,
+      };
+    });
+    setConfetti(pieces);
+    setTimeout(() => setConfetti([]), 1700);
   }
 
   async function handleLogin(formData: FormData) {
@@ -41,6 +83,7 @@ export default function LoginPage() {
     setMessage(null);
     const result = await signUpAction(formData);
     if (result.success) {
+      fireConfetti();
       setMessage(
         "Compte créé — vérifiez votre boîte mail pour confirmer votre adresse avant de vous connecter."
       );
@@ -60,33 +103,82 @@ export default function LoginPage() {
     }
   }
 
-  return (
-    <main className="min-h-screen bg-[#F6F7F5] text-navy">
-      <div className="mx-auto flex min-h-screen w-full max-w-sm flex-col justify-center px-6 py-14">
-        <LienRetour href="/" label="Accueil" />
+  async function handleOAuth(provider: "google" | "apple") {
+    const supabase = createClient();
+    await supabase.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: `${window.location.origin}/auth/callback?next=/ma-journee` },
+    });
+  }
 
-        <div className="mt-6 flex flex-col items-center text-center">
-          <div className="flex items-center gap-2 text-lg font-bold tracking-tight text-navy">
-            <LogoSoinely className="h-5 w-5" />
-            Soinely
+  const heroTitle =
+    mode === "forgot" ? "Mot de passe oublié" : mode === "signup" ? "Créez votre compte" : "Bienvenue sur Soinely";
+
+  return (
+    <main className={`${fraunces.variable} relative min-h-screen overflow-hidden`} style={{ background: "#faf8ff" }}>
+      {/* Filtre de distorsion verre, utilisé par .glass-pill-effect */}
+      <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
+        <filter id="glass-distortion-inscription" x="0" y="0" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.008 0.008" numOctaves="2" seed="5" result="noise" />
+          <feGaussianBlur in="noise" stdDeviation="2" result="blur" />
+          <feDisplacementMap in="SourceGraphic" in2="blur" scale="22" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      </svg>
+
+      {/* Confettis (succès inscription) */}
+      <div className="pointer-events-none absolute inset-0 z-50 overflow-hidden">
+        {confetti.map((p) => (
+          <div key={p.key} className="confetti-piece" style={p.style} />
+        ))}
+      </div>
+
+      <div className="mx-auto flex min-h-screen w-full max-w-[430px] flex-col px-[22px] pb-12 pt-8 sm:pt-14">
+        {/* Retour */}
+        <Link
+          href="/"
+          className="glass-pill appbtn inline-flex w-fit items-center gap-1 self-start rounded-full border border-white/50 px-4 py-[9px] text-[15px] font-medium text-[#1d1d1f]"
+        >
+          <span className="glass-pill-effect" aria-hidden="true" />
+          <span className="glass-pill-tint" aria-hidden="true" />
+          <span className="glass-pill-shine" aria-hidden="true" />
+          <span className="glass-pill-content inline-flex items-center gap-1">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+            Accueil
+          </span>
+        </Link>
+
+        {/* En-tête */}
+        <div className="mt-8 flex flex-col items-center text-center">
+          <div className="flex items-center gap-[9px]">
+            <LogoSoinely className="h-[26px] w-[26px]" />
+            <span className="text-[22px] font-bold tracking-[-0.4px] text-[#1d1d1f]">Soinely</span>
           </div>
-          <h1 className="mt-5 font-display text-[26px] font-medium leading-tight">
-            {mode === "forgot" ? "Mot de passe oublié" : "Bienvenue sur Soinely"}
+          <h1
+            className="mt-[22px] text-[30px] font-semibold leading-[1.1] tracking-[-0.5px] text-[#1d1d1f] sm:text-[34px]"
+            style={{ fontFamily: "var(--font-fraunces), var(--font-display), serif" }}
+          >
+            {heroTitle}
           </h1>
           {mode !== "forgot" && (
-            <p className="mt-1 text-sm text-navy/60">Fait par une IDEL, pour les IDEL.</p>
+            <p className="mt-2 text-[15.5px] tracking-[-0.2px] text-[#8a8a8e]">Fait par une IDEL, pour les IDEL.</p>
           )}
         </div>
 
+        {/* Onglets Connexion / Créer un compte */}
         {mode !== "forgot" && (
-          <div className="mt-6 flex rounded-full border border-navy/10 bg-white p-1">
+          <div className="glass-pill mt-[26px] flex gap-[5px] rounded-full border border-white/50 p-[5px]">
+            <span className="glass-pill-effect" aria-hidden="true" />
+            <span className="glass-pill-tint" aria-hidden="true" />
+            <span className="glass-pill-shine" aria-hidden="true" />
             <button
               type="button"
               onClick={() => switchMode("login")}
-              className={`flex-1 rounded-full py-2 text-sm font-semibold transition-colors ${
+              className={`glass-pill-content appbtn flex-1 rounded-full py-[11px] text-[15px] font-semibold tracking-[-0.2px] transition-colors ${
                 mode === "login"
-                  ? "bg-gradient-to-r from-brand-violet to-brand-rose text-white"
-                  : "text-navy/60 hover:text-navy"
+                  ? "bg-gradient-to-r from-brand-violet to-purple-500 text-white shadow-[0_6px_16px_rgba(124,58,237,0.3)]"
+                  : "text-[#8a8a8e]"
               }`}
             >
               Connexion
@@ -94,10 +186,10 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => switchMode("signup")}
-              className={`flex-1 rounded-full py-2 text-sm font-semibold transition-colors ${
+              className={`glass-pill-content appbtn flex-1 rounded-full py-[11px] text-[15px] font-semibold tracking-[-0.2px] transition-colors ${
                 mode === "signup"
-                  ? "bg-gradient-to-r from-brand-violet to-brand-rose text-white"
-                  : "text-navy/60 hover:text-navy"
+                  ? "bg-gradient-to-r from-brand-violet to-purple-500 text-white shadow-[0_6px_16px_rgba(124,58,237,0.3)]"
+                  : "text-[#8a8a8e]"
               }`}
             >
               Créer un compte
@@ -105,25 +197,29 @@ export default function LoginPage() {
           </div>
         )}
 
-        <div className="mt-6 rounded-[20px] border border-navy/10 bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,.04),0_18px_40px_rgba(15,23,42,.06)]">
+        {/* Carte formulaire */}
+        <div
+          className="mt-[18px] flex flex-col gap-[13px] rounded-[18px] bg-white p-[22px_20px]"
+          style={{ border: "1px solid rgba(0,0,0,.04)", boxShadow: "0 8px 24px rgba(0,0,0,.09)" }}
+        >
           {mode === "login" && (
-            <form action={handleLogin} className="flex flex-col gap-4">
-              <input name="email" type="email" required placeholder="Adresse email" className={INPUT_CLASS} />
-              <input
-                name="password"
-                type="password"
-                required
-                placeholder="Mot de passe"
-                className={INPUT_CLASS}
-              />
+            <form action={handleLogin} className="flex flex-col gap-[13px]">
+              <div>
+                <label className={LABEL_CLASS}>Adresse email</label>
+                <input name="email" type="email" required placeholder="vous@exemple.fr" className={INPUT_CLASS} />
+              </div>
+              <div>
+                <label className={LABEL_CLASS}>Mot de passe</label>
+                <input name="password" type="password" required placeholder="••••••••" className={INPUT_CLASS} />
+              </div>
               {error && <p className="text-sm text-danger">{error}</p>}
-              <button type="submit" className={SUBMIT_BUTTON_CLASS}>
+              <button type="submit" className={CTA_CLASS}>
                 Se connecter
               </button>
               <button
                 type="button"
                 onClick={() => switchMode("forgot")}
-                className="text-center text-sm text-brand-violet hover:underline"
+                className="mt-0.5 text-center text-[14.5px] font-semibold text-brand-violet"
               >
                 Mot de passe oublié ?
               </button>
@@ -131,49 +227,111 @@ export default function LoginPage() {
           )}
 
           {mode === "signup" && (
-            <form action={handleSignUp} className="flex flex-col gap-4">
-              <input
-                name="fullName"
-                type="text"
-                required
-                placeholder="Nom complet"
-                className={INPUT_CLASS}
-              />
-              <input name="email" type="email" required placeholder="Adresse email" className={INPUT_CLASS} />
-              <input
-                name="password"
-                type="password"
-                required
-                minLength={6}
-                placeholder="Mot de passe"
-                className={INPUT_CLASS}
-              />
+            <form action={handleSignUp} className="flex flex-col gap-[13px]">
+              <div>
+                <label className={LABEL_CLASS}>Nom complet</label>
+                <input name="fullName" type="text" required placeholder="Camille Laurent" className={INPUT_CLASS} />
+              </div>
+              <div>
+                <label className={LABEL_CLASS}>Adresse email</label>
+                <input name="email" type="email" required placeholder="vous@exemple.fr" className={INPUT_CLASS} />
+              </div>
+              <div>
+                <label className={LABEL_CLASS}>Mot de passe</label>
+                <input
+                  name="password"
+                  type="password"
+                  required
+                  minLength={6}
+                  placeholder="••••••••"
+                  className={INPUT_CLASS}
+                />
+              </div>
+              <div>
+                <label className={LABEL_CLASS}>Numéro ADELI / RPPS</label>
+                <input
+                  name="adeliRpps"
+                  type="text"
+                  placeholder="Facultatif — pour la facturation"
+                  className={INPUT_CLASS}
+                />
+              </div>
               {error && <p className="text-sm text-danger">{error}</p>}
               {message && <p className="text-sm text-success">{message}</p>}
-              <button type="submit" className={SUBMIT_BUTTON_CLASS}>
+              <button type="submit" className={CTA_CLASS}>
                 Créer mon compte
               </button>
+              <p className="mx-0.5 mt-0.5 text-center text-[12.5px] leading-[1.45] text-[#8a8a8e]">
+                En créant un compte, vous acceptez les{" "}
+                <a href="#" className="font-semibold text-brand-violet">
+                  conditions
+                </a>{" "}
+                et la{" "}
+                <a href="#" className="font-semibold text-brand-violet">
+                  politique de confidentialité
+                </a>
+                .
+              </p>
             </form>
           )}
 
           {mode === "forgot" && (
-            <form action={handleForgot} className="flex flex-col gap-4">
-              <input name="email" type="email" required placeholder="Adresse email" className={INPUT_CLASS} />
+            <form action={handleForgot} className="flex flex-col gap-[13px]">
+              <div>
+                <label className={LABEL_CLASS}>Adresse email</label>
+                <input name="email" type="email" required placeholder="vous@exemple.fr" className={INPUT_CLASS} />
+              </div>
               {error && <p className="text-sm text-danger">{error}</p>}
               {message && <p className="text-sm text-success">{message}</p>}
-              <button type="submit" className={SUBMIT_BUTTON_CLASS}>
+              <button type="submit" className={CTA_CLASS}>
                 Envoyer le lien
               </button>
               <button
                 type="button"
                 onClick={() => switchMode("login")}
-                className="text-center text-sm text-brand-violet hover:underline"
+                className="mt-0.5 text-center text-[14.5px] font-semibold text-brand-violet"
               >
                 ‹ Retour à la connexion
               </button>
             </form>
           )}
         </div>
+
+        {/* Séparateur + connexion sociale */}
+        {mode !== "forgot" && (
+          <>
+            <div className="mx-1 mt-5 flex items-center gap-3">
+              <div className="h-px flex-1 bg-[#e0dced]" />
+              <span className="text-[12.5px] text-[#8a8a8e]">ou continuer avec</span>
+              <div className="h-px flex-1 bg-[#e0dced]" />
+            </div>
+            <div className="mt-3.5 flex gap-2.5">
+              <button
+                type="button"
+                onClick={() => handleOAuth("apple")}
+                className="appbtn sheen flex flex-1 items-center justify-center gap-2 rounded-full border border-[#e0e0e0] bg-white py-3 text-[14.5px] font-semibold text-[#1d1d1f]"
+              >
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="#1d1d1f" aria-hidden="true">
+                  <path d="M16.365 1.43c0 1.14-.493 2.27-1.177 3.08-.744.9-1.99 1.57-2.987 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.572-2.27 1.206-2.98.804-.94 2.142-1.64 3.248-1.68.03.13.05.28.05.43zm4.565 15.71c-.03.07-.463 1.58-1.518 3.12-.945 1.34-1.94 2.71-3.43 2.71-1.517 0-1.9-.88-3.63-.88-1.698 0-2.302.91-3.67.91-1.377 0-2.332-1.26-3.428-2.8-1.287-1.82-2.323-4.63-2.323-7.28 0-4.28 2.797-6.55 5.552-6.55 1.448 0 2.675.95 3.6.95.865 0 2.222-1.01 3.902-1.01.613 0 2.886.06 4.374 2.19-.13.09-2.383 1.37-2.383 4.19 0 3.26 2.854 4.42 2.955 4.45z" />
+                </svg>
+                Apple
+              </button>
+              <button
+                type="button"
+                onClick={() => handleOAuth("google")}
+                className="appbtn sheen flex flex-1 items-center justify-center gap-2 rounded-full border border-[#e0e0e0] bg-white py-3 text-[14.5px] font-semibold text-[#1d1d1f]"
+              >
+                <svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true">
+                  <path fill="#4285F4" d="M23.06 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h6.2a5.3 5.3 0 0 1-2.3 3.48v2.9h3.72c2.18-2 3.44-4.96 3.44-8.39z" />
+                  <path fill="#34A853" d="M12 24c3.1 0 5.7-1.03 7.6-2.8l-3.72-2.9c-1.03.7-2.35 1.1-3.88 1.1-2.98 0-5.5-2-6.4-4.72H1.76v2.98A11.5 11.5 0 0 0 12 24z" />
+                  <path fill="#FBBC05" d="M5.6 14.68a6.9 6.9 0 0 1 0-4.36V7.34H1.76a11.5 11.5 0 0 0 0 10.32z" />
+                  <path fill="#EA4335" d="M12 5.5c1.68 0 3.2.58 4.4 1.72l3.3-3.3A11.5 11.5 0 0 0 12 0 11.5 11.5 0 0 0 1.76 7.34L5.6 10.32C6.5 7.6 9.02 5.5 12 5.5z" />
+                </svg>
+                Google
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </main>
   );

@@ -71,9 +71,29 @@ describe("signUpAction", () => {
     expect(signUpMock).toHaveBeenCalledWith({
       email: "marie@example.com",
       password: "motdepasse123",
-      options: { data: { full_name: "Marie Dupont" } },
+      options: { data: { full_name: "Marie Dupont", adeli_rpps: null } },
     });
     expect(result).toEqual({ success: true });
+  });
+
+  it("inclut le numéro ADELI / RPPS en metadata quand il est renseigné", async () => {
+    signUpMock.mockResolvedValueOnce({ error: null });
+
+    const { signUpAction } = await import("./actions");
+
+    const formData = new FormData();
+    formData.set("fullName", "Marie Dupont");
+    formData.set("email", "marie@example.com");
+    formData.set("password", "motdepasse123");
+    formData.set("adeliRpps", "751234567");
+
+    await signUpAction(formData);
+
+    expect(signUpMock).toHaveBeenCalledWith({
+      email: "marie@example.com",
+      password: "motdepasse123",
+      options: { data: { full_name: "Marie Dupont", adeli_rpps: "751234567" } },
+    });
   });
 
   it("retourne l'erreur Supabase si l'inscription échoue", async () => {

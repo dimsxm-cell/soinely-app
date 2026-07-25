@@ -26,12 +26,13 @@ export async function signUpAction(
   const fullName = String(formData.get("fullName"));
   const email = String(formData.get("email"));
   const password = String(formData.get("password"));
+  const adeliRpps = String(formData.get("adeliRpps") ?? "").trim();
 
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { full_name: fullName } },
+    options: { data: { full_name: fullName, adeli_rpps: adeliRpps || null } },
   });
 
   if (error) {
