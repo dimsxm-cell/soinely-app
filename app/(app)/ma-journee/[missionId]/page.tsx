@@ -10,6 +10,8 @@ import {
   uploadPhotoAction,
 } from "@/lib/data/ma-journee-actions";
 import { Button } from "@/components/ui/Button";
+import { Chronometre } from "@/components/ui/Chronometre";
+import { IconeSoin } from "@/components/ui/IconeSoin";
 import { LienRetour } from "@/components/ui/LienRetour";
 import type { StatutMission } from "@/lib/types/clinical";
 
@@ -21,10 +23,10 @@ const STATUT_LABEL: Record<StatutMission, string> = {
 };
 
 const STATUT_BADGE_CLASSES: Record<StatutMission, string> = {
-  a_faire: "bg-navy/5 text-navy/60",
-  en_cours: "bg-warning/15 text-warning",
+  a_faire: "border border-navy/15 text-navy/60",
+  en_cours: "bg-brand-violet/[0.12] text-brand-violet",
   terminee: "bg-teal/10 text-[#0E7E70]",
-  absent: "bg-navy/5 text-navy/40",
+  absent: "bg-danger/10 text-danger",
 };
 
 const PROCHAIN_STATUT: Partial<Record<StatutMission, StatutMission>> = {
@@ -34,8 +36,44 @@ const PROCHAIN_STATUT: Partial<Record<StatutMission, StatutMission>> = {
 
 const LIBELLE_ACTION: Partial<Record<StatutMission, string>> = {
   a_faire: "Commencer le soin",
-  en_cours: "Terminer",
+  en_cours: "Terminer le soin",
 };
+
+const DOSSIERS = [
+  { label: "Administratif", valeur: "Fiche complète", gradient: "from-[#b06ae0] to-[#8b3fd6]", icone: "admin" as const },
+  { label: "Prescriptions", valeur: "Soins actifs", gradient: "from-[#f2ad5c] to-[#e0863a]", icone: "rx" as const },
+  { label: "Diagramme de soins", valeur: "Historique", gradient: "from-[#7db8ea] to-[#4f97dd]", icone: "chart" as const },
+  { label: "Transmissions", valeur: "Notes de visite", gradient: "from-[#e86ab0] to-[#d63f97]", icone: "msg" as const },
+];
+
+function IconeDossier({ icone }: { icone: (typeof DOSSIERS)[number]["icone"] }) {
+  const chemins: Record<(typeof DOSSIERS)[number]["icone"], string> = {
+    admin: "M3 4h18v16H3z M9 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4z M15 8h3 M15 12h3 M7.5 16.5c.6-1.4 3.4-1.4 4 0",
+    rx: "M8 2h8v4H8z M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2 M9 12h6 M9 16h4",
+    chart: "M3 3v18h18 M7 14l3-4 3 3 4-6",
+    msg: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z",
+  };
+
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[19px] w-[19px] text-white">
+      <path d={chemins[icone]} stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function initiales(nomComplet: string): string {
+  return nomComplet
+    .split(" ")
+    .filter(Boolean)
+    .map((mot) => mot[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+}
+
+function formatNaissance(dateNaissance: string): string {
+  return new Date(dateNaissance).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
+}
 
 function calculerAge(dateNaissance: string): number {
   const naissance = new Date(dateNaissance);
@@ -67,215 +105,321 @@ export default async function ArriveePatientPage({
   const prochainStatut = PROCHAIN_STATUT[mission.statut];
   const peutMarquerAbsent = mission.statut === "a_faire";
   const peutEcrireTransmission = mission.statut === "en_cours" || mission.statut === "terminee";
+  const enCours = mission.statut === "en_cours";
+  const absente = mission.statut === "absent";
   const itineraireHref = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mission.patient.adresse)}`;
-  const wazeHref = `https://waze.com/ul?q=${encodeURIComponent(mission.patient.adresse)}&navigate=yes`;
 
   return (
     <main className="min-h-screen bg-[#F6F7F5] text-navy">
-      <div className="mx-auto flex max-w-2xl flex-col gap-6 px-6 py-10 sm:py-14">
+      <div className="mx-auto flex max-w-2xl flex-col gap-5 px-6 py-6 sm:py-10">
         <div className="flex items-center justify-between">
           <LienRetour href="/ma-journee" label="Ma journée" />
-          <span
-            className={`rounded-full px-2.5 py-1 text-[11.5px] font-semibold ${STATUT_BADGE_CLASSES[mission.statut]}`}
-          >
-            {STATUT_LABEL[mission.statut]}
-          </span>
-        </div>
-
-        <div>
-          <div className="flex items-baseline gap-2">
-            <h1 className="font-display text-[28px] font-medium leading-tight sm:text-[32px]">
-              {mission.patientNom}
-            </h1>
-            {mission.patient.dateNaissance && (
-              <span className="text-sm text-navy/60">{calculerAge(mission.patient.dateNaissance)} ans</span>
-            )}
-          </div>
-          <p className="mt-1 text-navy/60">{mission.heurePrevue}</p>
-        </div>
-
-      <div className="flex gap-3">
-        <a href={`tel:${mission.patient.telephone}`} className="flex-1">
-          <Button variant="secondary" className="w-full">
-            Appeler
-          </Button>
-        </a>
-        <a href={`sms:${mission.patient.telephone}`} className="flex-1">
-          <Button variant="secondary" className="w-full">
-            SMS
-          </Button>
-        </a>
-      </div>
-
-      <div className="rounded-card border border-navy/10 bg-white p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-xs font-medium uppercase text-navy/60">Adresse</p>
-            <p className="mt-1 text-navy">{mission.patient.adresse}</p>
-          </div>
-          <div className="flex gap-2">
-            <a href={itineraireHref} target="_blank" rel="noopener noreferrer">
-              <Button variant="secondary">Google Maps</Button>
-            </a>
-            <a href={wazeHref} target="_blank" rel="noopener noreferrer">
-              <Button variant="secondary">Waze</Button>
-            </a>
-          </div>
-        </div>
-
-        <div className="mt-4">
-          <p className="text-xs font-medium uppercase text-navy/60">Téléphone</p>
-          <p className="mt-1 text-navy">{mission.patient.telephone}</p>
-        </div>
-
-        <div className="mt-4">
-          <p className="text-xs font-medium uppercase text-navy/60">Acte prévu</p>
-          <p className="mt-1 text-navy">{mission.typeSoin}</p>
-        </div>
-      </div>
-
-      {mission.patient.allergies && (
-        <section className="rounded-card border border-danger/30 bg-danger/5 p-6">
-          <p className="text-xs font-medium uppercase text-danger">Allergie</p>
-          <p className="mt-1 text-navy">{mission.patient.allergies}</p>
-        </section>
-      )}
-
-      {mission.dernierRappel && (
-        <section className="rounded-card border border-warning/30 bg-warning/5 p-6">
-          <p className="text-xs font-medium uppercase text-warning">Rappel de la dernière visite</p>
-          <p className="mt-1 text-navy">{mission.dernierRappel}</p>
-        </section>
-      )}
-
-      {mission.derniereTransmission && (
-        <section className="rounded-card border border-navy/10 bg-navy/5 p-6">
-          <p className="text-xs font-medium uppercase text-navy/60">Dernière transmission</p>
-          <p className="mt-1 text-navy">{mission.derniereTransmission}</p>
-        </section>
-      )}
-
-      {dernierePhotoUrl && (
-        <section className="rounded-card border border-navy/10 bg-navy/5 p-6">
-          <p className="text-xs font-medium uppercase text-navy/60">Dernière photo</p>
-          {/* eslint-disable-next-line @next/next/no-img-element -- URL signée à courte durée de vie, incompatible avec le cache de next/image */}
-          <img
-            src={dernierePhotoUrl}
-            alt="Photo de la visite précédente"
-            className="mt-2 max-w-full rounded-card"
-          />
-        </section>
-      )}
-
-      <section className="rounded-card border border-navy/10 bg-white p-6">
-        <p className="text-xs font-medium uppercase text-navy/60">Consignes</p>
-        <form action={updateConsignesAction} className="mt-2 flex flex-col gap-3">
-          <input type="hidden" name="missionId" value={mission.id} />
-          <textarea
-            name="consignes"
-            defaultValue={mission.patient.consignes ?? ""}
-            rows={3}
-            className="rounded-card border border-navy/10 p-3 text-navy"
-          />
-          <Button type="submit" variant="tertiary" className="self-start">
-            Enregistrer
-          </Button>
-        </form>
-      </section>
-
-      {peutEcrireTransmission && (
-        <section className="rounded-card border border-navy/10 bg-white p-6">
-          <p className="text-xs font-medium uppercase text-navy/60">Transmission de cette visite</p>
-          <form action={updateTransmissionAction} className="mt-2 flex flex-col gap-3">
-            <input type="hidden" name="missionId" value={mission.id} />
-            <textarea
-              name="transmission"
-              defaultValue={mission.transmission ?? ""}
-              rows={3}
-              className="rounded-card border border-navy/10 p-3 text-navy"
-            />
-            <Button type="submit" variant="tertiary" className="self-start">
-              Enregistrer
-            </Button>
-          </form>
-        </section>
-      )}
-
-      {peutEcrireTransmission && (
-        <section className="rounded-card border border-navy/10 bg-white p-6">
-          <p className="text-xs font-medium uppercase text-navy/60">Rappel pour la prochaine visite</p>
-          <form action={updateRappelAction} className="mt-2 flex flex-col gap-3">
-            <input type="hidden" name="missionId" value={mission.id} />
-            <textarea
-              name="rappel"
-              defaultValue={mission.rappel ?? ""}
-              rows={3}
-              className="rounded-card border border-navy/10 p-3 text-navy"
-            />
-            <Button type="submit" variant="tertiary" className="self-start">
-              Enregistrer
-            </Button>
-          </form>
-        </section>
-      )}
-
-      {peutEcrireTransmission && (
-        <section className="rounded-card border border-navy/10 bg-white p-6">
-          <p className="text-xs font-medium uppercase text-navy/60">Photo de cette visite</p>
-          {photoUrl && (
-            // eslint-disable-next-line @next/next/no-img-element -- URL signée à courte durée de vie, incompatible avec le cache de next/image
-            <img
-              src={photoUrl}
-              alt="Photo envoyée pour cette visite"
-              className="mt-2 max-w-full rounded-card"
-            />
+          {absente ? (
+            <form action={updateMissionStatutAction}>
+              <input type="hidden" name="missionId" value={mission.id} />
+              <input type="hidden" name="nouveauStatut" value="a_faire" />
+              <button
+                type="submit"
+                className="rounded-full bg-danger/10 px-3.5 py-1.5 text-[12.5px] font-semibold text-danger"
+              >
+                Annuler l&apos;absence
+              </button>
+            </form>
+          ) : (
+            <span className={`rounded-full px-3 py-1.5 text-[13px] font-semibold ${STATUT_BADGE_CLASSES[mission.statut]}`}>
+              {STATUT_LABEL[mission.statut]}
+            </span>
           )}
-          <form action={uploadPhotoAction} className="mt-2 flex flex-col gap-3">
-            <input type="hidden" name="missionId" value={mission.id} />
-            <input type="file" name="photo" accept="image/*" capture="environment" />
-            <Button type="submit" variant="tertiary" className="self-start">
-              Envoyer
-            </Button>
-          </form>
-        </section>
-      )}
+        </div>
 
-      {prochainStatut ? (
-        <div className="flex gap-3">
-          {peutMarquerAbsent && (
-            <form action={updateMissionStatutAction} className="flex-1">
+        <div className="flex items-center gap-3.5">
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-violet to-purple-500 text-[17px] font-bold text-white shadow-[0_4px_12px_rgba(0,0,0,0.14)] ring-2 ring-white">
+            {initiales(mission.patientNom)}
+          </span>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5">
+              <h1 className="font-display text-[26px] font-semibold tracking-tight">{mission.patientNom}</h1>
+              {mission.patient.dateNaissance && (
+                <span className="whitespace-nowrap text-[13.5px] text-navy/45">
+                  {formatNaissance(mission.patient.dateNaissance)} · {calculerAge(mission.patient.dateNaissance)} ans
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-[18px] border border-navy/[0.06] bg-white p-4 shadow-[0_8px_22px_rgba(80,50,140,0.08)]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.07em] text-navy/45">
+            Acte prévu · {mission.heurePrevue.slice(0, 5)}
+          </p>
+          <div className="mt-2.5 flex items-center gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-violet/10">
+              <IconeSoin typeSoin={mission.typeSoin} className="h-6 w-6 text-brand-violet" />
+            </span>
+            <p className="font-display text-[19px] font-semibold tracking-tight">{mission.typeSoin}</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-4 gap-2">
+          <a
+            href={`tel:${mission.patient.telephone}`}
+            className="flex flex-col items-center gap-1.5 rounded-2xl border border-navy/[0.06] bg-white py-3 text-center shadow-[0_1px_2px_rgba(15,23,42,.04)]"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[21px] w-[21px] text-brand-violet">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <span className="text-[11.5px] font-semibold text-brand-violet">Appeler</span>
+          </a>
+          <a
+            href={itineraireHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-col items-center gap-1.5 rounded-2xl border border-navy/[0.06] bg-white py-3 text-center shadow-[0_1px_2px_rgba(15,23,42,.04)]"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[21px] w-[21px] text-brand-violet">
+              <polygon points="3 11 22 2 13 21 11 13 3 11" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <span className="text-[11.5px] font-semibold text-brand-violet">Itinéraire</span>
+          </a>
+          <a
+            href={`sms:${mission.patient.telephone}`}
+            className="flex flex-col items-center gap-1.5 rounded-2xl border border-navy/[0.06] bg-white py-3 text-center shadow-[0_1px_2px_rgba(15,23,42,.04)]"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[21px] w-[21px] text-brand-violet">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <span className="text-[11.5px] font-semibold text-brand-violet">SMS</span>
+          </a>
+          {peutMarquerAbsent ? (
+            <form action={updateMissionStatutAction}>
               <input type="hidden" name="missionId" value={mission.id} />
               <input type="hidden" name="nouveauStatut" value="absent" />
-              <Button type="submit" variant="secondary" className="w-full">
-                Absence
-              </Button>
+              <button
+                type="submit"
+                className="flex w-full flex-col items-center gap-1.5 rounded-2xl border border-navy/[0.06] bg-white py-3 text-center shadow-[0_1px_2px_rgba(15,23,42,.04)]"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[21px] w-[21px] text-danger">
+                  <path d="M12 9v4" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" />
+                  <path d="M12 17h.01" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" />
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" />
+                </svg>
+                <span className="text-[11.5px] font-semibold text-danger">Absence</span>
+              </button>
             </form>
+          ) : (
+            <span className="flex flex-col items-center gap-1.5 rounded-2xl border border-navy/[0.06] bg-white py-3 text-center opacity-40 shadow-[0_1px_2px_rgba(15,23,42,.04)]">
+              <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[21px] w-[21px] text-navy/40">
+                <path d="M12 9v4" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" />
+                <path d="M12 17h.01" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" />
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" />
+              </svg>
+              <span className="text-[11.5px] font-semibold text-navy/40">Absence</span>
+            </span>
           )}
-          <form action={updateMissionStatutAction} className="flex-1">
+        </div>
+
+        {absente && (
+          <div className="flex items-center gap-2.5 rounded-2xl border border-danger/20 bg-danger/5 px-3.5 py-3">
+            <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[19px] w-[19px] shrink-0 text-danger">
+              <path d="M12 9v4" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" />
+              <path d="M12 17h.01" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" />
+              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" />
+            </svg>
+            <p className="text-[14.5px] font-semibold leading-snug text-danger">
+              Absent(e) — le patient n&apos;a pas pu être vu à l&apos;heure prévue.
+            </p>
+          </div>
+        )}
+
+        <div className="flex items-start gap-2.5 text-[15px] text-navy">
+          <svg viewBox="0 0 24 24" aria-hidden="true" className="mt-0.5 h-[18px] w-[18px] shrink-0 text-navy/45">
+            <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="2" fill="none" />
+          </svg>
+          {mission.patient.adresse}
+        </div>
+
+        {mission.patient.allergies && (
+          <div className="flex items-center gap-2.5 rounded-2xl border border-danger/20 bg-danger/5 px-3.5 py-3">
+            <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[18px] w-[18px] shrink-0 text-danger">
+              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M12 9v4" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" />
+              <path d="M12 17h.01" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" />
+            </svg>
+            <p className="text-[14.5px] font-semibold text-danger">{mission.patient.allergies}</p>
+          </div>
+        )}
+
+        {mission.dernierRappel && (
+          <div className="rounded-2xl border border-warning/25 bg-warning/5 p-3.5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.07em] text-warning">
+              Rappel de la dernière visite
+            </p>
+            <p className="mt-1 text-[14.5px] text-navy">{mission.dernierRappel}</p>
+          </div>
+        )}
+
+        {mission.derniereTransmission && (
+          <div className="rounded-2xl border border-navy/[0.06] bg-white p-3.5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.07em] text-navy/45">
+              Dernière transmission
+            </p>
+            <p className="mt-1 text-[14.5px] text-navy">{mission.derniereTransmission}</p>
+          </div>
+        )}
+
+        {dernierePhotoUrl && (
+          <div className="rounded-2xl border border-navy/[0.06] bg-white p-3.5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.07em] text-navy/45">Dernière photo</p>
+            {/* eslint-disable-next-line @next/next/no-img-element -- URL signée à courte durée de vie, incompatible avec le cache de next/image */}
+            <img src={dernierePhotoUrl} alt="Photo de la visite précédente" className="mt-2 max-w-full rounded-xl" />
+          </div>
+        )}
+
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.07em] text-navy/45">Soins de la visite</p>
+          <div className="mt-2 flex items-center gap-2.5 rounded-2xl border border-navy/[0.06] bg-white px-3.5 py-3">
+            <IconeSoin typeSoin={mission.typeSoin} className="h-[18px] w-[18px] shrink-0 text-navy/45" />
+            <p className="text-[15.5px] font-semibold tracking-tight">{mission.typeSoin}</p>
+            <span className="ml-auto text-[12px] text-navy/35">prescrit</span>
+          </div>
+        </div>
+
+        {enCours && <Chronometre />}
+
+        <div className="rounded-2xl border border-navy/[0.06] bg-white p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.07em] text-navy/45">Consignes</p>
+          <form action={updateConsignesAction} className="mt-2 flex flex-col gap-3">
             <input type="hidden" name="missionId" value={mission.id} />
-            <input type="hidden" name="nouveauStatut" value={prochainStatut} />
-            <Button type="submit" variant="primary" className="w-full">
-              {LIBELLE_ACTION[mission.statut]}
+            <textarea
+              name="consignes"
+              defaultValue={mission.patient.consignes ?? ""}
+              rows={3}
+              className="rounded-[12px] border border-navy/10 bg-[#F6F7F5] p-3 text-[15px] text-navy"
+            />
+            <Button type="submit" variant="tertiary" className="self-start !min-h-0 !px-0 !py-0">
+              Enregistrer
             </Button>
           </form>
         </div>
-      ) : (
-        <section className="rounded-card border border-navy/10 bg-white p-6">
-          {mission.prochaineMission ? (
-            <>
-              <p className="text-xs font-medium uppercase text-navy/60">Patient suivant</p>
-              <p className="mt-1 text-navy">
-                {mission.prochaineMission.patientNom} · {mission.prochaineMission.heurePrevue}
-              </p>
-              <Link href={`/ma-journee/${mission.prochaineMission.id}`} className="mt-3 inline-block">
-                <Button variant="primary">Voir la fiche</Button>
+
+        {peutEcrireTransmission && (
+          <div className="rounded-2xl border border-navy/[0.06] bg-white p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.07em] text-navy/45">
+              Transmission de cette visite
+            </p>
+            <form action={updateTransmissionAction} className="mt-2 flex flex-col gap-3">
+              <input type="hidden" name="missionId" value={mission.id} />
+              <textarea
+                name="transmission"
+                defaultValue={mission.transmission ?? ""}
+                rows={3}
+                placeholder="Écrire ce qui s'est passé pendant la visite..."
+                className="rounded-[12px] border border-navy/10 bg-[#F6F7F5] p-3 text-[15px] text-navy placeholder:text-navy/40"
+              />
+              <Button type="submit" variant="tertiary" className="self-start !min-h-0 !px-0 !py-0">
+                Enregistrer
+              </Button>
+            </form>
+          </div>
+        )}
+
+        {peutEcrireTransmission && (
+          <div className="rounded-2xl border border-navy/[0.06] bg-white p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.07em] text-navy/45">
+              Rappel pour la prochaine visite
+            </p>
+            <form action={updateRappelAction} className="mt-2 flex flex-col gap-3">
+              <input type="hidden" name="missionId" value={mission.id} />
+              <textarea
+                name="rappel"
+                defaultValue={mission.rappel ?? ""}
+                rows={3}
+                className="rounded-[12px] border border-navy/10 bg-[#F6F7F5] p-3 text-[15px] text-navy"
+              />
+              <Button type="submit" variant="tertiary" className="self-start !min-h-0 !px-0 !py-0">
+                Enregistrer
+              </Button>
+            </form>
+          </div>
+        )}
+
+        {peutEcrireTransmission && (
+          <div className="rounded-2xl border border-navy/[0.06] bg-white p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.07em] text-navy/45">
+              Photo de cette visite
+            </p>
+            {photoUrl && (
+              // eslint-disable-next-line @next/next/no-img-element -- URL signée à courte durée de vie, incompatible avec le cache de next/image
+              <img src={photoUrl} alt="Photo envoyée pour cette visite" className="mt-2 max-w-full rounded-xl" />
+            )}
+            <form action={uploadPhotoAction} className="mt-2 flex flex-col gap-3">
+              <input type="hidden" name="missionId" value={mission.id} />
+              <input type="file" name="photo" accept="image/*" capture="environment" className="text-[14px]" />
+              <Button type="submit" variant="tertiary" className="self-start !min-h-0 !px-0 !py-0">
+                Envoyer
+              </Button>
+            </form>
+          </div>
+        )}
+
+        <div>
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.07em] text-navy/45">
+            Dossier du patient
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            {DOSSIERS.map((dossier) => (
+              <Link
+                key={dossier.label}
+                href={`/patients/${mission.patient.id}`}
+                className={`flex h-[110px] flex-col justify-between rounded-2xl bg-gradient-to-br p-3.5 shadow-[0_10px_20px_rgba(0,0,0,0.12)] transition-transform hover:scale-[1.02] ${dossier.gradient}`}
+              >
+                <span className="flex h-[30px] w-[30px] items-center justify-center rounded-[9px] bg-white/25">
+                  <IconeDossier icone={dossier.icone} />
+                </span>
+                <span>
+                  <span className="block text-[12.5px] font-semibold leading-tight text-white/90">
+                    {dossier.label}
+                  </span>
+                  <span className="mt-0.5 block text-[16px] font-bold tracking-tight text-white">
+                    {dossier.valeur}
+                  </span>
+                </span>
               </Link>
-            </>
-          ) : (
-            <p className="text-navy/60">Aucun autre patient à voir aujourd&apos;hui.</p>
-          )}
-        </section>
-      )}
+            ))}
+          </div>
+        </div>
+
+        {prochainStatut ? (
+          <form action={updateMissionStatutAction}>
+            <input type="hidden" name="missionId" value={mission.id} />
+            <input type="hidden" name="nouveauStatut" value={prochainStatut} />
+            <button
+              type="submit"
+              className="w-full rounded-full bg-gradient-to-r from-brand-violet to-purple-500 py-4 text-[17px] font-semibold tracking-tight text-white shadow-[0_8px_20px_rgba(124,58,237,0.32)]"
+            >
+              {LIBELLE_ACTION[mission.statut]}
+            </button>
+          </form>
+        ) : (
+          <div className="rounded-2xl border border-navy/[0.06] bg-white p-4">
+            {mission.prochaineMission ? (
+              <>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.07em] text-navy/45">
+                  Patient suivant
+                </p>
+                <p className="mt-1 text-[15px] text-navy">
+                  {mission.prochaineMission.patientNom} · {mission.prochaineMission.heurePrevue.slice(0, 5)}
+                </p>
+                <Link href={`/ma-journee/${mission.prochaineMission.id}`} className="mt-3 inline-block">
+                  <Button variant="primary">Voir la fiche</Button>
+                </Link>
+              </>
+            ) : (
+              <p className="text-navy/60">Aucun autre patient à voir aujourd&apos;hui.</p>
+            )}
+          </div>
+        )}
       </div>
     </main>
   );
