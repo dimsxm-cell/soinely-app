@@ -1,33 +1,30 @@
 import { createClient } from "@/lib/supabase/server";
-import { getAllFichesDossierSoins, SECTIONS_DOSSIER_SOINS } from "@/lib/data/dossierSoins";
-import { ListeFichesDossier } from "@/components/ui/ListeFichesDossier";
+import { getAllFichesDossierSoins } from "@/lib/data/dossierSoins";
+import { ListeInformationsProfessionnelles } from "@/components/ui/ListeInformationsProfessionnelles";
 import { OngletsExplorer } from "@/components/ui/OngletsExplorer";
 
-const SECTIONS_PATIENT = SECTIONS_DOSSIER_SOINS.filter(
-  (section) => section.valeur !== "informations_professionnelles"
-);
-
-export default async function DossierSoinsPage() {
+export default async function InformationsProfessionnellesPage() {
   const supabase = await createClient();
   const fiches = (await getAllFichesDossierSoins(supabase)).filter(
-    (fiche) => fiche.section !== "informations_professionnelles"
+    (fiche) => fiche.section === "informations_professionnelles"
   );
 
   return (
     <main className="min-h-screen bg-[#F6F7F5] text-navy">
       <div className="mx-auto flex max-w-2xl flex-col gap-6 px-6 py-10 sm:py-14">
-        <OngletsExplorer actif="dossier" />
+        <OngletsExplorer actif="informations" />
 
         <div>
           <h1 className="font-display text-[28px] font-bold leading-tight tracking-tight sm:text-[32px]">
-            Dossier de soins
+            Informations professionnelles
           </h1>
           <p className="mt-1.5 text-[14px] text-navy/50">
-            Ordonnances, comptes-rendus et protocoles de référence.
+            Repères juridiques et déontologiques pour votre exercice, issus des fiches de l&apos;Ordre National
+            des Infirmiers.
           </p>
         </div>
 
-        <ListeFichesDossier sections={SECTIONS_PATIENT} fiches={fiches} />
+        <ListeInformationsProfessionnelles fiches={fiches} />
       </div>
     </main>
   );

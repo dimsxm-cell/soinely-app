@@ -1,17 +1,18 @@
 import Link from "next/link";
 
 interface OngletsExplorerProps {
-  actif: "situations" | "dossier";
+  actif: "situations" | "dossier" | "informations";
 }
 
 const ONGLETS = [
   { cle: "situations" as const, href: "/situations", label: "Situations Terrain" },
   { cle: "dossier" as const, href: "/situations/dossier", label: "Dossier de soins" },
+  { cle: "informations" as const, href: "/situations/informations-professionnelles", label: "Informations professionnelles" },
 ];
 
 export function OngletsExplorer({ actif }: OngletsExplorerProps) {
   return (
-    <div className="flex gap-6 border-b border-navy/10">
+    <div className="flex gap-6 overflow-x-auto border-b border-navy/10">
       {ONGLETS.map((onglet) => {
         const estActif = onglet.cle === actif;
         return (
@@ -19,7 +20,7 @@ export function OngletsExplorer({ actif }: OngletsExplorerProps) {
             key={onglet.cle}
             href={onglet.href}
             aria-current={estActif ? "page" : undefined}
-            className={`-mb-px border-b-[2.5px] pb-3 text-[15px] font-semibold tracking-tight transition-colors ${
+            className={`-mb-px shrink-0 whitespace-nowrap border-b-[2.5px] pb-3 text-[15px] font-semibold tracking-tight transition-colors ${
               estActif ? "border-brand-violet text-brand-violet" : "border-transparent text-navy/40 hover:text-navy/60"
             }`}
           >

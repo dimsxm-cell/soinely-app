@@ -88,14 +88,15 @@ function IconeSection({ section }: { section: SectionDossierSoin }) {
 
 interface CarteFicheDossierProps {
   fiche: FicheDossierSoin;
+  base?: string;
 }
 
-export function CarteFicheDossier({ fiche }: CarteFicheDossierProps) {
+export function CarteFicheDossier({ fiche, base = "/situations/dossier" }: CarteFicheDossierProps) {
   const labelSection = SECTIONS_DOSSIER_SOINS.find((s) => s.valeur === fiche.section)?.label ?? "";
 
   return (
     <Link
-      href={`/situations/dossier/${fiche.id}`}
+      href={`${base}/${fiche.id}`}
       className="row-lift flex items-center gap-3.5 rounded-[18px] border border-navy/[0.06] bg-white p-[18px] shadow-[0_8px_22px_rgba(80,50,140,.1)]"
     >
       <span className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-[13px] bg-brand-violet/[0.12] text-brand-violet">
