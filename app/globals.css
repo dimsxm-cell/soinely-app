@@ -133,14 +133,44 @@ body {
 .cta-lift:hover { transform: translateY(-2px); filter: brightness(1.04); }
 .cta-lift:active { transform: translateY(0) scale(.97); }
 
+/* ── Cartes d'offres (page Tarifs) ───────────────────────────────────── */
+.pcard {
+  transition: transform 0.35s cubic-bezier(.22,1,.36,1), box-shadow 0.35s ease;
+}
+.pcard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 30px 70px rgba(76,29,149,.16), 0 4px 10px rgba(76,29,149,.08);
+}
+.pcard.pop:hover {
+  transform: translateY(-8px) scale(1.045);
+  box-shadow: 0 40px 90px rgba(124,58,237,.32), 0 4px 14px rgba(124,58,237,.14);
+}
+
+/* bouton effet verre avec onde au clic (page Tarifs) */
+.rbtn {
+  transition: transform 0.18s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s ease, filter 0.25s ease;
+}
+.rbtn:hover { transform: translateY(-2px); filter: brightness(1.03); }
+.rbtn:active { transform: translateY(0) scale(.97); }
+@keyframes ripple-anim { from { transform: scale(0); opacity: .5; } to { transform: scale(1); opacity: 0; } }
+.ripple-dot {
+  position: absolute;
+  border-radius: 9999px;
+  background: currentColor;
+  pointer-events: none;
+  z-index: 1;
+  animation: ripple-anim 0.6s ease-out forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
   }
   .reveal { opacity: 1; transform: none; filter: none; transition: none; }
-  .row-lift, .tile-bounce, .baguette, .cta-lift { transition: none; }
-  .row-lift:hover, .tile-bounce:hover, .baguette:hover, .cta-lift:hover { transform: none; }
+  .row-lift, .tile-bounce, .baguette, .cta-lift, .pcard, .rbtn { transition: none; }
+  .row-lift:hover, .tile-bounce:hover, .baguette:hover, .cta-lift:hover, .pcard:hover, .pcard.pop:hover, .rbtn:hover { transform: none; }
+  .ripple-dot { display: none; }
 }
 
 /* ── Liquid-glass nav (fidèle au HTML original) ─────────────────────── */
