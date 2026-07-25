@@ -40,7 +40,7 @@ export function ListeAttente() {
           <p className="mb-4 text-[14px] font-semibold text-white/80">Bêta privée · Ouverture bientôt</p>
           <Link
             href="/login"
-            className="mb-3 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-[15px] font-extrabold text-brand-violet shadow-lg transition-transform active:scale-95"
+            className="btn-lift mb-3 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-[15px] font-extrabold text-brand-violet shadow-lg"
           >
             Rejoindre la liste d&apos;attente
             <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[17px] w-[17px]">

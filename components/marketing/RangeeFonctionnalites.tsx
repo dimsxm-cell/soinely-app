@@ -72,9 +72,9 @@ export function RangeeFonctionnalites() {
     <section id="fonctionnalites" className="mx-auto w-full max-w-[1180px] px-6 pb-14 sm:pb-20">
       <div className="grid grid-cols-2 gap-8 rounded-[24px] border border-navy/5 bg-white px-6 py-10 shadow-[0_1px_2px_rgba(15,23,42,.04),0_18px_40px_-12px_rgba(15,23,42,.06)] sm:px-10 md:grid-cols-3 lg:grid-cols-6">
         {FONCTIONNALITES.map((item) => (
-          <div key={item.titre} className="flex flex-col items-center text-center">
+          <div key={item.titre} className="group flex flex-col items-center text-center">
             <span
-              className="mb-3.5 flex h-14 w-14 items-center justify-center rounded-2xl"
+              className="mb-3.5 flex h-14 w-14 items-center justify-center rounded-2xl transition-transform duration-300 [transition-timing-function:cubic-bezier(.34,1.56,.64,1)] group-hover:-translate-y-1 group-hover:scale-110"
               style={{ background: item.bg, color: item.couleur }}
             >
               <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6">

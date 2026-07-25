@@ -49,9 +49,40 @@ body {
 
 .ely-wave { transform-origin: bottom center; animation: ely-wave 2.4s ease-in-out infinite; }
 
+@keyframes slide-in-right {
+  0% { opacity: 0; transform: translateX(70px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slide-in-left {
+  0% { opacity: 0; transform: translateX(-70px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+.slide-in-right { animation: slide-in-right 0.9s cubic-bezier(.22,1,.36,1) 0.15s both; }
+.slide-in-left { animation: slide-in-left 1s cubic-bezier(.22,1,.36,1) 0.55s both; }
+
+.reveal {
+  opacity: 0;
+  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(.22,1,.36,1), filter 0.8s ease;
+}
+.reveal.rv-up { transform: translateY(60px); }
+.reveal.rv-zoom { transform: scale(.92); }
+.reveal.rv-left { transform: translateX(-60px); }
+.reveal.rv-blur { transform: translateY(30px); filter: blur(14px); }
+.reveal.rv-rise { transform: translateY(90px) scale(.96); transition-duration: 1s; }
+.reveal.in { opacity: 1; transform: none; filter: blur(0); }
+
+.btn-lift {
+  transition: transform 0.22s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s ease, filter 0.22s ease;
+}
+.btn-lift:hover { transform: translateY(-2px) scale(1.02); filter: brightness(1.04); }
+.btn-lift:active { transform: translateY(0) scale(0.96); transition-duration: 0.09s; }
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
   }
+  .reveal { opacity: 1; transform: none; filter: none; transition: none; }
 }

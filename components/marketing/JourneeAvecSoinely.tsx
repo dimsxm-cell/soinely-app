@@ -55,7 +55,7 @@ export function JourneeAvecSoinely() {
         {ETAPES.map((etape) => (
           <div
             key={etape.titre}
-            className="rounded-2xl border px-5 py-[22px]"
+            className="rounded-2xl border px-5 py-[22px] transition-transform duration-300 hover:-translate-y-1.5"
             style={{ background: etape.bg, borderColor: etape.bd }}
           >
             <div className="mb-3.5 flex items-center gap-2.5">
