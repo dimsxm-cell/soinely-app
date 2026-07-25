@@ -23,7 +23,7 @@ describe("CarteMission", () => {
 
     expect(screen.getByText("Mme Dupont")).toBeInTheDocument();
     expect(screen.getByText(/Pansement/)).toBeInTheDocument();
-    expect(screen.getByText(/08:30:00/)).toBeInTheDocument();
+    expect(screen.getByText("08:30")).toBeInTheDocument();
     expect(screen.getByText("À faire")).toBeInTheDocument();
   });
 
