@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/Button";
 import { Chronometre } from "@/components/ui/Chronometre";
 import { IconeSoin } from "@/components/ui/IconeSoin";
 import { LienRetour } from "@/components/ui/LienRetour";
+import { TuilesDossierPatient } from "@/components/ui/TuilesDossierPatient";
 import type { StatutMission } from "@/lib/types/clinical";
 
 const STATUT_LABEL: Record<StatutMission, string> = {
@@ -38,28 +39,6 @@ const LIBELLE_ACTION: Partial<Record<StatutMission, string>> = {
   a_faire: "Commencer le soin",
   en_cours: "Terminer le soin",
 };
-
-const DOSSIERS = [
-  { label: "Administratif", valeur: "Fiche complète", gradient: "from-[#b06ae0] to-[#8b3fd6]", icone: "admin" as const },
-  { label: "Prescriptions", valeur: "Soins actifs", gradient: "from-[#f2ad5c] to-[#e0863a]", icone: "rx" as const },
-  { label: "Diagramme de soins", valeur: "Historique", gradient: "from-[#7db8ea] to-[#4f97dd]", icone: "chart" as const },
-  { label: "Transmissions", valeur: "Notes de visite", gradient: "from-[#e86ab0] to-[#d63f97]", icone: "msg" as const },
-];
-
-function IconeDossier({ icone }: { icone: (typeof DOSSIERS)[number]["icone"] }) {
-  const chemins: Record<(typeof DOSSIERS)[number]["icone"], string> = {
-    admin: "M3 4h18v16H3z M9 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4z M15 8h3 M15 12h3 M7.5 16.5c.6-1.4 3.4-1.4 4 0",
-    rx: "M8 2h8v4H8z M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2 M9 12h6 M9 16h4",
-    chart: "M3 3v18h18 M7 14l3-4 3 3 4-6",
-    msg: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z",
-  };
-
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[19px] w-[19px] text-white">
-      <path d={chemins[icone]} stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
 
 function initiales(nomComplet: string): string {
   return nomComplet
@@ -367,27 +346,7 @@ export default async function ArriveePatientPage({
           <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.07em] text-navy/45">
             Dossier du patient
           </p>
-          <div className="grid grid-cols-2 gap-3">
-            {DOSSIERS.map((dossier) => (
-              <Link
-                key={dossier.label}
-                href={`/patients/${mission.patient.id}`}
-                className={`flex h-[110px] flex-col justify-between rounded-2xl bg-gradient-to-br p-3.5 shadow-[0_10px_20px_rgba(0,0,0,0.12)] transition-transform hover:scale-[1.02] ${dossier.gradient}`}
-              >
-                <span className="flex h-[30px] w-[30px] items-center justify-center rounded-[9px] bg-white/25">
-                  <IconeDossier icone={dossier.icone} />
-                </span>
-                <span>
-                  <span className="block text-[12.5px] font-semibold leading-tight text-white/90">
-                    {dossier.label}
-                  </span>
-                  <span className="mt-0.5 block text-[16px] font-bold tracking-tight text-white">
-                    {dossier.valeur}
-                  </span>
-                </span>
-              </Link>
-            ))}
-          </div>
+          <TuilesDossierPatient patientId={mission.patient.id} />
         </div>
 
         {prochainStatut ? (

@@ -79,12 +79,27 @@ body {
 .btn-lift:hover { transform: translateY(-2px) scale(1.02); filter: brightness(1.04); }
 .btn-lift:active { transform: translateY(0) scale(0.96); transition-duration: 0.09s; }
 
+/* rangée de liste (patients, missions) — légère élévation au survol */
+.row-lift {
+  transition: transform 0.22s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s ease;
+}
+.row-lift:hover { transform: translateY(-2px) scale(1.01); }
+.row-lift:active { transform: translateY(0) scale(0.99); }
+
+/* tuile de dossier — rebond au survol */
+.tile-bounce {
+  transition: transform 0.3s cubic-bezier(.34,1.56,.64,1), filter 0.3s ease;
+}
+.tile-bounce:hover { transform: translateY(-4px) scale(1.03); }
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
   }
   .reveal { opacity: 1; transform: none; filter: none; transition: none; }
+  .row-lift, .tile-bounce { transition: none; }
+  .row-lift:hover, .tile-bounce:hover { transform: none; }
 }
 
 /* ── Liquid-glass nav (fidèle au HTML original) ─────────────────────── */
