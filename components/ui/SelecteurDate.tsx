@@ -136,7 +136,7 @@ export function SelecteurDate({ name, label, valeur, onChange, hint }: Selecteur
       {hint && <p className="mt-1.5 text-[12px] leading-snug text-navy/40">{hint}</p>}
 
       {ouvert && (
-        <div className="panneau-cosmique absolute left-0 right-0 top-[calc(100%+8px)] z-20">
+        <div className="panneau-cosmique absolute left-0 right-0 top-[calc(100%+8px)] z-30">
           <div className="relative flex items-center justify-between p-4 pb-1">
             <button
               type="button"

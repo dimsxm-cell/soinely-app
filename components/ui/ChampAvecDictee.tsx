@@ -13,6 +13,8 @@ interface ChampAvecDicteeProps {
   name: string;
   label: string;
   defaultValue?: string | null;
+  value?: string;
+  onChange?: (valeur: string) => void;
   required?: boolean;
   multiligne?: boolean;
   rows?: number;
@@ -23,13 +25,26 @@ export function ChampAvecDictee({
   name,
   label,
   defaultValue,
+  value: valeurControlee,
+  onChange: surChangementControle,
   required,
   multiligne,
   rows = 2,
   placeholder,
 }: ChampAvecDicteeProps) {
-  const [valeur, setValeur] = useState(defaultValue ?? "");
+  const controle = valeurControlee !== undefined;
+  const [valeurInterne, setValeurInterne] = useState(defaultValue ?? "");
   const [ecoute, setEcoute] = useState(false);
+  const valeur = controle ? valeurControlee : valeurInterne;
+
+  function setValeur(next: string | ((precedente: string) => string)) {
+    const prochaine = typeof next === "function" ? next(valeur) : next;
+    if (controle) {
+      surChangementControle?.(prochaine);
+    } else {
+      setValeurInterne(prochaine);
+    }
+  }
   const supporte = useSyncExternalStore(
     souscrireSupportVocal,
     lireSupportVocalClient,

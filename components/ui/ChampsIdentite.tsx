@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { Sexe } from "@/lib/types/clinical";
+import { ChampAvecDictee } from "./ChampAvecDictee";
 import { SelecteurDate } from "./SelecteurDate";
 
 const MOIS_VALIDES = new Set(Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, "0")));
@@ -72,15 +73,12 @@ export function ChampsIdentite({ defaultNumeroSecu, defaultDateNaissance, defaul
 
   return (
     <>
-      <label className="flex flex-col gap-[7px] text-[12.5px] font-semibold tracking-[0.02em] text-[#3d3956]">
-        Numéro de sécurité sociale
-        <input
-          name="numeroSecu"
-          value={numeroSecu}
-          onChange={(event) => surChangementNumeroSecu(event.target.value)}
-          className="rounded-[14px] border border-[#d9d4ea] bg-[#F6F7F5] p-3.5 text-[15px] font-normal text-navy"
-        />
-      </label>
+      <ChampAvecDictee
+        name="numeroSecu"
+        label="Numéro de sécurité sociale"
+        value={numeroSecu}
+        onChange={surChangementNumeroSecu}
+      />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <SelecteurDate
@@ -113,7 +111,7 @@ export function ChampsIdentite({ defaultNumeroSecu, defaultDateNaissance, defaul
           <input type="hidden" name="sexe" value={sexe} />
 
           {ouvertSexe && (
-            <div className="panneau-cosmique absolute left-0 right-0 top-[calc(100%+8px)] z-20 p-2">
+            <div className="panneau-cosmique absolute left-0 right-0 top-[calc(100%+8px)] z-30 p-2">
               {OPTIONS_SEXE.map((o) => (
                 <button
                   key={o.valeur}

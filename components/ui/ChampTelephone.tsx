@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import {
+  creerReconnaissanceVocale,
+  lireSupportVocalClient,
+  lireSupportVocalServeur,
+  souscrireSupportVocal,
+} from "@/lib/reconnaissance-vocale";
+import { acquerirMicrophoneForce, relacherMicrophone } from "@/lib/verrou-microphone";
 import { DrapeauPays, type CodePays } from "./DrapeauPays";
 
 const INDICATIFS: { code: string; pays: string; drapeau: CodePays }[] = [
@@ -38,10 +45,43 @@ export function ChampTelephone({ name, label, defaultValue, required }: ChampTel
   const [indicatif, setIndicatif] = useState(initial.indicatif);
   const [numero, setNumero] = useState(initial.numero);
   const [ouvert, setOuvert] = useState(false);
+  const [ecoute, setEcoute] = useState(false);
   const conteneurRef = useRef<HTMLDivElement>(null);
 
   const selection = INDICATIFS.find((i) => i.code === indicatif) ?? INDICATIFS[0];
   const labelIndicatif = `Indicatif — ${label}`;
+
+  const supporte = useSyncExternalStore(
+    souscrireSupportVocal,
+    lireSupportVocalClient,
+    lireSupportVocalServeur
+  );
+
+  function demarrerEcoute() {
+    const recognition = creerReconnaissanceVocale();
+    if (!recognition) return;
+
+    acquerirMicrophoneForce("dictee", () => recognition.stop());
+
+    recognition.onstart = () => setEcoute(true);
+    recognition.onend = () => {
+      relacherMicrophone("dictee");
+      setEcoute(false);
+    };
+    recognition.onerror = () => {
+      relacherMicrophone("dictee");
+      setEcoute(false);
+    };
+    recognition.onresult = (event) => {
+      const transcript = event.results[0]?.[0]?.transcript;
+      if (!transcript) return;
+      const chiffres = transcript.replace(/\D/g, "");
+      if (!chiffres) return;
+      setNumero((precedent) => (precedent ? `${precedent}${chiffres}` : chiffres));
+    };
+
+    recognition.start();
+  }
 
   useEffect(() => {
     if (!ouvert) return;
@@ -83,7 +123,7 @@ export function ChampTelephone({ name, label, defaultValue, required }: ChampTel
           {ouvert && (
             <ul
               role="listbox"
-              className="panneau-cosmique absolute left-0 top-[calc(100%+8px)] z-20 max-h-64 w-max min-w-[190px] overflow-y-auto p-2"
+              className="panneau-cosmique absolute left-0 top-[calc(100%+8px)] z-30 max-h-64 w-max min-w-[190px] overflow-y-auto p-2"
             >
               {INDICATIFS.map((i) => (
                 <li key={i.code}>
@@ -117,6 +157,21 @@ export function ChampTelephone({ name, label, defaultValue, required }: ChampTel
           required={required}
           className="min-w-0 flex-1 rounded-[14px] border border-[#d9d4ea] bg-[#F6F7F5] p-3.5 text-[15px] font-normal text-navy"
         />
+        {supporte && (
+          <button
+            type="button"
+            onClick={demarrerEcoute}
+            aria-label={`Dicter — ${label}`}
+            aria-pressed={ecoute}
+            className={`baguette flex h-[38px] w-[38px] shrink-0 items-center justify-center self-start rounded-full border text-base ${
+              ecoute
+                ? "border-danger/30 bg-danger/15 text-danger"
+                : "border-brand-violet/20 bg-gradient-to-br from-brand-violet/[0.14] to-brand-rose/[0.14] text-brand-violet"
+            }`}
+          >
+            <span aria-hidden="true">🎤</span>
+          </button>
+        )}
       </div>
       <input type="hidden" name={name} value={numero ? `${indicatif} ${numero}` : ""} />
     </div>
