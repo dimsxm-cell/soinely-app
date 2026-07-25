@@ -36,6 +36,8 @@ beforeEach(() => {
   vi.clearAllMocks();
   process.env.STRIPE_PRICE_ID_SOLO = "price_solo_test";
   process.env.STRIPE_PRICE_ID_CABINET = "price_cabinet_test";
+  process.env.STRIPE_PRICE_ID_SOLO_ANNUEL = "price_solo_annuel_test";
+  process.env.STRIPE_PRICE_ID_CABINET_ANNUEL = "price_cabinet_annuel_test";
 });
 
 describe("createCheckoutSessionAction", () => {
@@ -78,6 +80,24 @@ describe("createCheckoutSessionAction", () => {
 
     expect(checkoutSessionsCreateMock).toHaveBeenCalledWith(
       expect.objectContaining({ line_items: [{ price: "price_cabinet_test", quantity: 1 }] })
+    );
+  });
+
+  it("utilise le prix annuel quand periodicite=annuel", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1", email: "marie@example.com" } } });
+    eqSelectMock.mockResolvedValue({ data: null, error: null });
+    checkoutSessionsCreateMock.mockResolvedValue({ url: "https://checkout.stripe.com/session_annuel" });
+
+    const { createCheckoutSessionAction } = await import("./abonnement-actions");
+
+    const formData = new FormData();
+    formData.set("plan", "solo");
+    formData.set("periodicite", "annuel");
+
+    await createCheckoutSessionAction(formData);
+
+    expect(checkoutSessionsCreateMock).toHaveBeenCalledWith(
+      expect.objectContaining({ line_items: [{ price: "price_solo_annuel_test", quantity: 1 }] })
     );
   });
 

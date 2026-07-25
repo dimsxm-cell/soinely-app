@@ -11,15 +11,24 @@ function getStripe(): Stripe {
   return new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2026-06-24.dahlia" });
 }
 
-function getPriceId(plan: string): string | null {
-  if (plan === "solo") return process.env.STRIPE_PRICE_ID_SOLO ?? null;
-  if (plan === "cabinet") return process.env.STRIPE_PRICE_ID_CABINET ?? null;
+function getPriceId(plan: string, periodicite: string): string | null {
+  if (plan === "solo") {
+    return periodicite === "annuel"
+      ? process.env.STRIPE_PRICE_ID_SOLO_ANNUEL ?? null
+      : process.env.STRIPE_PRICE_ID_SOLO ?? null;
+  }
+  if (plan === "cabinet") {
+    return periodicite === "annuel"
+      ? process.env.STRIPE_PRICE_ID_CABINET_ANNUEL ?? null
+      : process.env.STRIPE_PRICE_ID_CABINET ?? null;
+  }
   return null;
 }
 
 export async function createCheckoutSessionAction(formData: FormData): Promise<void> {
   const plan = String(formData.get("plan")) as PlanAbonnement;
-  const priceId = getPriceId(plan);
+  const periodicite = String(formData.get("periodicite") ?? "mensuel");
+  const priceId = getPriceId(plan, periodicite);
 
   if (!priceId) return;
 

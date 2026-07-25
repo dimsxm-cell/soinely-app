@@ -137,6 +137,10 @@ body {
 .pcard {
   transition: transform 0.35s cubic-bezier(.22,1,.36,1), box-shadow 0.35s ease;
 }
+.pcard.pop {
+  transform: scale(1.045);
+  z-index: 3;
+}
 .pcard:hover {
   transform: translateY(-8px);
   box-shadow: 0 30px 70px rgba(76,29,149,.16), 0 4px 10px rgba(76,29,149,.08);
