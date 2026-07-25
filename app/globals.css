@@ -86,3 +86,64 @@ body {
   }
   .reveal { opacity: 1; transform: none; filter: none; transition: none; }
 }
+
+/* ── Liquid-glass nav (fidèle au HTML original) ─────────────────────── */
+.lg-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  isolation: isolate;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255,255,255,.4);
+}
+
+/* couche distorsion SVG (glass-distortion filter défini dans le SVG global) */
+.lg-effect {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  backdrop-filter: blur(18px) saturate(1.6);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+}
+
+/* teinte blanche translucide */
+.lg-tint {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgba(255,255,255,.55);
+}
+
+/* reflet supérieur brillant */
+.lg-shine {
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 2;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255,255,255,.8) 30%,
+    rgba(255,255,255,.9) 50%,
+    rgba(255,255,255,.8) 70%,
+    transparent
+  );
+}
+
+/* le contenu est au-dessus de toutes les couches verre */
+.lg-content {
+  position: relative;
+  z-index: 3;
+}
+
+/* lien nav avec hover violet */
+.navlink { transition: color 0.2s ease; }
+.navlink:hover { color: #7c3aed; }
+
+/* flèche du bouton hero — glisse vers la droite au hover */
+@keyframes arrow-slide {
+  0%,100% { transform: translateX(0); }
+  50% { transform: translateX(4px); }
+}
+.btn-arrow { transition: transform 0.3s cubic-bezier(.34,1.56,.64,1); }
+a:hover .btn-arrow { transform: translateX(5px); }
+

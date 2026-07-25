@@ -10,7 +10,7 @@ import { Reveal } from "@/components/marketing/Reveal";
 
 export default function Page() {
   return (
-    <main className="flex flex-col overflow-x-hidden bg-[#F6F7F5] text-navy">
+    <main className="flex flex-col overflow-x-hidden" style={{ background: "#fff", color: "#1e1b3c" }}>
       <EnTeteMarketing />
       <Hero />
       <Reveal variant="up">

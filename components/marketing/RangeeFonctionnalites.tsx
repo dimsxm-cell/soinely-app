@@ -1,6 +1,7 @@
+/* Fonctionnalités grid — 6 colonnes */
 const FONCTIONNALITES = [
   {
-    titre: "Jusqu'à 1 heure gagnée par jour",
+    titre: "Jusqu'à 1h gagnée par jour",
     texte: "Des tournées optimisées qui s'adaptent en temps réel.",
     bg: "#eef4ff",
     couleur: "#2563eb",
@@ -40,7 +41,7 @@ const FONCTIONNALITES = [
     icone: (
       <>
         <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z" stroke="currentColor" strokeWidth="1.7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M12 10.5a1 1 0 1 0 0-1 1 1 0 0 0 0 1z" stroke="currentColor" strokeWidth="1.7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx="12" cy="10" r="2" stroke="currentColor" strokeWidth="1.7" fill="none" />
       </>
     ),
   },
@@ -69,22 +70,46 @@ const FONCTIONNALITES = [
 
 export function RangeeFonctionnalites() {
   return (
-    <section id="fonctionnalites" className="mx-auto w-full max-w-[1180px] px-6 pb-14 sm:pb-20">
-      <div className="grid grid-cols-2 gap-8 rounded-[24px] border border-navy/5 bg-white px-6 py-10 shadow-[0_1px_2px_rgba(15,23,42,.04),0_18px_40px_-12px_rgba(15,23,42,.06)] sm:px-10 md:grid-cols-3 lg:grid-cols-6">
-        {FONCTIONNALITES.map((item) => (
-          <div key={item.titre} className="group flex flex-col items-center text-center">
-            <span
-              className="mb-3.5 flex h-14 w-14 items-center justify-center rounded-2xl transition-transform duration-300 [transition-timing-function:cubic-bezier(.34,1.56,.64,1)] group-hover:-translate-y-1 group-hover:scale-110"
-              style={{ background: item.bg, color: item.couleur }}
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6">
-                {item.icone}
-              </svg>
-            </span>
-            <p className="text-[14.5px] font-extrabold leading-tight tracking-tight text-navy">{item.titre}</p>
-            <p className="mt-2 text-[12px] leading-relaxed text-navy/55">{item.texte}</p>
+    <section
+      id="feat"
+      style={{ background: "#faf8ff", padding: "26px 0" }}
+    >
+      <div className="mx-auto w-full max-w-[1180px] px-6">
+        <div
+          className="rounded-[20px] bg-white"
+          style={{ padding: "40px 30px", boxShadow: "0 12px 40px rgba(30,27,60,.06)" }}
+        >
+          <div
+            className="grid"
+            style={{ gridTemplateColumns: "repeat(6,1fr)", gap: 22 }}
+          >
+            {FONCTIONNALITES.map((item) => (
+              <div
+                key={item.titre}
+                className="feat group flex flex-col items-center text-center"
+                style={{ cursor: "default" }}
+              >
+                <div
+                  className="featicon mb-[14px] flex items-center justify-center rounded-[16px] transition-transform duration-300 [transition-timing-function:cubic-bezier(.34,1.56,.64,1)] group-hover:-translate-y-1 group-hover:scale-110"
+                  style={{ width: 56, height: 56, background: item.bg, color: item.couleur, margin: "0 auto 14px" }}
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6">
+                    {item.icone}
+                  </svg>
+                </div>
+                <p
+                  className="feattitle font-extrabold leading-tight"
+                  style={{ fontSize: 14.5, letterSpacing: "-0.3px", marginBottom: 8, color: "#1e1b3c" }}
+                >
+                  {item.titre}
+                </p>
+                <p style={{ fontSize: 12, lineHeight: 1.5, color: "#7a7391" }}>
+                  {item.texte}
+                </p>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     </section>
   );

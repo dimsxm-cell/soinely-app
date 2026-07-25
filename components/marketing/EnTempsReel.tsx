@@ -1,66 +1,121 @@
-const AVANTAGES = ["Gain de temps", "Moins de stress", "Plus de disponibilité pour vos patients"];
+import Image from "next/image";
 
-const ETAPES = [
-  {
-    heure: "08h17",
-    titre: "Embouteillage",
-    texte: "+18 min de retard estimé sur votre route.",
-  },
-  {
-    heure: "08h18",
-    titre: "Proposition d'ELY",
-    texte: "Nouvel ordre proposé : Mme Martin, Mme Bernard, M. Dupont, Mme Louis.",
-  },
-  {
-    heure: "08h18",
-    titre: "Vous validez",
-    texte: "Optimisation acceptée. Tournée mise à jour.",
-  },
-  {
-    heure: "08h19",
-    titre: "Vous gagnez du temps",
-    texte: "18 min gagnées et votre journée reste fluide.",
-  },
+const IMPREVU_CHECKS = [
+  "Réorganisation instantanée",
+  "Recalcul du meilleur itinéraire",
+  "Proposition validable en 1 tap",
 ];
+
+const PATIENT_ORDER = ["Mme Martin → Rue Leconte", "M. Dupont → Rue Victor Hugo", "Mme Bernard → Bd du Port", "Mme Louis → Av. des Fleurs"];
 
 export function EnTempsReel() {
   return (
-    <section className="bg-[#faf8ff] px-6 py-14 sm:py-20">
-      <div className="mx-auto grid w-full max-w-[1180px] grid-cols-1 gap-10 rounded-[28px] border border-navy/5 bg-white p-7 shadow-[0_12px_40px_-16px_rgba(30,27,60,0.1)] sm:p-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
-        <div>
-          <p className="mb-4 inline-block rounded-md bg-brand-violet/10 px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wider text-brand-violet">
-            En temps réel
-          </p>
-          <h2 className="mb-3.5 text-balance text-[22px] font-extrabold leading-[1.15] tracking-tight sm:text-[26px]">
-            Un imprévu survient…
-            <br />
-            <span className="text-brand-violet">ELY s&apos;occupe du reste.</span>
-          </h2>
-          <p className="mb-5 text-[14.5px] leading-relaxed text-navy/60">
-            Trafic, urgence, annulation de patient… SOINELY réorganise, recalcule et vous
-            propose toujours la meilleure option.
-          </p>
-          <ul className="flex flex-col gap-2.5">
-            {AVANTAGES.map((avantage) => (
-              <li key={avantage} className="flex items-center gap-2.5 text-[13.5px] font-semibold text-navy/75">
-                <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[18px] w-[18px] shrink-0 text-brand-violet">
-                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2.2" fill="none" />
-                  <path d="m9 12 2 2 4-4" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                {avantage}
-              </li>
-            ))}
-          </ul>
-        </div>
+    <section
+      style={{ background: "#faf8ff", padding: "56px 0" }}
+    >
+      <div className="mx-auto w-full max-w-[1180px] px-6">
+        <div
+          className="rounded-[20px] bg-white"
+          style={{ padding: "38px 34px", boxShadow: "0 12px 40px rgba(30,27,60,.06)" }}
+        >
+          <div style={{ display: "grid", gridTemplateColumns: "0.85fr 2.4fr", gap: 40, alignItems: "center" }}>
 
-        <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-4">
-          {ETAPES.map((etape) => (
-            <div key={etape.heure + etape.titre} className="rounded-2xl border border-navy/10 bg-white p-3.5">
-              <p className="mb-2 text-[11px] font-bold tabular-nums text-navy/40">{etape.heure}</p>
-              <p className="mb-2 text-[13.5px] font-extrabold text-navy">{etape.titre}</p>
-              <p className="text-[11.5px] leading-relaxed text-navy/60">{etape.texte}</p>
+            {/* Texte gauche */}
+            <div>
+              <div style={{ display: "inline-block", fontSize: 11, fontWeight: 800, letterSpacing: ".6px", color: "#6d28d9", background: "#f2eefe", padding: "5px 11px", borderRadius: 6, marginBottom: 16 }}>
+                EN TEMPS RÉEL
+              </div>
+              <h3 style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-0.6px", lineHeight: 1.15, margin: "0 0 14px" }}>
+                Un imprévu survient…<br />
+                <span style={{ color: "#6d28d9" }}>ELY s&apos;occupe du reste.</span>
+              </h3>
+              <p style={{ fontSize: 14, lineHeight: 1.55, color: "#6b6483", margin: "0 0 18px" }}>
+                Trafic, urgence, annulation de patient… SOINELY réorganise, recalcule et vous propose toujours la meilleure option.
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+                {IMPREVU_CHECKS.map((c) => (
+                  <div key={c} style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 13.5, fontWeight: 600, color: "#3d3956" }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <circle cx="12" cy="12" r="10" /><path d="m9 12 2 2 4-4" />
+                    </svg>
+                    {c}
+                  </div>
+                ))}
+              </div>
             </div>
-          ))}
+
+            {/* Timeline 4 colonnes */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, alignItems: "stretch" }}>
+
+              {/* 08h17 — Embouteillage */}
+              <div style={{ background: "#faf8ff", border: "1px solid #f0ecfb", borderRadius: 16, padding: "16px 15px", display: "flex", flexDirection: "column", minHeight: 242 }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: "#9a92b3", marginBottom: 9 }}>08h17</div>
+                <div style={{ fontSize: 13.5, fontWeight: 800, color: "#1e1b3c", marginBottom: 11 }}>Embouteillage</div>
+                <div style={{ position: "relative", borderRadius: 12, overflow: "hidden", height: 82, marginBottom: 10 }}>
+                  <Image
+                    src="/marketing/jour-embouteillage.webp"
+                    alt="Embouteillage"
+                    fill
+                    sizes="200px"
+                    className="object-cover"
+                  />
+                  {/* soleil superposé */}
+                  <div style={{ position: "absolute", top: 6, right: 6, width: 18, height: 18, borderRadius: 9999, background: "radial-gradient(circle,#fbbf24,#f59e0b)", opacity: 0.85 }} />
+                </div>
+                <div style={{ fontSize: 11.5, fontWeight: 700, color: "#e11d48", marginBottom: 8 }}>+ 18 min de retard estimé</div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: "#7c3aed", marginTop: "auto", lineHeight: 1.4 }}>
+                  Pas d&apos;inquiétude : ELY veille et garde votre journée sereine.
+                </div>
+              </div>
+
+              {/* 08h18 — Proposition ELY */}
+              <div style={{ background: "#faf8ff", border: "1px solid #f0ecfb", borderRadius: 16, padding: "16px 15px", display: "flex", flexDirection: "column", minHeight: 242 }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: "#9a92b3", marginBottom: 9 }}>08h18</div>
+                <div style={{ fontSize: 13.5, fontWeight: 800, color: "#1e1b3c", marginBottom: 11 }}>Proposition d&apos;ELY</div>
+                <div style={{ display: "flex", justifyContent: "center", marginBottom: 10 }}>
+                  <Image src="/marketing/ely-mascot-1.webp" alt="ELY" width={46} height={46} className="object-contain" style={{ filter: "drop-shadow(0 6px 14px rgba(124,58,237,.28))" }} />
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: "#9a92b3", marginBottom: 8 }}>Nouvel ordre proposé</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: "auto" }}>
+                  {PATIENT_ORDER.map((p) => (
+                    <div key={p} style={{ fontSize: 12, fontWeight: 600, color: "#3d3956" }}>→ {p}</div>
+                  ))}
+                </div>
+                <div style={{ fontSize: 11.5, fontWeight: 700, color: "#16a34a", marginTop: 11 }}>Gain estimé : 18 min</div>
+              </div>
+
+              {/* 08h18 — Vous validez */}
+              <div style={{ background: "#faf8ff", border: "1px solid #f0ecfb", borderRadius: 16, padding: "16px 15px", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", minHeight: 242 }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: "#9a92b3", marginBottom: 9, alignSelf: "flex-start" }}>08h18</div>
+                <div style={{ fontSize: 13.5, fontWeight: 800, color: "#1e1b3c", marginBottom: 14, alignSelf: "flex-start" }}>Vous validez</div>
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
+                  <div style={{ width: 52, height: 52, borderRadius: 9999, background: "#e7f7ec", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  </div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: "#1e1b3c" }}>Optimisation acceptée</div>
+                  <div style={{ fontSize: 11.5, color: "#9a92b3" }}>Tournée mise à jour</div>
+                </div>
+              </div>
+
+              {/* 08h19 — Temps gagné */}
+              <div style={{ background: "#faf8ff", border: "1px solid #f0ecfb", borderRadius: 16, padding: "16px 15px", display: "flex", flexDirection: "column", minHeight: 242 }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: "#9a92b3", marginBottom: 9 }}>08h19</div>
+                <div style={{ fontSize: 13.5, fontWeight: 800, color: "#1e1b3c", marginBottom: "auto" }}>Vous gagnez du temps</div>
+                <div style={{ textAlign: "center", flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4 }}>
+                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ marginBottom: 2, transformOrigin: "50% 15%", animation: "alarm-ring 2s ease-in-out infinite" }}>
+                    <path d="M12 6v6l3 2" /><circle cx="12" cy="13" r="8" />
+                    <path d="M5 3 2 6M22 6l-3-3M6 19l-2 2M18 19l2 2" />
+                  </svg>
+                  <div style={{ fontSize: 40, fontWeight: 800, letterSpacing: "-1px", color: "#7c3aed" }}>18 min</div>
+                  <div style={{ fontSize: 12.5, fontWeight: 700, color: "#3d3956" }}>Gagnées</div>
+                  <div style={{ fontSize: 11, color: "#9a92b3", marginTop: 2 }}>et votre journée reste fluide.</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
         </div>
       </div>
     </section>

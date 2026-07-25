@@ -1,43 +1,73 @@
 import Link from "next/link";
-import { LogoSoinely } from "@/components/ui/LogoSoinely";
 
 const LIENS_NAV = [
-  { href: "#fonctionnalites", label: "Fonctionnalités" },
+  { href: "#feat", label: "Fonctionnalités" },
   { href: "#ely", label: "ELY, votre copilote" },
-  { href: "/abonnement", label: "Tarifs" },
-  { href: "#ressources", label: "Ressources" },
-  { href: "#a-propos", label: "À propos" },
+  { href: "#", label: "Tarifs" },
+  { href: "#", label: "Ressources", hasArrow: true },
+  { href: "#", label: "À propos" },
 ];
 
 export function EnTeteMarketing() {
   return (
-    <header className="sticky top-0 z-30 border-b border-white/40 bg-white/70 backdrop-blur-md">
-      <div className="mx-auto flex w-full max-w-[1180px] items-center justify-between gap-6 px-6 py-4">
-        <Link href="/" className="flex items-center gap-2.5">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px] bg-gradient-to-br from-brand-violet to-purple-500 shadow-[0_4px_12px_-2px_rgba(124,58,237,0.45)]">
-            <LogoSoinely className="h-[19px] w-[19px] text-white [&_path]:fill-white" />
+    <header className="lg-nav sticky top-0 z-50 border-b border-white/40">
+      {/* couche distorsion verre */}
+      <div className="lg-effect" aria-hidden="true" />
+      {/* couche teinte blanche */}
+      <div className="lg-tint" aria-hidden="true" />
+      {/* reflet supérieur */}
+      <div className="lg-shine" aria-hidden="true" />
+
+      <div className="lg-content mx-auto flex w-full max-w-[1180px] items-center justify-between gap-6 px-6" style={{ height: "76px" }}>
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-[11px]">
+          <span
+            className="flex shrink-0 items-center justify-center rounded-[11px]"
+            style={{
+              width: 38,
+              height: 38,
+              background: "linear-gradient(135deg,#7c3aed,#a855f7)",
+              boxShadow: "0 4px 12px rgba(124,58,237,.35)",
+            }}
+          >
+            {/* icône cœur */}
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M12 21s-7-4.4-9.5-8.5C.5 9 2 5 5.5 5 7.8 5 9 6.5 12 9c3-2.5 4.2-4 6.5-4C22 5 23.5 9 21.5 12.5 19 16.6 12 21 12 21z" />
+            </svg>
           </span>
-          <span>
-            <span className="block text-[19px] font-extrabold leading-none tracking-tight text-navy">SOINELY</span>
-            <span className="hidden text-[8.5px] font-bold uppercase tracking-[0.03em] text-[#9a92b3] sm:block">
+          <span style={{ lineHeight: 1 }}>
+            <span className="block text-[19px] font-extrabold tracking-[-0.5px]" style={{ color: "#1e1b3c" }}>SOINELY</span>
+            <span className="hidden text-[8.5px] font-bold uppercase tracking-[0.05em] sm:block" style={{ color: "#9a92b3", marginTop: 2 }}>
               Le copilote des infirmiers libéraux
             </span>
           </span>
         </Link>
 
-        <nav aria-label="Navigation principale" className="hidden items-center gap-7 text-[14.5px] font-semibold text-navy/70 lg:flex">
+        {/* Nav links */}
+        <nav aria-label="Navigation principale" className="hidden items-center gap-[30px] text-[14.5px] font-semibold lg:flex" style={{ color: "#4b4763" }}>
           {LIENS_NAV.map((lien) => (
-            <a key={lien.href} href={lien.href} className="transition-colors hover:text-brand-violet">
+            <a key={lien.label} href={lien.href} className="navlink flex items-center gap-1 transition-colors hover:text-[#7c3aed]">
               {lien.label}
+              {lien.hasArrow && (
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              )}
             </a>
           ))}
         </nav>
 
+        {/* CTA — Se connecter */}
         <Link
           href="/login"
-          className="btn-lift whitespace-nowrap rounded-full bg-gradient-to-r from-brand-violet to-purple-500 px-5 py-3 text-sm font-bold text-white shadow-[0_6px_18px_-4px_rgba(124,58,237,0.5)]"
+          className="btn-lift whitespace-nowrap rounded-full text-[14.5px] font-bold text-white"
+          style={{
+            background: "linear-gradient(135deg,#7c3aed,#a855f7)",
+            padding: "12px 22px",
+            boxShadow: "0 6px 18px rgba(124,58,237,.32)",
+          }}
         >
-          Demander une démo
+          Se connecter
         </Link>
       </div>
     </header>
