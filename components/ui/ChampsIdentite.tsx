@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Sexe } from "@/lib/types/clinical";
+import { SelecteurDate } from "./SelecteurDate";
 
 const MOIS_VALIDES = new Set(Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, "0")));
 
@@ -30,6 +31,12 @@ export function deriverIdentiteDepuisNir(numeroSecu: string): {
   return { dateNaissance, sexe };
 }
 
+const OPTIONS_SEXE: { valeur: string; label: string }[] = [
+  { valeur: "", label: "Non renseigné" },
+  { valeur: "femme", label: "Féminin" },
+  { valeur: "homme", label: "Masculin" },
+];
+
 interface ChampsIdentiteProps {
   defaultNumeroSecu?: string | null;
   defaultDateNaissance?: string | null;
@@ -40,6 +47,8 @@ export function ChampsIdentite({ defaultNumeroSecu, defaultDateNaissance, defaul
   const [numeroSecu, setNumeroSecu] = useState(defaultNumeroSecu ?? "");
   const [dateNaissance, setDateNaissance] = useState(defaultDateNaissance ?? "");
   const [sexe, setSexe] = useState<string>(defaultSexe ?? "");
+  const [ouvertSexe, setOuvertSexe] = useState(false);
+  const conteneurSexeRef = useRef<HTMLDivElement>(null);
 
   function surChangementNumeroSecu(valeur: string) {
     setNumeroSecu(valeur);
@@ -48,43 +57,84 @@ export function ChampsIdentite({ defaultNumeroSecu, defaultDateNaissance, defaul
     if (derive.sexe) setSexe(derive.sexe);
   }
 
+  useEffect(() => {
+    if (!ouvertSexe) return;
+    function surClicDehors(event: MouseEvent) {
+      if (conteneurSexeRef.current && !conteneurSexeRef.current.contains(event.target as Node)) {
+        setOuvertSexe(false);
+      }
+    }
+    document.addEventListener("mousedown", surClicDehors);
+    return () => document.removeEventListener("mousedown", surClicDehors);
+  }, [ouvertSexe]);
+
+  const optionSexeActive = OPTIONS_SEXE.find((o) => o.valeur === sexe) ?? OPTIONS_SEXE[0];
+
   return (
     <>
-      <label className="flex flex-col gap-1 text-sm text-navy">
+      <label className="flex flex-col gap-[7px] text-[12.5px] font-semibold tracking-[0.02em] text-[#3d3956]">
         Numéro de sécurité sociale
         <input
           name="numeroSecu"
           value={numeroSecu}
           onChange={(event) => surChangementNumeroSecu(event.target.value)}
-          className="rounded-card border border-navy/20 p-2"
+          className="rounded-[14px] border border-[#d9d4ea] bg-[#F6F7F5] p-3.5 text-[15px] font-normal text-navy"
         />
       </label>
-      <label className="flex flex-col gap-1 text-sm text-navy">
-        Date de naissance
-        <input
-          type="date"
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <SelecteurDate
           name="dateNaissance"
-          value={dateNaissance}
-          onChange={(event) => setDateNaissance(event.target.value)}
-          className="rounded-card border border-navy/20 p-2"
+          label="Date de naissance"
+          valeur={dateNaissance}
+          onChange={setDateNaissance}
+          hint="Année et mois déduits du numéro de sécu — vérifiez le jour exact."
         />
-        <span className="text-xs text-navy/45">
-          Année et mois déduits du numéro de sécu — vérifiez le jour exact.
-        </span>
-      </label>
-      <label className="flex flex-col gap-1 text-sm text-navy">
-        Sexe
-        <select
-          name="sexe"
-          value={sexe}
-          onChange={(event) => setSexe(event.target.value)}
-          className="rounded-card border border-navy/20 bg-white p-2"
-        >
-          <option value="">Non renseigné</option>
-          <option value="homme">Homme</option>
-          <option value="femme">Femme</option>
-        </select>
-      </label>
+
+        <div ref={conteneurSexeRef} className="relative flex flex-col gap-[7px] text-[12.5px] font-semibold tracking-[0.02em] text-[#3d3956]">
+          Sexe
+          <button
+            type="button"
+            aria-haspopup="listbox"
+            aria-expanded={ouvertSexe}
+            onClick={() => setOuvertSexe((o) => !o)}
+            className="flex w-full items-center justify-between gap-2.5 rounded-[14px] border border-[#d9d4ea] bg-[#F6F7F5] px-4 py-3.5 text-left text-[15px] font-normal"
+          >
+            <span className={sexe ? "text-navy" : "text-navy/40"}>{optionSexeActive.label}</span>
+            <svg
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              className="h-[15px] w-[15px] shrink-0 text-brand-violet transition-transform"
+              style={{ transform: ouvertSexe ? "rotate(180deg)" : "rotate(0deg)" }}
+            >
+              <path d="m6 9 6 6 6-6" stroke="currentColor" strokeWidth="2.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          <input type="hidden" name="sexe" value={sexe} />
+
+          {ouvertSexe && (
+            <div className="panneau-cosmique absolute left-0 right-0 top-[calc(100%+8px)] z-20 p-2">
+              {OPTIONS_SEXE.map((o) => (
+                <button
+                  key={o.valeur}
+                  type="button"
+                  role="option"
+                  aria-selected={o.valeur === sexe}
+                  onClick={() => {
+                    setSexe(o.valeur);
+                    setOuvertSexe(false);
+                  }}
+                  className={`option-cosmique flex w-full items-center rounded-[11px] px-3 py-2.5 text-left text-[13.5px] font-semibold ${
+                    o.valeur === sexe ? "bg-[#a855f7]/[0.28] text-[#f1e9ff]" : "text-[#e4d9ff]"
+                  }`}
+                >
+                  {o.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </>
   );
 }

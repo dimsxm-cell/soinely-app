@@ -63,10 +63,11 @@ export function ChampAvecDictee({
     recognition.start();
   }
 
-  const classeChamp = "min-w-0 flex-1 rounded-card border border-navy/20 p-2 text-navy";
+  const classeChamp =
+    "min-w-0 flex-1 rounded-[14px] border border-[#d9d4ea] bg-[#F6F7F5] p-3.5 text-[15px] text-navy placeholder:text-navy/40";
 
   return (
-    <label className="flex flex-col gap-1 text-sm text-navy">
+    <label className="flex flex-col gap-[7px] text-[12.5px] font-semibold tracking-[0.02em] text-[#3d3956]">
       {label}
       <div className="flex gap-2">
         {multiligne ? (
@@ -95,8 +96,10 @@ export function ChampAvecDictee({
             onClick={demarrerEcoute}
             aria-label={`Dicter — ${label}`}
             aria-pressed={ecoute}
-            className={`flex h-[44px] w-[44px] shrink-0 items-center justify-center self-start rounded-card text-base transition-colors ${
-              ecoute ? "bg-danger/15 text-danger" : "bg-navy/5 text-navy hover:bg-navy/10"
+            className={`baguette flex h-[38px] w-[38px] shrink-0 items-center justify-center self-start rounded-full border text-base ${
+              ecoute
+                ? "border-danger/30 bg-danger/15 text-danger"
+                : "border-brand-violet/20 bg-gradient-to-br from-brand-violet/[0.14] to-brand-rose/[0.14] text-brand-violet"
             }`}
           >
             <span aria-hidden="true">🎤</span>

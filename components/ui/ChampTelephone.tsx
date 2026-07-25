@@ -57,25 +57,33 @@ export function ChampTelephone({ name, label, defaultValue, required }: ChampTel
   }, [ouvert]);
 
   return (
-    <div className="flex flex-col gap-1 text-sm text-navy">
+    <div className="flex flex-col gap-[7px] text-[12.5px] font-semibold tracking-[0.02em] text-[#3d3956]">
       <span>{label}</span>
       <div className="flex gap-2">
-        <div ref={conteneurRef} className="relative">
+        <div ref={conteneurRef} className="relative shrink-0">
           <button
             type="button"
             aria-haspopup="listbox"
             aria-expanded={ouvert}
             aria-label={labelIndicatif}
             onClick={() => setOuvert((o) => !o)}
-            className="flex h-full items-center gap-1.5 rounded-card border border-navy/20 bg-white px-2 py-2 text-sm text-navy"
+            className="flex h-full items-center gap-1.5 rounded-[14px] border border-[#d9d4ea] bg-[#F6F7F5] px-3 py-3.5 text-[15px] font-normal text-navy"
           >
             <DrapeauPays code={selection.drapeau} />
-            {selection.code}
+            <span className="text-navy/60">{selection.code}</span>
+            <svg
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              className="h-3 w-3 shrink-0 text-brand-violet transition-transform"
+              style={{ transform: ouvert ? "rotate(180deg)" : "rotate(0deg)" }}
+            >
+              <path d="m6 9 6 6 6-6" stroke="currentColor" strokeWidth="2.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </button>
           {ouvert && (
             <ul
               role="listbox"
-              className="absolute z-10 mt-1 max-h-56 w-max overflow-y-auto rounded-card border border-navy/20 bg-white py-1 shadow-lg"
+              className="panneau-cosmique absolute left-0 top-[calc(100%+8px)] z-20 max-h-64 w-max min-w-[190px] overflow-y-auto p-2"
             >
               {INDICATIFS.map((i) => (
                 <li key={i.code}>
@@ -88,12 +96,13 @@ export function ChampTelephone({ name, label, defaultValue, required }: ChampTel
                       setIndicatif(i.code);
                       setOuvert(false);
                     }}
-                    className={`flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm hover:bg-navy/5 ${
-                      i.code === indicatif ? "bg-navy/5 font-medium" : ""
+                    className={`option-cosmique relative flex w-full items-center gap-2 rounded-[11px] px-2.5 py-2 text-left text-[13.5px] font-semibold ${
+                      i.code === indicatif ? "bg-[#a855f7]/[0.28] text-[#f1e9ff]" : "text-[#e4d9ff]"
                     }`}
                   >
                     <DrapeauPays code={i.drapeau} />
-                    {i.code}
+                    {i.pays}
+                    <span className="ml-auto text-[#a894c9]">{i.code}</span>
                   </button>
                 </li>
               ))}
@@ -106,7 +115,7 @@ export function ChampTelephone({ name, label, defaultValue, required }: ChampTel
           value={numero}
           onChange={(event) => setNumero(event.target.value)}
           required={required}
-          className="min-w-0 flex-1 rounded-card border border-navy/20 p-2 text-navy"
+          className="min-w-0 flex-1 rounded-[14px] border border-[#d9d4ea] bg-[#F6F7F5] p-3.5 text-[15px] font-normal text-navy"
         />
       </div>
       <input type="hidden" name={name} value={numero ? `${indicatif} ${numero}` : ""} />
