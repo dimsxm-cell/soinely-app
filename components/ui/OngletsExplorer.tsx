@@ -5,9 +5,9 @@ interface OngletsExplorerProps {
 }
 
 const ONGLETS = [
-  { cle: "situations" as const, href: "/situations", label: "Situations Terrain" },
   { cle: "dossier" as const, href: "/situations/dossier", label: "Dossier de soins" },
-  { cle: "informations" as const, href: "/situations/informations-professionnelles", label: "Informations professionnelles" },
+  { cle: "situations" as const, href: "/situations", label: "Situations Terrain" },
+  { cle: "informations" as const, href: "/situations/informations-professionnelles", label: "Infos pro" },
 ];
 
 export function OngletsExplorer({ actif }: OngletsExplorerProps) {

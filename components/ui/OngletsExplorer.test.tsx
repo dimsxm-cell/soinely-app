@@ -8,7 +8,7 @@ describe("OngletsExplorer", () => {
 
     const situations = screen.getByRole("link", { name: "Situations Terrain" });
     const dossier = screen.getByRole("link", { name: "Dossier de soins" });
-    const informations = screen.getByRole("link", { name: "Informations professionnelles" });
+    const informations = screen.getByRole("link", { name: "Infos pro" });
 
     expect(situations).toHaveAttribute("href", "/situations");
     expect(dossier).toHaveAttribute("href", "/situations/dossier");
@@ -20,7 +20,7 @@ describe("OngletsExplorer", () => {
 
     expect(screen.getByRole("link", { name: "Dossier de soins" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "Situations Terrain" })).not.toHaveAttribute("aria-current");
-    expect(screen.getByRole("link", { name: "Informations professionnelles" })).not.toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Infos pro" })).not.toHaveAttribute(
       "aria-current"
     );
   });
