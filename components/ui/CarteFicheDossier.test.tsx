@@ -17,13 +17,13 @@ const fiche: FicheDossierSoin = {
 };
 
 describe("CarteFicheDossier", () => {
-  it("links to the fiche detail page and shows titre, resume and niveauConfiance badge", () => {
+  it("links to the fiche detail page and shows titre, section and niveauConfiance badge", () => {
     render(<CarteFicheDossier fiche={fiche} />);
 
     const lien = screen.getByRole("link");
     expect(lien).toHaveAttribute("href", "/situations/dossier/11111111-1111-1111-1111-111111111111");
     expect(screen.getByText("Douleur — conduite à tenir")).toBeInTheDocument();
-    expect(screen.getByText("Évaluation de la douleur et conduite à tenir.")).toBeInTheDocument();
-    expect(screen.getByText("brouillon")).toBeInTheDocument();
+    expect(screen.getByText("Protocoles d'urgence (conduites à tenir)")).toBeInTheDocument();
+    expect(screen.getByText("Brouillon")).toBeInTheDocument();
   });
 });

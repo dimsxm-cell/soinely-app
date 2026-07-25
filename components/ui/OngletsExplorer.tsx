@@ -19,8 +19,8 @@ export function OngletsExplorer({ actif }: OngletsExplorerProps) {
             key={onglet.cle}
             href={onglet.href}
             aria-current={estActif ? "page" : undefined}
-            className={`-mb-px border-b-2 pb-3 text-sm font-medium transition-colors ${
-              estActif ? "border-brand-violet text-brand-violet" : "border-transparent text-navy/50"
+            className={`-mb-px border-b-[2.5px] pb-3 text-[15px] font-semibold tracking-tight transition-colors ${
+              estActif ? "border-brand-violet text-brand-violet" : "border-transparent text-navy/40 hover:text-navy/60"
             }`}
           >
             {onglet.label}
