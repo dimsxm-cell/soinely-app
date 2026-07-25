@@ -23,12 +23,12 @@ export function ListeAttente() {
   return (
     <section id="liste-attente" className="px-6 pb-20 sm:pb-28">
       <div className="relative mx-auto grid w-full max-w-[1180px] grid-cols-1 items-center gap-8 overflow-hidden rounded-[26px] bg-[linear-gradient(115deg,#4c1d95_0%,#7c3aed_42%,#c026d3_78%,#ec4899_100%)] px-7 py-11 text-white sm:grid-cols-[0.55fr_1.2fr] sm:px-11 sm:py-11 lg:grid-cols-[0.5fr_1.15fr_repeat(3,0.72fr)]">
-        <span className="mx-auto hidden h-[130px] w-[130px] overflow-hidden rounded-[20px] ring-4 ring-white/20 lg:block">
+        <span className="mx-auto hidden h-[150px] w-[130px] overflow-hidden rounded-[20px] lg:block">
           <Image
-            src="/marketing/ely-mascot.png"
+            src="/marketing/ely-mascot-2.webp"
             alt="ELY"
-            width={400}
-            height={400}
+            width={195}
+            height={260}
             className="h-full w-full object-cover"
           />
         </span>

@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const POINTS = [
   {
     l: "Tournée optimisée",
@@ -47,8 +49,9 @@ export function VideoDemo() {
           <button
             type="button"
             aria-label="Regarder la vidéo de démonstration"
-            className="group relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-brand-violet/60 to-black/40 ring-1 ring-white/15"
+            className="group relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-2xl ring-1 ring-white/15"
           >
+            <Image src="/marketing/video-thumb.webp" alt="" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
             <span className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(236,72,153,0.35),transparent_60%)]" />
             <span className="relative flex h-16 w-16 items-center justify-center rounded-full bg-white/95 text-brand-violet shadow-lg transition-transform group-hover:scale-105">
               <svg viewBox="0 0 16 16" aria-hidden="true" className="ml-0.5 h-6 w-6">

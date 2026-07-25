@@ -35,7 +35,11 @@ function IconeCheck() {
 export function Hero() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-[#faf8ff] to-white">
-      <div className="mx-auto grid w-full max-w-[1180px] grid-cols-1 items-center gap-14 px-6 py-14 sm:py-20 lg:grid-cols-[1.02fr_0.98fr] lg:gap-10">
+      <div className="absolute inset-0 z-0">
+        <Image src="/marketing/hero-nurse.webp" alt="" fill sizes="100vw" priority className="object-cover" />
+      </div>
+      <div className="absolute inset-0 z-[1] bg-[linear-gradient(100deg,#faf8ff_0%,rgba(250,248,255,.94)_32%,rgba(250,248,255,.7)_50%,rgba(250,248,255,.12)_100%)]" />
+      <div className="relative z-[2] mx-auto grid w-full max-w-[1180px] grid-cols-1 items-center gap-14 px-6 py-14 sm:py-20 lg:grid-cols-[1.02fr_0.98fr] lg:gap-10">
         <div>
           <span className="mb-6 inline-flex items-center gap-1.5 rounded-full border border-brand-violet/15 bg-brand-violet/[0.06] px-3.5 py-1.5 text-[13px] font-bold text-brand-violet">
             Conçu par des IDEL, pour des IDEL
@@ -216,7 +220,7 @@ export function Hero() {
             <div className="mb-2.5 flex items-center justify-between">
               <span className="flex items-center gap-2">
                 <span className="flex h-[34px] w-[34px] items-center justify-center overflow-hidden rounded-full bg-[radial-gradient(circle_at_50%_35%,#efe7fb,#fff)]">
-                  <Image src="/marketing/ely-avatar.png" alt="ELY" width={80} height={80} className="h-[30px] w-[30px] object-cover" />
+                  <Image src="/marketing/ely-mascot-1.webp" alt="ELY" width={51} height={68} className="h-[30px] w-[30px] object-contain" />
                 </span>
                 <span className="text-[16px] font-extrabold text-brand-violet">ELY</span>
               </span>
