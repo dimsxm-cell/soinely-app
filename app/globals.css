@@ -49,6 +49,19 @@ body {
 
 .ely-wave { transform-origin: bottom center; animation: ely-wave 2.4s ease-in-out infinite; }
 
+@keyframes ely-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+
+@keyframes ely-glow {
+  0%, 100% { opacity: .3; transform: scale(1); }
+  50% { opacity: .55; transform: scale(1.08); }
+}
+
+.ely-float { animation: ely-float 3.6s ease-in-out infinite; }
+.ely-glow { animation: ely-glow 3.6s ease-in-out infinite; }
+
 @keyframes slide-in-right {
   0% { opacity: 0; transform: translateX(70px); }
   100% { opacity: 1; transform: translateX(0); }

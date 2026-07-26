@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { PatientComplet } from "@/lib/types/clinical";
+import { formaterNomPropre } from "@/lib/format";
 import { TuilesDossierPatient } from "@/components/ui/TuilesDossierPatient";
 
 function initiales(nomComplet: string): string {
@@ -64,7 +65,7 @@ export function ListePatients({ patients, prochaineVisiteParPatient }: ListePati
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-[16.5px] font-semibold tracking-tight text-navy">
-                    {patient.nomComplet}
+                    {formaterNomPropre(patient.nomComplet)}
                   </span>
                   <span className="block truncate text-[13.5px] text-navy/50">{patient.adresse || "—"}</span>
                 </span>

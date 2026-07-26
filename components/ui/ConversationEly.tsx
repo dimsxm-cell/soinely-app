@@ -163,8 +163,20 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
       <div className="py-6">
         {!aDesMessages ? (
           <div className="flex flex-col items-center px-4 pt-6 text-center">
-            <span className="ely-wave relative flex h-[120px] w-[120px] items-center justify-center rounded-full bg-gradient-to-br from-brand-violet/[0.16] to-brand-rose/[0.16]">
-              <Image src="/app/ely-avatar.png" alt="" width={160} height={160} className="h-24 w-24 object-contain drop-shadow-[0_10px_24px_rgba(124,58,237,0.28)]" />
+            <span className="relative flex h-[160px] w-[160px] items-center justify-center">
+              <span
+                aria-hidden="true"
+                className="ely-glow absolute h-[110px] w-[110px] rounded-full bg-gradient-to-br from-brand-violet/40 to-brand-rose/40 blur-xl"
+              />
+              <span className="ely-float relative">
+                <Image
+                  src="/app/ely-mascot.png"
+                  alt=""
+                  width={340}
+                  height={454}
+                  className="h-[150px] w-auto object-contain drop-shadow-[0_18px_28px_rgba(124,58,237,0.32)]"
+                />
+              </span>
             </span>
             <h1 className="mt-5 font-display text-[24px] font-bold tracking-tight text-navy">Bonjour, je suis ELY</h1>
             <p className="mt-2 max-w-[280px] text-[15px] leading-relaxed text-navy/55">

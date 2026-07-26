@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getPatient, getSoinsPrescrits } from "@/lib/data/patients";
 import { createSoinPrescritAction, arreterSoinPrescritAction, updatePatientAction } from "@/lib/data/patients-actions";
+import { formaterNomPropre } from "@/lib/format";
 import type { SoinPrescrit } from "@/lib/types/clinical";
 import { Button } from "@/components/ui/Button";
 import { ChampAvecDictee } from "@/components/ui/ChampAvecDictee";
@@ -55,7 +56,7 @@ export default async function PatientPage({ params }: { params: Promise<{ id: st
         <div>
           <LienRetour href="/patients" label="Patients" />
           <h1 className="mt-4 text-center font-display text-[28px] font-medium leading-tight sm:text-[32px]">
-            {patient.nomComplet}
+            {formaterNomPropre(patient.nomComplet)}
           </h1>
         </div>
 
@@ -63,7 +64,12 @@ export default async function PatientPage({ params }: { params: Promise<{ id: st
         <p className="text-xs font-medium uppercase text-navy/60">Fiche patient</p>
         <form action={updatePatientAction} className="mt-3 flex flex-col gap-3">
           <input type="hidden" name="patientId" value={patient.id} />
-          <ChampAvecDictee name="nomComplet" label="Nom et prénom" defaultValue={patient.nomComplet} required />
+          <ChampAvecDictee
+            name="nomComplet"
+            label="Nom et prénom"
+            defaultValue={formaterNomPropre(patient.nomComplet)}
+            required
+          />
           <ChampsIdentite
             defaultNumeroSecu={patient.numeroSecu}
             defaultDateNaissance={patient.dateNaissance}

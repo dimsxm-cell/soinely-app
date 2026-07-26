@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { MissionDuJour, StatutMission } from "@/lib/types/clinical";
 import { updateMissionStatutAction } from "@/lib/data/ma-journee-actions";
+import { formaterNomPropre } from "@/lib/format";
 import { IconeSoin } from "@/components/ui/IconeSoin";
 
 const STATUT_LABEL: Record<MissionDuJour["statut"], string> = {
@@ -42,18 +43,25 @@ const BOUTON_CLASSES: Partial<Record<StatutMission, string>> = {
 interface CarteMissionProps {
   mission: MissionDuJour;
   contexteHref?: string;
+  estDerniere?: boolean;
 }
 
-export function CarteMission({ mission, contexteHref }: CarteMissionProps) {
+export function CarteMission({ mission, contexteHref, estDerniere }: CarteMissionProps) {
   const prochainStatut = PROCHAIN_STATUT[mission.statut];
   const heureAffichee = mission.heurePrevue.slice(0, 5);
   const terminee = mission.statut === "terminee";
 
   return (
     <div className="flex items-stretch gap-2.5">
-      <div className="flex w-9 shrink-0 flex-col items-center gap-1.5 pt-3.5">
+      <div className="relative flex w-9 shrink-0 flex-col items-center gap-1.5 pt-3.5">
+        {!estDerniere && (
+          <span aria-hidden="true" className="absolute left-1/2 top-[30px] bottom-[-12px] w-px -translate-x-1/2 bg-navy/12" />
+        )}
         <span className="whitespace-nowrap text-[11px] font-bold tabular-nums text-navy/45">{heureAffichee}</span>
-        <span aria-hidden="true" className={`h-3 w-3 rounded-full ring-4 ring-[#F6F7F5] ${DOT_CLASSES[mission.statut]}`} />
+        <span
+          aria-hidden="true"
+          className={`relative z-10 h-3 w-3 rounded-full ring-4 ring-[#F6F7F5] ${DOT_CLASSES[mission.statut]}`}
+        />
       </div>
 
       <div
@@ -72,7 +80,9 @@ export function CarteMission({ mission, contexteHref }: CarteMissionProps) {
           </span>
 
           <Link href={`/ma-journee/${mission.id}`} className="min-w-0 flex-1 hover:opacity-80">
-            <p className={`font-semibold ${terminee ? "text-navy/50" : "text-navy"}`}>{mission.patientNom}</p>
+            <p className={`font-semibold ${terminee ? "text-navy/50" : "text-navy"}`}>
+              {formaterNomPropre(mission.patientNom)}
+            </p>
             <p className="text-sm text-navy/50">{mission.typeSoin}</p>
           </Link>
         </div>
@@ -92,7 +102,7 @@ export function CarteMission({ mission, contexteHref }: CarteMissionProps) {
               <input type="hidden" name="nouveauStatut" value={prochainStatut} />
               <button
                 type="submit"
-                className={`rounded-full px-4 py-2 text-sm font-semibold text-white ${BOUTON_CLASSES[mission.statut]}`}
+                className={`btn-lift rounded-full px-4 py-2 text-sm font-semibold text-white ${BOUTON_CLASSES[mission.statut]}`}
               >
                 {LIBELLE_ACTION[mission.statut]}
               </button>

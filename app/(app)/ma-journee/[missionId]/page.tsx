@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getMissionDetail, getPhotoUrl } from "@/lib/data/ma-journee";
+import { formaterNomPropre } from "@/lib/format";
 import {
   updateConsignesAction,
   updateMissionStatutAction,
@@ -117,7 +118,9 @@ export default async function ArriveePatientPage({
           </span>
           <div className="min-w-0">
             <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5">
-              <h1 className="font-display text-[26px] font-semibold tracking-tight">{mission.patientNom}</h1>
+              <h1 className="font-display text-[26px] font-semibold tracking-tight">
+                {formaterNomPropre(mission.patientNom)}
+              </h1>
               {mission.patient.dateNaissance && (
                 <span className="whitespace-nowrap text-[13.5px] text-navy/45">
                   {formatNaissance(mission.patient.dateNaissance)} · {calculerAge(mission.patient.dateNaissance)} ans
@@ -368,7 +371,8 @@ export default async function ArriveePatientPage({
                   Patient suivant
                 </p>
                 <p className="mt-1 text-[15px] text-navy">
-                  {mission.prochaineMission.patientNom} · {mission.prochaineMission.heurePrevue.slice(0, 5)}
+                  {formaterNomPropre(mission.prochaineMission.patientNom)} ·{" "}
+                  {mission.prochaineMission.heurePrevue.slice(0, 5)}
                 </p>
                 <Link href={`/ma-journee/${mission.prochaineMission.id}`} className="mt-3 inline-block">
                   <Button variant="primary">Voir la fiche</Button>

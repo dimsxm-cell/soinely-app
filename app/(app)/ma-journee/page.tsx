@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
+import { formaterNomPropre } from "@/lib/format";
 import { getMissionEnCoursHref, getMissionsDuJour, getTourneeDuJour } from "@/lib/data/ma-journee";
 import { CarteInformation } from "@/components/ui/CarteInformation";
 import { CarteMission } from "@/components/ui/CarteMission";
@@ -30,7 +31,8 @@ export default async function MaJourneePage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  const prenom = (user?.user_metadata?.full_name as string | undefined)?.split(" ")[0];
+  const nomComplet = user?.user_metadata?.full_name as string | undefined;
+  const prenom = nomComplet ? formaterNomPropre(nomComplet).split(" ")[0] : undefined;
 
   const tournee = user ? await getTourneeDuJour(supabase, user.id) : null;
   const missions = tournee ? await getMissionsDuJour(supabase, tournee.id) : [];
@@ -102,11 +104,12 @@ export default async function MaJourneePage({
 
             {missionsVisibles.length > 0 ? (
               <div className="mt-3 flex flex-col gap-3">
-                {missionsVisibles.map((mission) => (
+                {missionsVisibles.map((mission, index) => (
                   <CarteMission
                     key={mission.id}
                     mission={mission}
                     contexteHref={mission.id === contexte?.missionId ? contexte.href : undefined}
+                    estDerniere={index === missionsVisibles.length - 1}
                   />
                 ))}
               </div>

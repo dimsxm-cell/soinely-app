@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { LogoSoinely } from "@/components/ui/LogoSoinely";
-import { formatDateFr } from "@/lib/format";
+import { formatDateFr, formaterNomPropre } from "@/lib/format";
 
 interface EnTeteDocumentProps {
   titreDocument: string;
@@ -18,7 +18,7 @@ export function EnTeteDocument({ titreDocument, sousTitre, nomIdel, patient }: E
           <span className="font-display text-lg font-bold text-navy">Soinely</span>
         </div>
         <div className="text-right text-[13px] text-navy/60">
-          <p className="font-semibold text-navy">{nomIdel}</p>
+          <p className="font-semibold text-navy">{formaterNomPropre(nomIdel)}</p>
           <p>Infirmier(ère) diplômé(e) d&apos;État</p>
         </div>
       </div>
@@ -29,7 +29,7 @@ export function EnTeteDocument({ titreDocument, sousTitre, nomIdel, patient }: E
       <div className="mt-5 grid grid-cols-2 gap-4 rounded-[16px] border border-navy/10 bg-[#F6F7F5] p-4 text-[13.5px]">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-wide text-navy/45">Patient</p>
-          <p className="mt-1 font-semibold text-navy">{patient.nomComplet}</p>
+          <p className="mt-1 font-semibold text-navy">{formaterNomPropre(patient.nomComplet)}</p>
           {patient.dateNaissance && <p className="text-navy/70">Né(e) le {formatDateFr(patient.dateNaissance)}</p>}
         </div>
         <div>
@@ -62,7 +62,7 @@ export function BlocSignature({ titre, nom, sousTitre }: BlocSignatureProps) {
     <div className="flex flex-col gap-1 rounded-[14px] border border-navy/10 p-4">
       <p className="text-[12px] font-bold uppercase tracking-wide text-navy/45">{titre}</p>
       {sousTitre && <p className="text-[11.5px] text-navy/45">{sousTitre}</p>}
-      <p className="mt-1 text-[13.5px] text-navy/70">Nom : {nom ?? "……………………………………"}</p>
+      <p className="mt-1 text-[13.5px] text-navy/70">Nom : {nom ? formaterNomPropre(nom) : "……………………………………"}</p>
       <p className="text-[13.5px] text-navy/70">Date : ……… / ……… / …………</p>
       <div className="mt-3 h-16 rounded-[10px] border border-dashed border-navy/20" />
     </div>

@@ -4,6 +4,7 @@ import { getPatient } from "@/lib/data/patients";
 import { BoutonImprimer } from "@/components/ui/BoutonImprimer";
 import { CaseACocher, EnTeteDocument, BlocSignature, TitreSection } from "@/components/ui/ElementsDocument";
 import { LienRetour } from "@/components/ui/LienRetour";
+import { formaterNomPropre } from "@/lib/format";
 
 export default async function DocumentConsentementPage({
   params,
@@ -25,7 +26,7 @@ export default async function DocumentConsentementPage({
     <main className="min-h-screen bg-[#F6F7F5] text-navy print:bg-white">
       <div className="mx-auto flex max-w-[720px] flex-col gap-6 px-6 py-10 sm:py-14 print:py-0">
         <div className="print:hidden">
-          <LienRetour href={`/patients/${patient.id}`} label={patient.nomComplet} />
+          <LienRetour href={`/patients/${patient.id}`} label={formaterNomPropre(patient.nomComplet)} />
         </div>
 
         <div className="rounded-[20px] border border-navy/10 bg-white p-7 shadow-[0_1px_2px_rgba(15,23,42,.04),0_18px_40px_rgba(15,23,42,.06)] print:border-0 print:p-0 print:shadow-none">
@@ -40,7 +41,10 @@ export default async function DocumentConsentementPage({
             <section>
               <TitreSection>Personne de confiance (article L1111-6 du Code de la santé publique)</TitreSection>
               <div className="mt-3 grid grid-cols-2 gap-3 text-[14px] text-navy/80">
-                <p>Nom : {patient.personneConfianceNom || "……………………………………"}</p>
+                <p>
+                  Nom :{" "}
+                  {patient.personneConfianceNom ? formaterNomPropre(patient.personneConfianceNom) : "……………………………………"}
+                </p>
                 <p>Téléphone : {patient.personneConfianceTelephone || "……………………………………"}</p>
               </div>
               <ul className="mt-3 flex flex-wrap gap-x-6 gap-y-2">

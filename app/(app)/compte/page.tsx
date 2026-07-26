@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { formaterNomPropre } from "@/lib/format";
 import { getAbonnement, getJoursRestantsEssaiGratuit } from "@/lib/data/abonnement";
 import { createBillingPortalSessionAction } from "@/lib/data/abonnement-actions";
+import { getAvatarUrl } from "@/lib/data/profil";
+import { uploadAvatarAction } from "@/lib/data/profil-actions";
 import { signOutAction } from "@/app/login/actions";
 import { BasculeEcoutePermanenteEly } from "@/components/ui/BasculeEcoutePermanenteEly";
+import { Button } from "@/components/ui/Button";
 import type { PlanAbonnement, StatutAbonnement } from "@/lib/types/abonnement";
 
 const PLAN_LABEL: Record<PlanAbonnement, string> = {
@@ -41,7 +45,10 @@ export default async function ComptePage() {
   }
 
   const abonnement = await getAbonnement(supabase, user.id);
-  const nom = (user.user_metadata?.full_name as string | undefined) ?? user.email ?? "";
+  const nomBrut = user.user_metadata?.full_name as string | undefined;
+  const nom = nomBrut ? formaterNomPropre(nomBrut) : user.email ?? "";
+  const avatarPath = user.user_metadata?.avatar_path as string | undefined;
+  const avatarUrl = avatarPath ? await getAvatarUrl(supabase, avatarPath) : null;
   const joursRestantsEssai = abonnement ? 0 : getJoursRestantsEssaiGratuit(user.created_at);
   const ecoutePermanenteActivee = Boolean(user.user_metadata?.ecoute_permanente_ely);
 
@@ -53,8 +60,36 @@ export default async function ComptePage() {
         <div className="mt-8 flex flex-col gap-5">
           <section className="rounded-[20px] border border-navy/10 bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,.04),0_18px_40px_rgba(15,23,42,.06)]">
             <p className="text-[12.5px] font-bold uppercase tracking-wider text-navy/45">Profil</p>
-            <p className="mt-2 text-[15px] font-semibold text-navy">{nom}</p>
-            <p className="text-sm text-navy/60">{user.email}</p>
+            <div className="mt-3 flex items-center gap-4">
+              {avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element -- URL signée à courte durée de vie, incompatible avec le cache de next/image
+                <img
+                  src={avatarUrl}
+                  alt="Photo de profil"
+                  className="h-16 w-16 shrink-0 rounded-full object-cover ring-2 ring-white shadow-[0_2px_8px_rgba(15,23,42,.12)]"
+                />
+              ) : (
+                <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-brand-violet/[0.12] text-[22px] font-semibold text-brand-violet">
+                  {nom.charAt(0).toLocaleUpperCase("fr-FR") || "?"}
+                </span>
+              )}
+              <div>
+                <p className="text-[15px] font-semibold text-navy">{nom}</p>
+                <p className="text-sm text-navy/60">{user.email}</p>
+              </div>
+            </div>
+            <form action={uploadAvatarAction} className="mt-4 flex items-center gap-3">
+              <input
+                type="file"
+                name="photo"
+                accept="image/*"
+                className="text-[13.5px] text-navy/70"
+                aria-label="Changer la photo de profil"
+              />
+              <Button type="submit" variant="tertiary" className="!min-h-0 !px-0 !py-0">
+                Enregistrer
+              </Button>
+            </form>
           </section>
 
           <section className="rounded-[20px] border border-navy/10 bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,.04),0_18px_40px_rgba(15,23,42,.06)]">
