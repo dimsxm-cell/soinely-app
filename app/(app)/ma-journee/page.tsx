@@ -52,11 +52,11 @@ export default async function MaJourneePage({
             {prenom ? `, ${prenom}` : ""}
           </h1>
           <Image
-            src="/app/ely-avatar.png"
+            src="/app/ely-mascot.png"
             alt="ELY"
-            width={400}
-            height={400}
-            className="h-[38px] w-[38px] object-contain drop-shadow-[0_4px_10px_rgba(124,58,237,0.28)]"
+            width={340}
+            height={454}
+            className="ely-float h-[46px] w-auto object-contain drop-shadow-[0_4px_10px_rgba(124,58,237,0.28)]"
           />
         </div>
         <div className="mt-1.5 flex items-center gap-2 text-[15px] text-navy/50">

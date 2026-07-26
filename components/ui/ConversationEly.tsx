@@ -135,7 +135,13 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
       <div className="flex items-center justify-between border-b border-navy/10 pb-4">
         <div className="flex items-center gap-2.5">
           <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-violet/[0.18] to-brand-rose/[0.18]">
-            <Image src="/app/ely-avatar.png" alt="" width={80} height={80} className="h-8 w-8 object-contain" />
+            <Image
+              src="/app/ely-mascot.png"
+              alt=""
+              width={340}
+              height={454}
+              className="ely-float h-9 w-auto object-contain"
+            />
           </span>
           <div>
             <p className="font-display text-[17px] font-bold leading-none tracking-tight text-navy">ELY</p>
@@ -207,7 +213,13 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
               ) : (
                 <div key={message.id} className="flex items-end gap-2.5">
                   <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-violet/[0.16] to-brand-rose/[0.16]">
-                    <Image src="/app/ely-avatar.png" alt="" width={60} height={60} className="h-6 w-6 object-contain" />
+                    <Image
+                      src="/app/ely-mascot.png"
+                      alt=""
+                      width={340}
+                      height={454}
+                      className="ely-float h-[26px] w-auto object-contain"
+                    />
                   </span>
                   <div className="max-w-[80%] rounded-[18px] rounded-bl-[5px] border border-navy/[0.06] bg-white px-4 py-3.5 shadow-[0_1px_2px_rgba(15,23,42,.04)]">
                     {message.situation ? (
@@ -256,7 +268,13 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
             {enChargement && (
               <div className="flex items-end gap-2.5">
                 <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-violet/[0.16] to-brand-rose/[0.16]">
-                  <Image src="/app/ely-avatar.png" alt="" width={60} height={60} className="h-6 w-6 object-contain" />
+                  <Image
+                    src="/app/ely-mascot.png"
+                    alt=""
+                    width={340}
+                    height={454}
+                    className="ely-float h-[26px] w-auto object-contain"
+                  />
                 </span>
                 <div className="flex gap-1.5 rounded-[18px] rounded-bl-[5px] border border-navy/[0.06] bg-white px-4 py-3.5">
                   <span className="h-[7px] w-[7px] animate-bounce rounded-full bg-brand-violet" />
