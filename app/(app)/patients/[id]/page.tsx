@@ -8,6 +8,26 @@ import { ChampAvecDictee } from "@/components/ui/ChampAvecDictee";
 import { ChampsIdentite } from "@/components/ui/ChampsIdentite";
 import { ChampTelephone } from "@/components/ui/ChampTelephone";
 import { LienRetour } from "@/components/ui/LienRetour";
+import Link from "next/link";
+
+const DOCUMENTS_IMPRIMABLES = [
+  { href: "identite", label: "Identité du patient", description: "Résumé de la fiche patient, prêt à imprimer." },
+  {
+    href: "consentement",
+    label: "Consentement éclairé",
+    description: "Personne de confiance et consentement aux soins.",
+  },
+  {
+    href: "fin-de-prise-en-charge",
+    label: "Fin de prise en charge",
+    description: "Bilan et transmission à la fin d'un suivi.",
+  },
+  {
+    href: "renoncement",
+    label: "Attestation de renoncement",
+    description: "En cas d'arrêt des soins à la demande du patient.",
+  },
+];
 
 const JOUR_LABEL = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
 
@@ -200,6 +220,30 @@ export default async function PatientPage({ params }: { params: Promise<{ id: st
             Ajouter le soin
           </Button>
         </form>
+        </section>
+
+        <section className="rounded-card border border-navy/10 bg-white p-6">
+          <p className="text-xs font-medium uppercase text-navy/60">Documents à imprimer</p>
+          <p className="mt-2 text-sm text-navy/60">
+            Pré-remplis avec les informations du patient et votre nom, prêts à imprimer et signer.
+          </p>
+          <div className="mt-4 flex flex-col gap-2.5">
+            {DOCUMENTS_IMPRIMABLES.map((document) => (
+              <Link
+                key={document.href}
+                href={`/patients/${patient.id}/documents/${document.href}`}
+                className="row-lift flex items-center justify-between gap-3 rounded-[14px] border border-navy/10 bg-[#F6F7F5] px-4 py-3"
+              >
+                <div>
+                  <p className="text-[14.5px] font-semibold text-navy">{document.label}</p>
+                  <p className="text-[12.5px] text-navy/50">{document.description}</p>
+                </div>
+                <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[18px] w-[18px] shrink-0 text-navy/30">
+                  <path d="m9 18 6-6-6-6" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </Link>
+            ))}
+          </div>
         </section>
       </div>
     </main>

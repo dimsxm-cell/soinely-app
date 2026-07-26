@@ -80,7 +80,7 @@ export function BarreNavigationBasse() {
   return (
     <nav
       aria-label="Navigation principale"
-      className="fixed inset-x-0 bottom-0 z-20 border-t border-navy/10 bg-white/95 backdrop-blur"
+      className="fixed inset-x-0 bottom-0 z-20 border-t border-navy/10 bg-white/95 backdrop-blur print:hidden"
     >
       <div className="mx-auto flex max-w-2xl items-center justify-between px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2">
         {ONGLETS_GAUCHE.map((onglet) => (
