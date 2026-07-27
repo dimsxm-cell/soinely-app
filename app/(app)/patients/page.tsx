@@ -1,18 +1,16 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUtilisateurConnecte } from "@/lib/supabase/server";
 import { getPatients } from "@/lib/data/patients";
 import { getMissionsDuJour, getTourneeDuJour } from "@/lib/data/ma-journee";
 import { ListePatients } from "@/components/ui/ListePatients";
 
 export default async function PatientsPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUtilisateurConnecte();
 
-  const patients = user ? await getPatients(supabase, user.id) : [];
-
-  const tournee = user ? await getTourneeDuJour(supabase, user.id) : null;
+  const [patients, tournee] = user
+    ? await Promise.all([getPatients(supabase, user.id), getTourneeDuJour(supabase, user.id)])
+    : [[], null];
   const missionsDuJour = tournee ? await getMissionsDuJour(supabase, tournee.id) : [];
 
   const prochaineVisiteParPatient: Record<string, string> = {};

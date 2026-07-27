@@ -42,11 +42,9 @@ function decrireRecurrence(soin: SoinPrescrit): string {
 export default async function PatientPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
-  const patient = await getPatient(supabase, id);
+  const [patient, soins] = await Promise.all([getPatient(supabase, id), getSoinsPrescrits(supabase, id)]);
 
   if (!patient) notFound();
-
-  const soins = await getSoinsPrescrits(supabase, id);
   const soinsActifs = soins.filter((soin) => soin.actif);
   const soinsArretes = soins.filter((soin) => !soin.actif);
 

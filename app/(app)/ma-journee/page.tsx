@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUtilisateurConnecte } from "@/lib/supabase/server";
 import { formaterNomPropre } from "@/lib/format";
 import { getMissionEnCoursHref, getMissionsDuJour, getTourneeDuJour } from "@/lib/data/ma-journee";
 import { CarteInformation } from "@/components/ui/CarteInformation";
@@ -27,16 +27,18 @@ export default async function MaJourneePage({
   const requete = (q ?? "").trim();
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUtilisateurConnecte();
 
   const nomComplet = user?.user_metadata?.full_name as string | undefined;
   const prenom = nomComplet ? formaterNomPropre(nomComplet).split(" ")[0] : undefined;
 
   const tournee = user ? await getTourneeDuJour(supabase, user.id) : null;
-  const missions = tournee ? await getMissionsDuJour(supabase, tournee.id) : [];
-  const contexte = tournee ? await getMissionEnCoursHref(supabase, tournee.id) : null;
+  const [missions, contexte] = tournee
+    ? await Promise.all([
+        getMissionsDuJour(supabase, tournee.id),
+        getMissionEnCoursHref(supabase, tournee.id),
+      ])
+    : [[], null];
 
   const missionsVisibles = requete
     ? missions.filter((m) => m.patientNom.toLowerCase().includes(requete.toLowerCase()))

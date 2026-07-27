@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUtilisateurConnecte } from "@/lib/supabase/server";
 import { getPatient } from "@/lib/data/patients";
 import { BoutonImprimer } from "@/components/ui/BoutonImprimer";
 import { CaseACocher, EnTeteDocument, BlocSignature, TitreSection } from "@/components/ui/ElementsDocument";
@@ -23,10 +23,7 @@ export default async function DocumentFinDePriseEnChargePage({
 }) {
   const { id } = await params;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const patient = await getPatient(supabase, id);
+  const [user, patient] = await Promise.all([getUtilisateurConnecte(), getPatient(supabase, id)]);
 
   if (!patient) notFound();
 

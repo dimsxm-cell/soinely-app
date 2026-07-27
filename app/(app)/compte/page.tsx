@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUtilisateurConnecte } from "@/lib/supabase/server";
 import { formaterNomPropre } from "@/lib/format";
 import { getAbonnement, getJoursRestantsEssaiGratuit } from "@/lib/data/abonnement";
 import { createBillingPortalSessionAction } from "@/lib/data/abonnement-actions";
@@ -36,19 +36,19 @@ function formatDate(iso: string): string {
 
 export default async function ComptePage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUtilisateurConnecte();
 
   if (!user) {
     redirect("/login");
   }
 
-  const abonnement = await getAbonnement(supabase, user.id);
   const nomBrut = user.user_metadata?.full_name as string | undefined;
   const nom = nomBrut ? formaterNomPropre(nomBrut) : user.email ?? "";
   const avatarPath = user.user_metadata?.avatar_path as string | undefined;
-  const avatarUrl = avatarPath ? await getAvatarUrl(supabase, avatarPath) : null;
+  const [abonnement, avatarUrl] = await Promise.all([
+    getAbonnement(supabase, user.id),
+    avatarPath ? getAvatarUrl(supabase, avatarPath) : Promise.resolve(null),
+  ]);
   const joursRestantsEssai = abonnement ? 0 : getJoursRestantsEssaiGratuit(user.created_at);
   const ecoutePermanenteActivee = Boolean(user.user_metadata?.ecoute_permanente_ely);
 

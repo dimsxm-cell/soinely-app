@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUtilisateurConnecte } from "@/lib/supabase/server";
 import { getAbonnement, getJoursRestantsEssaiGratuit } from "@/lib/data/abonnement";
 import { CartesTarifs } from "@/components/ui/CartesTarifs";
 import { LienRetour } from "@/components/ui/LienRetour";
@@ -6,9 +6,7 @@ import { OrbeArrierePlan } from "@/components/ui/OrbeArrierePlan";
 
 export default async function AbonnementPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUtilisateurConnecte();
 
   const abonnement = user ? await getAbonnement(supabase, user.id) : null;
   const joursRestantsEssai = user && !abonnement ? getJoursRestantsEssaiGratuit(user.created_at) : 0;
