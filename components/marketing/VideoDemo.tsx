@@ -35,7 +35,7 @@ export function VideoDemo() {
             </p>
             <button
               type="button"
-              className="btn-lift inline-flex items-center gap-[9px] rounded-full font-bold text-white"
+              className="btn-glace inline-flex items-center gap-[9px] rounded-full font-bold text-white"
               style={{ background: "rgba(255,255,255,.14)", border: "1px solid rgba(255,255,255,.25)", fontSize: 14, padding: "12px 20px" }}
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="#fff" aria-hidden="true">

@@ -14,10 +14,7 @@ export function EnTempsReel() {
       style={{ background: "#faf8ff", padding: "56px 0" }}
     >
       <div className="mx-auto w-full max-w-[1180px] px-6">
-        <div
-          className="rounded-[20px] bg-white px-5 py-7 sm:px-[34px] sm:py-[38px]"
-          style={{ boxShadow: "0 12px 40px rgba(30,27,60,.06)" }}
-        >
+        <div className="glass-panel rounded-[20px] px-5 py-7 sm:px-[34px] sm:py-[38px]">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.85fr_2.4fr] lg:items-center lg:gap-10">
 
             {/* Texte gauche */}

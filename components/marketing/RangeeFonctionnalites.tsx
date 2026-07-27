@@ -75,10 +75,7 @@ export function RangeeFonctionnalites() {
       style={{ background: "#faf8ff", padding: "26px 0" }}
     >
       <div className="mx-auto w-full max-w-[1180px] px-6">
-        <div
-          className="rounded-[20px] bg-white px-5 py-8 sm:px-[30px] sm:py-10"
-          style={{ boxShadow: "0 12px 40px rgba(30,27,60,.06)" }}
-        >
+        <div className="glass-panel rounded-[20px] px-5 py-8 sm:px-[30px] sm:py-10">
           <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-6 lg:gap-[22px]">
             {FONCTIONNALITES.map((item) => (
               <div
