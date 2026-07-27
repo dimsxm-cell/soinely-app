@@ -60,7 +60,7 @@ export function EnTeteMarketing() {
         {/* CTA — Se connecter */}
         <Link
           href="/login"
-          className="btn-lift whitespace-nowrap rounded-full text-[14.5px] font-bold text-white"
+          className="btn-glace whitespace-nowrap rounded-full text-[14.5px] font-bold text-white"
           style={{
             background: "linear-gradient(135deg,#7c3aed,#a855f7)",
             padding: "12px 22px",
