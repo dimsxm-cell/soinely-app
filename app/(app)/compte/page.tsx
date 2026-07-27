@@ -78,15 +78,15 @@ export default async function ComptePage() {
                 <p className="text-sm text-navy/60">{user.email}</p>
               </div>
             </div>
-            <form action={uploadAvatarAction} className="mt-4 flex items-center gap-3">
+            <form action={uploadAvatarAction} className="mt-4 flex flex-wrap items-center gap-3">
               <input
                 type="file"
                 name="photo"
                 accept="image/*"
-                className="text-[13.5px] text-navy/70"
+                className="min-w-0 max-w-full flex-1 text-[13px] text-navy/70 file:mr-3 file:rounded-full file:border-0 file:bg-brand-violet/10 file:px-3 file:py-1.5 file:text-[12.5px] file:font-semibold file:text-brand-violet"
                 aria-label="Changer la photo de profil"
               />
-              <Button type="submit" variant="tertiary" className="!min-h-0 !px-0 !py-0">
+              <Button type="submit" variant="tertiary" className="!min-h-0 shrink-0 !px-0 !py-0">
                 Enregistrer
               </Button>
             </form>
