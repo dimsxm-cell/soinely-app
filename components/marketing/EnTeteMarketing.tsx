@@ -3,9 +3,7 @@ import Link from "next/link";
 const LIENS_NAV = [
   { href: "#feat", label: "Fonctionnalités" },
   { href: "#ely", label: "ELY, votre copilote" },
-  { href: "#", label: "Tarifs" },
-  { href: "#", label: "Ressources", hasArrow: true },
-  { href: "#", label: "À propos" },
+  { href: "/abonnement", label: "Tarifs" },
 ];
 
 export function EnTeteMarketing() {
@@ -46,14 +44,13 @@ export function EnTeteMarketing() {
         {/* Nav links */}
         <nav aria-label="Navigation principale" className="hidden items-center gap-[30px] text-[14.5px] font-semibold lg:flex" style={{ color: "#4b4763" }}>
           {LIENS_NAV.map((lien) => (
-            <a key={lien.label} href={lien.href} className="navlink flex items-center gap-1 transition-colors hover:text-[#7c3aed]">
+            <Link
+              key={lien.label}
+              href={lien.href}
+              className="navlink flex items-center gap-1 transition-colors hover:text-[#7c3aed]"
+            >
               {lien.label}
-              {lien.hasArrow && (
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
-              )}
-            </a>
+            </Link>
           ))}
         </nav>
 
