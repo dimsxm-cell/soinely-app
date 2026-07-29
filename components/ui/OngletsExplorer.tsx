@@ -17,10 +17,13 @@ export function OngletsExplorer({ actif }: OngletsExplorerProps) {
     //
     // `overflow-x-auto` autorise le défilement sur écran étroit, mais rogne
     // aussi verticalement : en CSS, dès qu'un axe cesse d'être `visible`,
-    // l'autre est rogné également. Sans marge, le bouton qui se soulève au
-    // survol se retrouve coupé en haut. La paire `py-3 -my-3` ménage la place
-    // nécessaire au soulèvement et à son ombre, sans modifier l'espacement.
-    <div className="defilement-discret -my-3 flex gap-2 overflow-x-auto py-3">
+    // l'autre est rogné également. La réserve doit donc contenir le
+    // soulèvement au survol *et* la lueur portée du bouton actif, sinon
+    // celle-ci est tranchée net et laisse un bord rectangulaire au lieu de
+    // s'estomper. La lueur au survol descend à 42 px sous le bouton (décalage
+    // de 14 px et flou de 28 px) : la réserve de 44 px la contient entièrement.
+    // La marge négative l'annule dans la mise en page.
+    <div className="defilement-discret -my-11 flex gap-2 overflow-x-auto py-11">
       {ONGLETS.map((onglet) => {
         const estActif = onglet.cle === actif;
         return (
