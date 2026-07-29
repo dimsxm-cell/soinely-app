@@ -12,7 +12,9 @@ const ONGLETS = [
 
 export function OngletsExplorer({ actif }: OngletsExplorerProps) {
   return (
-    <div className="defilement-discret flex gap-6 overflow-x-auto border-b border-navy/10">
+    // Boutons sélectionnables plutôt que des onglets soulignés : la cible est
+    // plus large au doigt et l'état actif se lit immédiatement.
+    <div className="defilement-discret flex gap-2 overflow-x-auto">
       {ONGLETS.map((onglet) => {
         const estActif = onglet.cle === actif;
         return (
@@ -20,8 +22,10 @@ export function OngletsExplorer({ actif }: OngletsExplorerProps) {
             key={onglet.cle}
             href={onglet.href}
             aria-current={estActif ? "page" : undefined}
-            className={`-mb-px shrink-0 whitespace-nowrap border-b-[2.5px] pb-3 text-[15px] font-semibold tracking-tight transition-colors ${
-              estActif ? "border-brand-violet text-brand-violet" : "border-transparent text-navy/40 hover:text-navy/60"
+            className={`shrink-0 whitespace-nowrap rounded-[12px] px-4 py-2.5 text-[14px] font-semibold tracking-tight ${
+              estActif
+                ? "btn-glace bg-gradient-to-r from-brand-violet to-brand-rose text-white shadow-[0_6px_16px_rgba(124,58,237,0.28)]"
+                : "btn-glace-clair border border-navy/10 bg-white text-navy/60"
             }`}
           >
             {onglet.label}

@@ -1,5 +1,6 @@
 "use client";
 
+import { IconeMicro } from "@/components/ui/IconeMicro";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
   creerReconnaissanceVocale,
@@ -169,7 +170,7 @@ export function ChampTelephone({ name, label, defaultValue, required }: ChampTel
                 : "border-brand-violet/20 bg-gradient-to-br from-brand-violet/[0.14] to-brand-rose/[0.14] text-brand-violet"
             }`}
           >
-            <span aria-hidden="true">🎤</span>
+            <IconeMicro />
           </button>
         )}
       </div>

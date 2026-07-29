@@ -17,7 +17,7 @@ const LABEL_CLASS =
   "mb-[7px] block text-[11.5px] font-semibold uppercase tracking-[0.06em] text-[#8a8a8e]";
 
 const CTA_CLASS =
-  "btn-glace mt-1 flex min-h-[52px] w-full items-center justify-center rounded-[12px] bg-gradient-to-r from-brand-violet to-purple-500 text-[17px] font-semibold tracking-[-0.3px] text-white shadow-[0_8px_20px_rgba(124,58,237,0.32)]";
+  "btn-glace mt-1 flex min-h-[52px] w-full items-center justify-center rounded-[12px] bg-gradient-to-r from-brand-violet to-brand-rose text-[17px] font-semibold tracking-[-0.3px] text-white shadow-[0_8px_20px_rgba(124,58,237,0.32)]";
 
 const CONFETTI_COLORS = ["#7c3aed", "#a855f7", "#ec4899", "#5856d6", "#22c55e", "#f59e0b"];
 
@@ -167,7 +167,7 @@ export default function LoginPage() {
               onClick={() => switchMode("login")}
               className={`glass-pill-content appbtn flex-1 rounded-[10px] py-[11px] text-[15px] font-semibold tracking-[-0.2px] transition-colors ${
                 mode === "login"
-                  ? "bg-gradient-to-r from-brand-violet to-purple-500 text-white shadow-[0_6px_16px_rgba(124,58,237,0.3)]"
+                  ? "bg-gradient-to-r from-brand-violet to-brand-rose text-white shadow-[0_6px_16px_rgba(124,58,237,0.3)]"
                   : "text-[#8a8a8e]"
               }`}
             >
@@ -178,7 +178,7 @@ export default function LoginPage() {
               onClick={() => switchMode("signup")}
               className={`glass-pill-content appbtn flex-1 rounded-[10px] py-[11px] text-[15px] font-semibold tracking-[-0.2px] transition-colors ${
                 mode === "signup"
-                  ? "bg-gradient-to-r from-brand-violet to-purple-500 text-white shadow-[0_6px_16px_rgba(124,58,237,0.3)]"
+                  ? "bg-gradient-to-r from-brand-violet to-brand-rose text-white shadow-[0_6px_16px_rgba(124,58,237,0.3)]"
                   : "text-[#8a8a8e]"
               }`}
             >

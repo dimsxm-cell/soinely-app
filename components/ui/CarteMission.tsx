@@ -36,7 +36,7 @@ const LIBELLE_ACTION: Partial<Record<StatutMission, string>> = {
 };
 
 const BOUTON_CLASSES: Partial<Record<StatutMission, string>> = {
-  a_faire: "bg-gradient-to-r from-brand-violet to-purple-500 shadow-[0_4px_12px_rgba(124,58,237,0.3)]",
+  a_faire: "bg-gradient-to-r from-brand-violet to-brand-rose shadow-[0_4px_12px_rgba(124,58,237,0.3)]",
   en_cours: "bg-[#1a7f37] shadow-[0_4px_12px_rgba(26,127,55,0.28)]",
 };
 

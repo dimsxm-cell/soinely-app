@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { SituationTerrain } from "@/lib/types/clinical";
 import { poserQuestionElyAction } from "@/lib/data/ely-actions";
+import { IconeMicro } from "@/components/ui/IconeMicro";
 import { LectureVocaleReponse } from "@/components/ui/LectureVocaleReponse";
 import {
   creerReconnaissanceVocale,
@@ -134,13 +135,13 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
     <div className="flex flex-col">
       <div className="flex items-center justify-between border-b border-navy/10 pb-4">
         <div className="flex items-center gap-2.5">
-          <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-violet/[0.18] to-brand-rose/[0.18]">
+          <span className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white ring-2 ring-brand-violet/70">
             <Image
               src="/app/ely-mascot.png"
               alt=""
               width={936}
               height={1400}
-              className="h-9 w-auto object-contain"
+              className="h-[38px] w-auto object-contain"
             />
           </span>
           <div>
@@ -206,13 +207,13 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
             {messages.map((message) =>
               message.role === "utilisateur" ? (
                 <div key={message.id} className="flex justify-end">
-                  <div className="max-w-[80%] rounded-[18px] rounded-br-[5px] bg-gradient-to-r from-brand-violet to-purple-500 px-4 py-3 text-[15px] text-white shadow-[0_6px_16px_rgba(124,58,237,0.24)]">
+                  <div className="max-w-[80%] rounded-[18px] rounded-br-[5px] bg-gradient-to-r from-brand-violet to-brand-rose px-4 py-3 text-[15px] text-white shadow-[0_6px_16px_rgba(124,58,237,0.24)]">
                     {message.texte}
                   </div>
                 </div>
               ) : (
                 <div key={message.id} className="flex items-end gap-2.5">
-                  <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-violet/[0.16] to-brand-rose/[0.16]">
+                  <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center overflow-hidden rounded-full bg-white ring-2 ring-brand-violet/70">
                     <Image
                       src="/app/ely-mascot.png"
                       alt=""
@@ -267,7 +268,7 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
             )}
             {enChargement && (
               <div className="flex items-end gap-2.5">
-                <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-violet/[0.16] to-brand-rose/[0.16]">
+                <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center overflow-hidden rounded-full bg-white ring-2 ring-brand-violet/70">
                   <Image
                     src="/app/ely-mascot.png"
                     alt=""
@@ -314,14 +315,14 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
                 ecoute ? "bg-danger/15 text-danger" : "bg-brand-violet/10 text-brand-violet"
               }`}
             >
-              <span aria-hidden="true">🎤</span>
+              <IconeMicro />
             </button>
           )}
         </div>
         <button
           type="submit"
           disabled={!brouillon.trim() || enChargement}
-          className="btn-glace shrink-0 rounded-[12px] bg-gradient-to-r from-brand-violet to-purple-500 px-5 py-3 text-[15px] font-semibold text-white shadow-[0_6px_16px_rgba(124,58,237,0.28)] disabled:opacity-50"
+          className="btn-glace shrink-0 rounded-[12px] bg-gradient-to-r from-brand-violet to-brand-rose px-5 py-3 text-[15px] font-semibold text-white shadow-[0_6px_16px_rgba(124,58,237,0.28)] disabled:opacity-40 disabled:saturate-50"
         >
           Demander
         </button>
