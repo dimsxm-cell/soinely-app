@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 const HERO_CHECKS = [
-  "Données sécurisées (HDS)",
+  "Données de santé chiffrées",
   "Sans engagement",
   "Conçu par et pour les IDEL",
 ];
@@ -154,7 +154,7 @@ export function Hero() {
           >
             {[
               {
-                label: "Données sécurisées (HDS)",
+                label: "Données de santé chiffrées",
                 d: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
               },
               { label: "Sans engagement", d: "M20 6 9 17l-5-5" },

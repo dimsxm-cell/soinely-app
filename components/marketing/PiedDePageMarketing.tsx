@@ -2,8 +2,8 @@ import Link from "next/link";
 
 const BADGES = [
   {
-    t1: "Données sécurisées",
-    t2: "Hébergement HDS certifié",
+    t1: "Données chiffrées",
+    t2: "En transit et au repos",
     d: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
   },
   {
@@ -12,8 +12,8 @@ const BADGES = [
     d: "M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5z",
   },
   {
-    t1: "Chiffrement bout en bout",
-    t2: "Aucun accès non autorisé",
+    t1: "Accès cloisonné",
+    t2: "Chaque IDEL n'accède qu'à ses patients",
     d: "M6 10V8a6 6 0 0 1 12 0v2 M5 10h14v10H5z",
   },
   {

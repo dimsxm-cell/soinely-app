@@ -59,7 +59,7 @@ const FONCTIONNALITES = [
   },
   {
     titre: "Sécurisé et conforme",
-    texte: "Hébergé HDS, chiffré de bout en bout, conforme RGPD.",
+    texte: "Données chiffrées, accès cloisonné par professionnel.",
     bg: "#fdeef0",
     couleur: "#e11d48",
     icone: (
