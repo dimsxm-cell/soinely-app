@@ -34,10 +34,12 @@ function IconeExplorer() {
   );
 }
 
-function IconePlus() {
+function IconeTournee() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" className="h-6 w-6">
-      <path d="M12 5v14M5 12h14" />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-[22px] w-[22px]">
+      <path d="M4 18.5h3.5a3 3 0 0 0 0-6h-3a3 3 0 0 1 0-6H20" />
+      <circle cx="18.5" cy="18.5" r="2" />
+      <path d="M17.5 6.5 20 4l-2.5-2.5" />
     </svg>
   );
 }
@@ -54,11 +56,12 @@ interface Onglet {
 
 const ONGLETS_GAUCHE: Onglet[] = [
   { href: "/ma-journee", label: "Accueil", icone: <IconeAccueil /> },
-  { href: "/patients", label: "Patients", icone: <IconePatients /> },
+  { href: "/ma-tournee", label: "Ma tournée", icone: <IconeTournee /> },
 ];
 
 // Explorer ouvre sur « Dossier de soins », premier onglet de la section.
 const ONGLETS_DROITE: Onglet[] = [
+  { href: "/patients", label: "Patients", icone: <IconePatients /> },
   { href: "/situations/dossier", label: "Explorer", icone: <IconeExplorer />, prefixeActif: "/situations" },
 ];
 
@@ -98,13 +101,9 @@ export function BarreNavigationBasse() {
           />
         ))}
 
-        <Link
-          href="/patients/nouveau"
-          aria-label="Ajouter un patient"
-          className="-mt-6 flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-brand-violet to-brand-rose text-white shadow-[0_4px_12px_rgba(124,58,237,.35)] transition-transform hover:scale-105"
-        >
-          <IconePlus />
-        </Link>
+        {/* Ely occupe la place centrale : c'est l'entrée principale de l'app.
+            La création d'un patient reste accessible depuis la page Patients. */}
+        <OngletEly actif={estActif(pathname, "/ely")} />
 
         {ONGLETS_DROITE.map((onglet) => (
           <OngletNav
@@ -113,8 +112,6 @@ export function BarreNavigationBasse() {
             actif={estActif(pathname, onglet.prefixeActif ?? onglet.href)}
           />
         ))}
-
-        <OngletEly actif={estActif(pathname, "/ely")} />
       </div>
     </nav>
   );

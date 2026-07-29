@@ -62,7 +62,7 @@ export default async function MaJourneePage({
           />
         </div>
         <div className="mt-1.5 flex items-center gap-2 text-[15px] text-navy/50">
-          Ma journée
+          Accueil
           <span className="inline-flex items-center gap-1.5 rounded-[10px] bg-brand-violet/[0.12] px-2.5 py-1 text-[12.5px] font-semibold text-brand-violet">
             <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-brand-violet" />
             {formatDateDuJour()}

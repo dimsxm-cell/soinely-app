@@ -119,19 +119,21 @@ export function OngletEly({ actif }: OngletElyProps) {
   }
 
   return (
+    // Bouton central de la barre : Ely est l'entrée principale de l'app.
+    // L'appui long, qui déclenche l'écoute vocale, est conservé tel quel.
     <Link
       href="/ely"
       onPointerDown={demarrerMinuteur}
       onPointerUp={annulerMinuteur}
       onPointerLeave={annulerMinuteur}
       onClick={handleClick}
+      aria-label="Ely — appui long pour dicter"
       aria-current={actif ? "page" : undefined}
-      className={`flex w-14 flex-col items-center gap-1 py-1 text-[11px] font-medium transition-colors select-none [-webkit-touch-callout:none] [touch-action:manipulation] ${
-        actif ? "text-brand-violet" : "text-navy/40"
+      className={`-mt-6 flex h-14 w-14 shrink-0 items-center justify-center rounded-[18px] bg-gradient-to-r from-brand-violet to-brand-rose text-white shadow-[0_4px_12px_rgba(124,58,237,.35)] transition-transform select-none [-webkit-touch-callout:none] [touch-action:manipulation] hover:scale-105 ${
+        enSequence ? "scale-105 ring-4 ring-brand-violet/30" : ""
       }`}
     >
       <IconeEly />
-      Ely
     </Link>
   );
 }

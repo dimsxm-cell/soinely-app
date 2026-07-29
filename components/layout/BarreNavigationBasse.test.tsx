@@ -9,17 +9,14 @@ vi.mock("next/navigation", () => ({
 }));
 
 describe("BarreNavigationBasse", () => {
-  it("affiche les 5 destinations, dont le bouton Créer vers /patients/nouveau", async () => {
+  it("affiche les 5 destinations, Ely occupant la place centrale", async () => {
     usePathnameMock.mockReturnValue("/ma-journee");
     const { BarreNavigationBasse } = await import("./BarreNavigationBasse");
 
     render(<BarreNavigationBasse />);
 
-    expect(screen.getByRole("link", { name: "Ajouter un patient" })).toHaveAttribute(
-      "href",
-      "/patients/nouveau"
-    );
     expect(screen.getByRole("link", { name: /Accueil/ })).toHaveAttribute("href", "/ma-journee");
+    expect(screen.getByRole("link", { name: /Ma tournée/ })).toHaveAttribute("href", "/ma-tournee");
     expect(screen.getByRole("link", { name: /Patients/ })).toHaveAttribute("href", "/patients");
     // Explorer ouvre directement sur « Dossier de soins », son premier onglet.
     expect(screen.getByRole("link", { name: /Explorer/ })).toHaveAttribute("href", "/situations/dossier");

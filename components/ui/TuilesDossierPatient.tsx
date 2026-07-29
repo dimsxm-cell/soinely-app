@@ -1,10 +1,10 @@
 import Link from "next/link";
 
 const DOSSIERS = [
-  { label: "Administratif", valeur: "Fiche complète", gradient: "from-[#b06ae0] to-[#8b3fd6]", icone: "admin" },
-  { label: "Prescriptions", valeur: "Soins actifs", gradient: "from-[#f2ad5c] to-[#e0863a]", icone: "rx" },
-  { label: "Diagramme de soins", valeur: "Historique", gradient: "from-[#7db8ea] to-[#4f97dd]", icone: "chart" },
-  { label: "Transmissions", valeur: "Notes de visite", gradient: "from-[#e86ab0] to-[#d63f97]", icone: "msg" },
+  { label: "Administratif", valeur: "Fiche complète", chemin: "administratif", gradient: "from-[#b06ae0] to-[#8b3fd6]", icone: "admin" },
+  { label: "Prescriptions", valeur: "Soins actifs", chemin: "prescriptions", gradient: "from-[#f2ad5c] to-[#e0863a]", icone: "rx" },
+  { label: "Diagramme de soins", valeur: "Historique", chemin: "diagramme", gradient: "from-[#7db8ea] to-[#4f97dd]", icone: "chart" },
+  { label: "Transmissions", valeur: "Notes de visite", chemin: "transmissions", gradient: "from-[#e86ab0] to-[#d63f97]", icone: "msg" },
 ] as const;
 
 const CHEMINS_ICONE: Record<(typeof DOSSIERS)[number]["icone"], string> = {
@@ -25,7 +25,7 @@ export function TuilesDossierPatient({ patientId, className = "" }: TuilesDossie
       {DOSSIERS.map((dossier) => (
         <Link
           key={dossier.label}
-          href={`/patients/${patientId}`}
+          href={`/patients/${patientId}/${dossier.chemin}`}
           className={`tile-bounce flex h-[110px] flex-col justify-between rounded-2xl bg-gradient-to-br p-3.5 shadow-[0_10px_20px_rgba(0,0,0,0.12)] ${dossier.gradient}`}
         >
           <span className="flex h-[30px] w-[30px] items-center justify-center rounded-[9px] bg-white/25">
