@@ -33,6 +33,7 @@ export async function updateMissionStatutAction(formData: FormData): Promise<voi
   await supabase.from("missions_du_jour").update({ statut: nouveauStatut }).eq("id", missionId);
 
   revalidatePath("/ma-journee");
+  revalidatePath("/ma-tournee");
   revalidatePath(`/ma-journee/${missionId}`);
 }
 

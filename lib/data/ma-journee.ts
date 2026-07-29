@@ -293,3 +293,73 @@ export async function getMissionEnCoursHref(
 
   return { missionId: mission.id, href };
 }
+
+// ── Vue enrichie pour la page Ma tournée ────────────────────────────────────
+
+export interface MissionTourneeVue {
+  id: string;
+  patientId: string;
+  patientNom: string;
+  patientAdresse: string;
+  patientTelephone: string;
+  patientAllergies: string | null;
+  patientConsignes: string | null;
+  patientDateNaissance: string | null;
+  typeSoin: string;
+  heurePrevue: string;
+  statut: StatutMission;
+  missionCliniqueId: string | null;
+  dureeEstimeeMin: number;
+}
+
+export async function getMissionsTourneeVue(
+  supabase: SupabaseClient<Database>,
+  tourneeId: string
+): Promise<MissionTourneeVue[]> {
+  const { data, error } = await supabase
+    .from("missions_du_jour")
+    .select(
+      "id, patient_id, type_soin, heure_prevue, statut, mission_clinique_id, patients(nom_complet, adresse, telephone, allergies, consignes, date_naissance), missions_cliniques(duree_estimee_min)"
+    )
+    .eq("tournee_id", tourneeId)
+    .order("heure_prevue");
+
+  if (error || !data) return [];
+
+  return data.map((row) => {
+    type PatientRow = {
+      nom_complet: string;
+      adresse: string;
+      telephone: string;
+      allergies: string | null;
+      consignes: string | null;
+      date_naissance: string | null;
+    };
+    type MCRow = { duree_estimee_min: number };
+
+    const patientEmbed = row.patients as unknown;
+    const patient = (
+      Array.isArray(patientEmbed) ? patientEmbed[0] : patientEmbed
+    ) as PatientRow;
+
+    const mcEmbed = row.missions_cliniques as unknown;
+    const mc = (Array.isArray(mcEmbed) ? mcEmbed[0] : mcEmbed) as MCRow | null;
+
+    return {
+      id: row.id,
+      patientId: row.patient_id,
+      patientNom: patient?.nom_complet ?? "",
+      patientAdresse: patient?.adresse ?? "",
+      patientTelephone: patient?.telephone ?? "",
+      patientAllergies: patient?.allergies ?? null,
+      patientConsignes: patient?.consignes ?? null,
+      patientDateNaissance: patient?.date_naissance ?? null,
+      typeSoin: row.type_soin,
+      heurePrevue: row.heure_prevue,
+      statut: row.statut as StatutMission,
+      missionCliniqueId: row.mission_clinique_id,
+      dureeEstimeeMin: mc?.duree_estimee_min ?? 0,
+    };
+  });
+}
+
