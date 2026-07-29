@@ -205,12 +205,30 @@ export default function LoginPage() {
           {mode === "login" && (
             <form action={handleLogin} className="flex flex-col gap-[13px]">
               <div>
-                <label className={LABEL_CLASS}>Adresse email</label>
-                <input name="email" type="email" required placeholder="vous@exemple.fr" className={INPUT_CLASS} />
+                <label htmlFor="login-email" className={LABEL_CLASS}>
+                  Adresse email
+                </label>
+                <input
+                  id="login-email"
+                  name="email"
+                  type="email"
+                  required
+                  placeholder="vous@exemple.fr"
+                  className={INPUT_CLASS}
+                />
               </div>
               <div>
-                <label className={LABEL_CLASS}>Mot de passe</label>
-                <input name="password" type="password" required placeholder="••••••••" className={INPUT_CLASS} />
+                <label htmlFor="login-password" className={LABEL_CLASS}>
+                  Mot de passe
+                </label>
+                <input
+                  id="login-password"
+                  name="password"
+                  type="password"
+                  required
+                  placeholder="••••••••"
+                  className={INPUT_CLASS}
+                />
               </div>
               {error && <p className="text-sm text-danger">{error}</p>}
               <button type="submit" className={CTA_CLASS}>
@@ -229,16 +247,37 @@ export default function LoginPage() {
           {mode === "signup" && (
             <form action={handleSignUp} className="flex flex-col gap-[13px]">
               <div>
-                <label className={LABEL_CLASS}>Nom complet</label>
-                <input name="fullName" type="text" required placeholder="Camille Laurent" className={INPUT_CLASS} />
-              </div>
-              <div>
-                <label className={LABEL_CLASS}>Adresse email</label>
-                <input name="email" type="email" required placeholder="vous@exemple.fr" className={INPUT_CLASS} />
-              </div>
-              <div>
-                <label className={LABEL_CLASS}>Mot de passe</label>
+                <label htmlFor="signup-fullName" className={LABEL_CLASS}>
+                  Nom complet
+                </label>
                 <input
+                  id="signup-fullName"
+                  name="fullName"
+                  type="text"
+                  required
+                  placeholder="Camille Laurent"
+                  className={INPUT_CLASS}
+                />
+              </div>
+              <div>
+                <label htmlFor="signup-email" className={LABEL_CLASS}>
+                  Adresse email
+                </label>
+                <input
+                  id="signup-email"
+                  name="email"
+                  type="email"
+                  required
+                  placeholder="vous@exemple.fr"
+                  className={INPUT_CLASS}
+                />
+              </div>
+              <div>
+                <label htmlFor="signup-password" className={LABEL_CLASS}>
+                  Mot de passe
+                </label>
+                <input
+                  id="signup-password"
                   name="password"
                   type="password"
                   required
@@ -248,8 +287,11 @@ export default function LoginPage() {
                 />
               </div>
               <div>
-                <label className={LABEL_CLASS}>Numéro ADELI / RPPS</label>
+                <label htmlFor="signup-adeliRpps" className={LABEL_CLASS}>
+                  Numéro ADELI / RPPS
+                </label>
                 <input
+                  id="signup-adeliRpps"
                   name="adeliRpps"
                   type="text"
                   placeholder="Facultatif — pour la facturation"
@@ -278,8 +320,17 @@ export default function LoginPage() {
           {mode === "forgot" && (
             <form action={handleForgot} className="flex flex-col gap-[13px]">
               <div>
-                <label className={LABEL_CLASS}>Adresse email</label>
-                <input name="email" type="email" required placeholder="vous@exemple.fr" className={INPUT_CLASS} />
+                <label htmlFor="forgot-email" className={LABEL_CLASS}>
+                  Adresse email
+                </label>
+                <input
+                  id="forgot-email"
+                  name="email"
+                  type="email"
+                  required
+                  placeholder="vous@exemple.fr"
+                  className={INPUT_CLASS}
+                />
               </div>
               {error && <p className="text-sm text-danger">{error}</p>}
               {message && <p className="text-sm text-success">{message}</p>}
