@@ -384,7 +384,7 @@ export function Hero() {
               <b>18 minutes</b>.
             </p>
             <div
-              className="btn-lift mb-[9px] rounded-[11px] text-center font-bold text-white"
+              className="btn-glace mb-[9px] rounded-[11px] text-center font-bold text-white"
               style={{
                 background: "linear-gradient(135deg,#7c3aed,#a855f7)",
                 fontSize: 12.5,

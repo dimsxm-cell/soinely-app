@@ -123,8 +123,8 @@ export function JourneeAvecSoinely() {
                 + 18 min de retard<br />Souhaitez-vous optimiser votre tournée ?
               </div>
               <div style={{ display: "flex", gap: 7 }}>
-                <div className="btn-lift" style={{ flex: 1, textAlign: "center", background: "linear-gradient(135deg,#7c3aed,#a855f7)", color: "#fff", fontSize: 11.5, fontWeight: 700, padding: 8, borderRadius: 9, cursor: "pointer" }}>Optimiser</div>
-                <div className="btn-lift" style={{ textAlign: "center", background: "#f2eefe", color: "#6d28d9", fontSize: 11.5, fontWeight: 700, padding: "8px 13px", borderRadius: 9, cursor: "pointer" }}>Plus tard</div>
+                <div className="btn-glace" style={{ flex: 1, textAlign: "center", background: "linear-gradient(135deg,#7c3aed,#a855f7)", color: "#fff", fontSize: 11.5, fontWeight: 700, padding: 8, borderRadius: 9, cursor: "pointer" }}>Optimiser</div>
+                <div className="btn-glace-clair" style={{ textAlign: "center", background: "#f2eefe", color: "#6d28d9", fontSize: 11.5, fontWeight: 700, padding: "8px 13px", borderRadius: 9, cursor: "pointer" }}>Plus tard</div>
               </div>
             </div>
           </div>
@@ -145,7 +145,7 @@ export function JourneeAvecSoinely() {
                 ))}
               </div>
             </div>
-            <div className="btn-lift" style={{ marginTop: "auto", textAlign: "center", background: "linear-gradient(135deg,#7c3aed,#a855f7)", color: "#fff", fontSize: 12.5, fontWeight: 700, padding: 11, borderRadius: 11, cursor: "pointer" }}>
+            <div className="btn-glace" style={{ marginTop: "auto", textAlign: "center", background: "linear-gradient(135deg,#7c3aed,#a855f7)", color: "#fff", fontSize: 12.5, fontWeight: 700, padding: 11, borderRadius: 11, cursor: "pointer" }}>
               Demander à ELY
             </div>
           </div>
