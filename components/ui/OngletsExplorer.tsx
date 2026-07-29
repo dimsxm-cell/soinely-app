@@ -14,7 +14,13 @@ export function OngletsExplorer({ actif }: OngletsExplorerProps) {
   return (
     // Boutons sélectionnables plutôt que des onglets soulignés : la cible est
     // plus large au doigt et l'état actif se lit immédiatement.
-    <div className="defilement-discret flex gap-2 overflow-x-auto">
+    //
+    // `overflow-x-auto` autorise le défilement sur écran étroit, mais rogne
+    // aussi verticalement : en CSS, dès qu'un axe cesse d'être `visible`,
+    // l'autre est rogné également. Sans marge, le bouton qui se soulève au
+    // survol se retrouve coupé en haut. La paire `py-3 -my-3` ménage la place
+    // nécessaire au soulèvement et à son ombre, sans modifier l'espacement.
+    <div className="defilement-discret -my-3 flex gap-2 overflow-x-auto py-3">
       {ONGLETS.map((onglet) => {
         const estActif = onglet.cle === actif;
         return (
