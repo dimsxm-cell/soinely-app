@@ -42,7 +42,7 @@ export function Hero() {
         <div>
           {/* Badge */}
           <div
-            className="mb-[26px] inline-flex items-center gap-[7px] rounded-full text-[13px] font-bold"
+            className="mb-[26px] inline-flex items-center gap-[7px] rounded-[10px] text-[13px] font-bold"
             style={{
               background: "#f3eefe",
               border: "1px solid #e9defb",

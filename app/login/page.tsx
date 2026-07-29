@@ -126,22 +126,22 @@ export default function LoginPage() {
       </div>
 
       <div className="mx-auto flex min-h-screen w-full max-w-[430px] flex-col px-[22px] pb-12 pt-8 sm:pt-14">
-        {/* Retour */}
+        {/* Retour — même traitement de verre que les autres boutons clairs */}
         <Link
           href="/"
-          className="glass-pill appbtn inline-flex w-fit items-center gap-1 self-start rounded-[12px] border border-white/50 px-4 py-[9px] text-[15px] font-medium text-[#1d1d1f]"
+          className="btn-glace-clair inline-flex w-fit shrink-0 items-center gap-1 self-start rounded-[12px] border border-[#e0e0e0] bg-white px-4 py-[9px] text-[15px] font-semibold text-[#1d1d1f]"
         >
-          <span className="glass-pill-effect" aria-hidden="true" />
-          <span className="glass-pill-tint" aria-hidden="true" />
-          <span className="glass-pill-shine" aria-hidden="true" />
-          <span className="glass-pill-content inline-flex items-center gap-1">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="m15 18-6-6 6-6" />
-            </svg>
-            Accueil
-          </span>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="m15 18-6-6 6-6" />
+          </svg>
+          Accueil
         </Link>
 
+        {/* Bloc centré verticalement : les formulaires Connexion et Créer un
+            compte n'ont pas la même hauteur. Sans ce centrage, passer de l'un
+            à l'autre décalait tout le contenu vers le bas, d'où l'impression
+            de rebond. Le bloc grandit désormais symétriquement. */}
+        <div className="flex flex-1 flex-col justify-center">
         {/* En-tête */}
         <div className="mt-8 flex flex-col items-center text-center">
           <div className="flex items-center gap-[9px]">
@@ -384,6 +384,7 @@ export default function LoginPage() {
             </div>
           </>
         )}
+        </div>
       </div>
     </main>
   );

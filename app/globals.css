@@ -53,18 +53,8 @@ body {
 
 .ely-wave { transform-origin: bottom center; animation: ely-wave 2.4s ease-in-out infinite; }
 
-@keyframes ely-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-14px); }
-}
-
-@keyframes ely-glow {
-  0%, 100% { opacity: .3; transform: scale(1); }
-  50% { opacity: .55; transform: scale(1.08); }
-}
-
-.ely-float { animation: ely-float 3.6s ease-in-out infinite; }
-.ely-glow { animation: ely-glow 3.6s ease-in-out infinite; }
+/* Ely ne bouge plus : ni flottement, ni halo pulsé. Le halo reste, fixe. */
+.ely-glow { opacity: .42; }
 
 @keyframes slide-in-right {
   0% { opacity: 0; transform: translateX(70px); }
@@ -335,6 +325,16 @@ body {
   pointer-events: none;
 }
 .btn-glace-clair:hover::after { animation: glace-sweep 1s ease; }
+
+/* Conteneur défilable sans barre visible : le menu d'onglets d'Explorer
+   déborde sur écran étroit, et la barre de défilement (avec ses flèches sous
+   Windows) parasitait le menu. Le défilement reste possible au doigt et à la
+   molette. */
+.defilement-discret {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.defilement-discret::-webkit-scrollbar { display: none; }
 
 /* panneau "verre liquide" — encart translucide et flouté pour les blocs de contenu */
 .glass-panel {

@@ -138,9 +138,9 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
             <Image
               src="/app/ely-mascot.png"
               alt=""
-              width={724}
-              height={1232}
-              className="ely-float h-9 w-auto object-contain"
+              width={936}
+              height={1400}
+              className="h-9 w-auto object-contain"
             />
           </span>
           <div>
@@ -174,12 +174,12 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
                 aria-hidden="true"
                 className="ely-glow absolute h-[110px] w-[110px] rounded-full bg-gradient-to-br from-brand-violet/40 to-brand-rose/40 blur-xl"
               />
-              <span className="ely-float relative">
+              <span className="relative">
                 <Image
                   src="/app/ely-mascot.png"
                   alt=""
-                  width={724}
-                  height={1232}
+                  width={936}
+                  height={1400}
                   className="h-[150px] w-auto object-contain drop-shadow-[0_18px_28px_rgba(124,58,237,0.32)]"
                 />
               </span>
@@ -216,9 +216,9 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
                     <Image
                       src="/app/ely-mascot.png"
                       alt=""
-                      width={724}
-                      height={1232}
-                      className="ely-float h-[26px] w-auto object-contain"
+                      width={936}
+                      height={1400}
+                      className="h-[26px] w-auto object-contain"
                     />
                   </span>
                   <div className="max-w-[80%] rounded-[18px] rounded-bl-[5px] border border-navy/[0.06] bg-white px-4 py-3.5 shadow-[0_1px_2px_rgba(15,23,42,.04)]">
@@ -271,9 +271,9 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
                   <Image
                     src="/app/ely-mascot.png"
                     alt=""
-                    width={724}
-                    height={1232}
-                    className="ely-float h-[26px] w-auto object-contain"
+                    width={936}
+                    height={1400}
+                    className="h-[26px] w-auto object-contain"
                   />
                 </span>
                 <div className="flex gap-1.5 rounded-[18px] rounded-bl-[5px] border border-navy/[0.06] bg-white px-4 py-3.5">

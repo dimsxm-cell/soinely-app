@@ -93,7 +93,7 @@ export function CarteMission({ mission, contexteHref, estDerniere }: CarteMissio
               Contexte clinique
             </Link>
           )}
-          <span className={`rounded-full px-2.5 py-1 text-[11.5px] font-semibold ${STATUT_CLASSES[mission.statut]}`}>
+          <span className={`rounded-[10px] px-2.5 py-1 text-[11.5px] font-semibold ${STATUT_CLASSES[mission.statut]}`}>
             {STATUT_LABEL[mission.statut]}
           </span>
           {prochainStatut && (

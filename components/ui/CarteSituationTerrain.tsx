@@ -13,7 +13,7 @@ export function CarteSituationTerrain({ situation }: CarteSituationTerrainProps)
       className="row-lift block rounded-[18px] border border-navy/[0.06] bg-white p-[18px] shadow-[0_8px_22px_rgba(80,50,140,.1)]"
     >
       <div className="flex flex-wrap items-center gap-2">
-        <span className="rounded-full bg-navy/5 px-2.5 py-1 text-[11.5px] font-semibold text-navy/60">
+        <span className="rounded-[10px] bg-navy/5 px-2.5 py-1 text-[11.5px] font-semibold text-navy/60">
           {situation.specialite}
         </span>
         <BadgeNiveauConfiance niveau={situation.niveauConfiance} />

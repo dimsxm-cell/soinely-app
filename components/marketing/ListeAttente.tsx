@@ -41,8 +41,8 @@ export function ListeAttente() {
             <Image
               src="/marketing/ely-mascot-2.webp"
               alt="Mascotte ELY"
-              width={724}
-              height={1232}
+              width={936}
+              height={1400}
               className="h-full w-full object-contain drop-shadow-[0_8px_18px_rgba(0,0,0,.25)]"
             />
           </div>

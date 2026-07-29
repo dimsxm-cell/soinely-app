@@ -12,7 +12,7 @@ const ONGLETS = [
 
 export function OngletsExplorer({ actif }: OngletsExplorerProps) {
   return (
-    <div className="flex gap-6 overflow-x-auto border-b border-navy/10">
+    <div className="defilement-discret flex gap-6 overflow-x-auto border-b border-navy/10">
       {ONGLETS.map((onglet) => {
         const estActif = onglet.cle === actif;
         return (

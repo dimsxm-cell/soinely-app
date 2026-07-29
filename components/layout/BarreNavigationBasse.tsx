@@ -46,6 +46,10 @@ interface Onglet {
   href: string;
   label: string;
   icone: ReactNode;
+  // Préfixe servant à déterminer l'onglet actif, quand il diffère du lien.
+  // Explorer pointe vers un sous-onglet mais doit rester surligné sur
+  // l'ensemble de la section.
+  prefixeActif?: string;
 }
 
 const ONGLETS_GAUCHE: Onglet[] = [
@@ -53,7 +57,10 @@ const ONGLETS_GAUCHE: Onglet[] = [
   { href: "/patients", label: "Patients", icone: <IconePatients /> },
 ];
 
-const ONGLETS_DROITE: Onglet[] = [{ href: "/situations", label: "Explorer", icone: <IconeExplorer /> }];
+// Explorer ouvre sur « Dossier de soins », premier onglet de la section.
+const ONGLETS_DROITE: Onglet[] = [
+  { href: "/situations/dossier", label: "Explorer", icone: <IconeExplorer />, prefixeActif: "/situations" },
+];
 
 function estActif(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -84,7 +91,11 @@ export function BarreNavigationBasse() {
     >
       <div className="mx-auto flex max-w-2xl items-center justify-between px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2">
         {ONGLETS_GAUCHE.map((onglet) => (
-          <OngletNav key={onglet.href} onglet={onglet} actif={estActif(pathname, onglet.href)} />
+          <OngletNav
+            key={onglet.href}
+            onglet={onglet}
+            actif={estActif(pathname, onglet.prefixeActif ?? onglet.href)}
+          />
         ))}
 
         <Link
@@ -96,7 +107,11 @@ export function BarreNavigationBasse() {
         </Link>
 
         {ONGLETS_DROITE.map((onglet) => (
-          <OngletNav key={onglet.href} onglet={onglet} actif={estActif(pathname, onglet.href)} />
+          <OngletNav
+            key={onglet.href}
+            onglet={onglet}
+            actif={estActif(pathname, onglet.prefixeActif ?? onglet.href)}
+          />
         ))}
 
         <OngletEly actif={estActif(pathname, "/ely")} />

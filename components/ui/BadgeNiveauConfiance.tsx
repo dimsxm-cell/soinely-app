@@ -15,7 +15,7 @@ export function BadgeNiveauConfiance({ niveau }: BadgeNiveauConfianceProps) {
 
   return (
     <span
-      className="inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[11.5px] font-semibold"
+      className="inline-flex shrink-0 items-center gap-1.5 rounded-[10px] px-2.5 py-1 text-[11.5px] font-semibold"
       style={{ color: meta.couleur, background: meta.fond }}
     >
       {niveau === "valide" && (

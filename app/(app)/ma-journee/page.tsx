@@ -56,14 +56,14 @@ export default async function MaJourneePage({
           <Image
             src="/app/ely-mascot.png"
             alt="ELY"
-            width={724}
-            height={1232}
-            className="ely-float h-[46px] w-auto object-contain drop-shadow-[0_4px_10px_rgba(124,58,237,0.28)]"
+            width={936}
+            height={1400}
+            className="h-[46px] w-auto object-contain drop-shadow-[0_4px_10px_rgba(124,58,237,0.28)]"
           />
         </div>
         <div className="mt-1.5 flex items-center gap-2 text-[15px] text-navy/50">
           Ma journée
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-violet/[0.12] px-2.5 py-1 text-[12.5px] font-semibold text-brand-violet">
+          <span className="inline-flex items-center gap-1.5 rounded-[10px] bg-brand-violet/[0.12] px-2.5 py-1 text-[12.5px] font-semibold text-brand-violet">
             <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-brand-violet" />
             {formatDateDuJour()}
           </span>

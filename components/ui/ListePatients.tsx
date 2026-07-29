@@ -70,7 +70,7 @@ export function ListePatients({ patients, prochaineVisiteParPatient }: ListePati
                   <span className="block truncate text-[13.5px] text-navy/50">{patient.adresse || "—"}</span>
                 </span>
                 {prochaineHeure && (
-                  <span className="shrink-0 whitespace-nowrap rounded-full bg-brand-violet/[0.12] px-2.5 py-1 text-[12px] font-semibold text-brand-violet">
+                  <span className="shrink-0 whitespace-nowrap rounded-[10px] bg-brand-violet/[0.12] px-2.5 py-1 text-[12px] font-semibold text-brand-violet">
                     {prochaineHeure.slice(0, 5)}
                   </span>
                 )}
