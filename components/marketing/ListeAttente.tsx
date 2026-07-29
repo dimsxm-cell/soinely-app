@@ -36,13 +36,14 @@ export function ListeAttente() {
         >
           {/* Mascotte ELY */}
           <div className="mx-auto hidden sm:mx-0 sm:block" style={{ width: 130, height: 150 }}>
+            {/* object-contain (et non cover) : le personnage est détouré, il
+                doit tenir entier dans le cadre plutôt que d'être rogné. */}
             <Image
               src="/marketing/ely-mascot-2.webp"
               alt="Mascotte ELY"
-              width={130}
-              height={150}
-              className="h-full w-full object-cover"
-              style={{ borderRadius: 20 }}
+              width={724}
+              height={1232}
+              className="h-full w-full object-contain drop-shadow-[0_8px_18px_rgba(0,0,0,.25)]"
             />
           </div>
 

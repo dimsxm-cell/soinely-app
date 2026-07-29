@@ -56,8 +56,8 @@ export default async function MaJourneePage({
           <Image
             src="/app/ely-mascot.png"
             alt="ELY"
-            width={340}
-            height={454}
+            width={724}
+            height={1232}
             className="ely-float h-[46px] w-auto object-contain drop-shadow-[0_4px_10px_rgba(124,58,237,0.28)]"
           />
         </div>

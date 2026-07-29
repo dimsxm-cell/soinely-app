@@ -45,10 +45,10 @@ export function BarreSuperieure({ avatarUrl }: BarreSuperieureProps) {
               <img
                 src={avatarUrl}
                 alt=""
-                className="h-9 w-9 rounded-full object-cover ring-1 ring-navy/10"
+                className="h-9 w-9 rounded-full object-cover ring-2 ring-brand-violet/70"
               />
             ) : (
-              <span className="flex h-9 w-9 items-center justify-center rounded-full text-navy/60 transition-colors hover:bg-navy/5 hover:text-navy">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full text-brand-violet ring-2 ring-brand-violet/40 transition-colors hover:bg-brand-violet/10">
                 <IconeProfil />
               </span>
             )}

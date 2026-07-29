@@ -138,8 +138,8 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
             <Image
               src="/app/ely-mascot.png"
               alt=""
-              width={340}
-              height={454}
+              width={724}
+              height={1232}
               className="ely-float h-9 w-auto object-contain"
             />
           </span>
@@ -178,8 +178,8 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
                 <Image
                   src="/app/ely-mascot.png"
                   alt=""
-                  width={340}
-                  height={454}
+                  width={724}
+                  height={1232}
                   className="h-[150px] w-auto object-contain drop-shadow-[0_18px_28px_rgba(124,58,237,0.32)]"
                 />
               </span>
@@ -216,8 +216,8 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
                     <Image
                       src="/app/ely-mascot.png"
                       alt=""
-                      width={340}
-                      height={454}
+                      width={724}
+                      height={1232}
                       className="ely-float h-[26px] w-auto object-contain"
                     />
                   </span>
@@ -271,8 +271,8 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
                   <Image
                     src="/app/ely-mascot.png"
                     alt=""
-                    width={340}
-                    height={454}
+                    width={724}
+                    height={1232}
                     className="ely-float h-[26px] w-auto object-contain"
                   />
                 </span>

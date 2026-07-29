@@ -66,10 +66,10 @@ export default async function ComptePage() {
                 <img
                   src={avatarUrl}
                   alt="Photo de profil"
-                  className="h-16 w-16 shrink-0 rounded-full object-cover ring-2 ring-white shadow-[0_2px_8px_rgba(15,23,42,.12)]"
+                  className="h-16 w-16 shrink-0 rounded-full object-cover ring-[3px] ring-brand-violet/70 ring-offset-2 ring-offset-white shadow-[0_2px_8px_rgba(124,58,237,.22)]"
                 />
               ) : (
-                <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-brand-violet/[0.12] text-[22px] font-semibold text-brand-violet">
+                <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-brand-violet/[0.12] text-[22px] font-semibold text-brand-violet ring-[3px] ring-brand-violet/70 ring-offset-2 ring-offset-white">
                   {nom.charAt(0).toLocaleUpperCase("fr-FR") || "?"}
                 </span>
               )}
