@@ -3,16 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Fraunces } from "next/font/google";
 import { LogoSoinely } from "@/components/ui/LogoSoinely";
 import { createClient } from "@/lib/supabase/client";
 import { signInAction, signUpAction, requestPasswordResetAction } from "./actions";
-
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  weight: ["500", "600"],
-  variable: "--font-fraunces",
-});
 
 type Mode = "login" | "signup" | "forgot";
 type ConfettiPiece = { key: number; style: React.CSSProperties };
@@ -115,7 +108,7 @@ export default function LoginPage() {
     mode === "forgot" ? "Mot de passe oublié" : mode === "signup" ? "Créez votre compte" : "Bienvenue sur Soinely";
 
   return (
-    <main className={`${fraunces.variable} relative min-h-screen overflow-hidden`} style={{ background: "#faf8ff" }}>
+    <main className="relative min-h-screen overflow-hidden" style={{ background: "#faf8ff" }}>
       {/* Filtre de distorsion verre, utilisé par .glass-pill-effect */}
       <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
         <filter id="glass-distortion-inscription" x="0" y="0" width="100%" height="100%">
@@ -155,10 +148,7 @@ export default function LoginPage() {
             <LogoSoinely className="h-[26px] w-[26px]" />
             <span className="text-[22px] font-bold tracking-[-0.4px] text-[#1d1d1f]">Soinely</span>
           </div>
-          <h1
-            className="mt-[22px] text-[30px] font-semibold leading-[1.1] tracking-[-0.5px] text-[#1d1d1f] sm:text-[34px]"
-            style={{ fontFamily: "var(--font-fraunces), var(--font-display), serif" }}
-          >
+          <h1 className="mt-[22px] font-display text-[30px] font-semibold leading-[1.1] tracking-[-0.5px] text-[#1d1d1f] sm:text-[34px]">
             {heroTitle}
           </h1>
           {mode !== "forgot" && (

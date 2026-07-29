@@ -55,7 +55,7 @@ export function Hero() {
 
           {/* H1 */}
           <h1
-            className="text-[38px] font-extrabold sm:text-[50px] lg:text-[62px]"
+            className="font-display text-[38px] font-extrabold sm:text-[50px] lg:text-[62px]"
             style={{
               lineHeight: 1.02,
               letterSpacing: "-1.5px",

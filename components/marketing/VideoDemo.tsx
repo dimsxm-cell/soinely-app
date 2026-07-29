@@ -27,7 +27,10 @@ export function VideoDemo() {
             <div style={{ display: "inline-block", fontSize: 10.5, fontWeight: 800, letterSpacing: ".6px", color: "#fff", background: "rgba(255,255,255,.16)", padding: "5px 11px", borderRadius: 6, marginBottom: 16 }}>
               EN 45 SECONDES
             </div>
-            <h2 style={{ fontSize: 30, fontWeight: 800, letterSpacing: "-0.8px", lineHeight: 1.12, color: "#fff", margin: "0 0 14px" }}>
+            <h2
+              className="font-display"
+              style={{ fontSize: 30, fontWeight: 800, letterSpacing: "-0.8px", lineHeight: 1.12, color: "#fff", margin: "0 0 14px" }}
+            >
               Découvrez SOINELY en action
             </h2>
             <p style={{ fontSize: 14, lineHeight: 1.55, color: "rgba(255,255,255,.8)", margin: "0 0 22px" }}>

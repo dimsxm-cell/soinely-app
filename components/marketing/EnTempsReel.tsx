@@ -22,7 +22,10 @@ export function EnTempsReel() {
               <div style={{ display: "inline-block", fontSize: 11, fontWeight: 800, letterSpacing: ".6px", color: "#6d28d9", background: "#f2eefe", padding: "5px 11px", borderRadius: 6, marginBottom: 16 }}>
                 EN TEMPS RÉEL
               </div>
-              <h3 style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-0.6px", lineHeight: 1.15, margin: "0 0 14px" }}>
+              <h3
+                className="font-display"
+                style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-0.6px", lineHeight: 1.15, margin: "0 0 14px" }}
+              >
                 Un imprévu survient…<br />
                 <span style={{ color: "#6d28d9" }}>ELY s&apos;occupe du reste.</span>
               </h3>

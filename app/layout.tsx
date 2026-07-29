@@ -1,18 +1,33 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, Geist_Mono, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ActiverAppuiTactile } from "@/components/layout/ActiverAppuiTactile";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Trois polices, chargées une seule fois pour toute l'application : le corps
+// de texte (Inter), les titres (Fraunces) et les chiffres à chasse fixe
+// (Geist Mono, utilisé par le sélecteur de date et les échelles imprimées).
+// Elles sont servies par Next depuis notre domaine : le rendu est donc
+// identique sur tous les appareils, contrairement aux polices système.
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
+});
+
+// Police variable : une seule requête couvre toutes les graisses utilisées
+// dans l'app (de medium à extrabold).
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -28,7 +43,7 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${fraunces.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <ActiverAppuiTactile />

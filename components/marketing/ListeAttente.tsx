@@ -48,7 +48,10 @@ export function ListeAttente() {
 
           {/* Texte + CTA */}
           <div>
-            <h3 className="text-[22px] sm:text-[27px]" style={{ fontWeight: 800, letterSpacing: "-0.7px", lineHeight: 1.12, color: "#fff", margin: "0 0 6px" }}>
+            <h3
+              className="font-display text-[22px] sm:text-[27px]"
+              style={{ fontWeight: 800, letterSpacing: "-0.7px", lineHeight: 1.12, color: "#fff", margin: "0 0 6px" }}
+            >
               Rejoignez les 100 premiers IDEL testeurs
             </h3>
             <div style={{ fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,.82)", marginBottom: 18 }}>

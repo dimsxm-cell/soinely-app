@@ -59,7 +59,7 @@ export function JourneeAvecSoinely() {
       <div className="mx-auto w-full max-w-[1180px] px-6">
         {/* Titre centré */}
         <h2
-          className="text-[28px] font-extrabold sm:text-[38px]"
+          className="font-display text-[28px] font-extrabold sm:text-[38px]"
           style={{ textAlign: "center", letterSpacing: "-1px", margin: "0 0 10px" }}
         >
           Une journée avec{" "}
