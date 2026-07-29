@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const BADGES = [
   {
     t1: "Données sécurisées",
@@ -41,6 +43,15 @@ export function PiedDePageMarketing() {
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="mx-auto mt-6 flex w-full max-w-[1180px] flex-wrap items-center justify-center gap-x-5 gap-y-2 px-6">
+        <Link href="/conditions" className="text-[12.5px] font-semibold text-[#8a83a0] hover:text-[#7c3aed]">
+          Conditions générales
+        </Link>
+        <Link href="/confidentialite" className="text-[12.5px] font-semibold text-[#8a83a0] hover:text-[#7c3aed]">
+          Politique de confidentialité
+        </Link>
       </div>
     </footer>
   );

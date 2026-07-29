@@ -305,11 +305,22 @@ export default function LoginPage() {
               </button>
               <p className="mx-0.5 mt-0.5 text-center text-[12.5px] leading-[1.45] text-[#8a8a8e]">
                 En créant un compte, vous acceptez les{" "}
-                <a href="#" className="font-semibold text-brand-violet">
+                {/* Nouvel onglet : la saisie du formulaire en cours n'est pas perdue. */}
+                <a
+                  href="/conditions"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-brand-violet underline"
+                >
                   conditions
                 </a>{" "}
                 et la{" "}
-                <a href="#" className="font-semibold text-brand-violet">
+                <a
+                  href="/confidentialite"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-brand-violet underline"
+                >
                   politique de confidentialité
                 </a>
                 .
