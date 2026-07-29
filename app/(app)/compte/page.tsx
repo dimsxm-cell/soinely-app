@@ -100,13 +100,13 @@ export default async function ComptePage() {
             <div className="mt-4 flex flex-wrap gap-2">
               <Link
                 href="/patients/nouveau"
-                className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-brand-violet to-brand-rose px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:brightness-110"
+                className="btn-glace inline-flex items-center justify-center rounded-full bg-gradient-to-r from-brand-violet to-brand-rose px-5 py-2.5 text-sm font-semibold text-white"
               >
                 Ajouter un patient
               </Link>
               <Link
                 href="/patients"
-                className="inline-flex items-center justify-center rounded-full border border-navy/20 bg-white px-5 py-2.5 text-sm font-semibold text-navy transition-colors hover:bg-navy/5"
+                className="inline-flex items-center justify-center btn-glace-clair rounded-full border border-navy/20 bg-white px-5 py-2.5 text-sm font-semibold text-navy"
               >
                 Voir mes patients
               </Link>
@@ -157,7 +157,7 @@ export default async function ComptePage() {
                   <form action={createBillingPortalSessionAction} className="mt-4">
                     <button
                       type="submit"
-                      className="rounded-full border border-navy/20 bg-white px-5 py-2.5 text-sm font-semibold text-navy transition-colors hover:bg-navy/5"
+                      className="btn-glace-clair rounded-full border border-navy/20 bg-white px-5 py-2.5 text-sm font-semibold text-navy"
                     >
                       Gérer mon abonnement
                     </button>
@@ -178,7 +178,7 @@ export default async function ComptePage() {
                 </p>
                 <Link
                   href="/abonnement"
-                  className="mt-4 inline-flex items-center justify-center rounded-full border border-navy/20 bg-white px-5 py-2.5 text-sm font-semibold text-navy transition-colors hover:bg-navy/5"
+                  className="mt-4 inline-flex items-center justify-center btn-glace-clair rounded-full border border-navy/20 bg-white px-5 py-2.5 text-sm font-semibold text-navy"
                 >
                   Choisir une offre
                 </Link>
@@ -188,7 +188,7 @@ export default async function ComptePage() {
                 <p className="mt-2 text-sm text-navy/60">Votre essai gratuit est terminé.</p>
                 <Link
                   href="/abonnement"
-                  className="mt-4 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-brand-violet to-brand-rose px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:brightness-110"
+                  className="btn-glace mt-4 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-brand-violet to-brand-rose px-5 py-2.5 text-sm font-semibold text-white"
                 >
                   Choisir une offre
                 </Link>

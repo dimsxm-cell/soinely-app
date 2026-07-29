@@ -5,7 +5,7 @@ export function BoutonImprimer() {
     <button
       type="button"
       onClick={() => window.print()}
-      className="cta-lift print:hidden flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-brand-violet to-purple-500 px-5 py-3 text-[14.5px] font-semibold text-white shadow-[0_8px_20px_rgba(124,58,237,0.28)]"
+      className="btn-glace print:hidden flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-brand-violet to-purple-500 px-5 py-3 text-[14.5px] font-semibold text-white shadow-[0_8px_20px_rgba(124,58,237,0.28)]"
     >
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M6 9V2h12v7" />

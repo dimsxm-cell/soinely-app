@@ -102,7 +102,7 @@ export function CarteMission({ mission, contexteHref, estDerniere }: CarteMissio
               <input type="hidden" name="nouveauStatut" value={prochainStatut} />
               <button
                 type="submit"
-                className={`btn-lift rounded-full px-4 py-2 text-sm font-semibold text-white ${BOUTON_CLASSES[mission.statut]}`}
+                className={`btn-glace rounded-full px-4 py-2 text-sm font-semibold text-white ${BOUTON_CLASSES[mission.statut]}`}
               >
                 {LIBELLE_ACTION[mission.statut]}
               </button>
