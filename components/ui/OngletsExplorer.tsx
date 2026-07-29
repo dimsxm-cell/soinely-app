@@ -15,15 +15,12 @@ export function OngletsExplorer({ actif }: OngletsExplorerProps) {
     // Boutons sélectionnables plutôt que des onglets soulignés : la cible est
     // plus large au doigt et l'état actif se lit immédiatement.
     //
-    // `overflow-x-auto` autorise le défilement sur écran étroit, mais rogne
-    // aussi verticalement : en CSS, dès qu'un axe cesse d'être `visible`,
-    // l'autre est rogné également. La réserve doit donc contenir le
-    // soulèvement au survol *et* la lueur portée du bouton actif, sinon
-    // celle-ci est tranchée net et laisse un bord rectangulaire au lieu de
-    // s'estomper. La lueur au survol descend à 42 px sous le bouton (décalage
-    // de 14 px et flou de 28 px) : la réserve de 44 px la contient entièrement.
-    // La marge négative l'annule dans la mise en page.
-    <div className="defilement-discret -my-11 flex gap-2 overflow-x-auto py-11">
+    // Retour à la ligne plutôt que défilement horizontal : un conteneur
+    // défilable rogne sur ses quatre côtés, et tranchait donc la lueur portée
+    // du bouton actif — à gauche pour le premier bouton, en dessous pour tous.
+    // Sans conteneur défilable, la lueur s'étend librement, et aucun onglet
+    // n'est masqué hors écran sur mobile.
+    <div className="flex flex-wrap gap-2">
       {ONGLETS.map((onglet) => {
         const estActif = onglet.cle === actif;
         return (

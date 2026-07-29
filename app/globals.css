@@ -342,16 +342,6 @@ body {
 }
 .btn-glace-clair:hover::after { animation: glace-sweep 1s ease; }
 
-/* Conteneur défilable sans barre visible : le menu d'onglets d'Explorer
-   déborde sur écran étroit, et la barre de défilement (avec ses flèches sous
-   Windows) parasitait le menu. Le défilement reste possible au doigt et à la
-   molette. */
-.defilement-discret {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.defilement-discret::-webkit-scrollbar { display: none; }
-
 /* panneau "verre liquide" — encart translucide et flouté pour les blocs de contenu */
 .glass-panel {
   position: relative;
