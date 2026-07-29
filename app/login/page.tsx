@@ -293,28 +293,6 @@ export default function LoginPage() {
               <button type="submit" className={CTA_CLASS}>
                 Créer mon compte
               </button>
-              <p className="mx-0.5 mt-0.5 text-center text-[12.5px] leading-[1.45] text-[#8a8a8e]">
-                En créant un compte, vous acceptez les{" "}
-                {/* Nouvel onglet : la saisie du formulaire en cours n'est pas perdue. */}
-                <a
-                  href="/conditions"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-semibold text-brand-violet underline"
-                >
-                  conditions
-                </a>{" "}
-                et la{" "}
-                <a
-                  href="/confidentialite"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-semibold text-brand-violet underline"
-                >
-                  politique de confidentialité
-                </a>
-                .
-              </p>
             </form>
           )}
 
@@ -382,6 +360,31 @@ export default function LoginPage() {
                 Google
               </button>
             </div>
+
+            {/* Mention affichée dans les deux modes : se connecter avec Apple
+                ou Google crée aussi un compte le cas échéant. Les liens
+                s'ouvrent dans un nouvel onglet pour ne pas perdre la saisie. */}
+            <p className="mx-0.5 mt-5 text-center text-[12.5px] leading-[1.45] text-[#8a8a8e]">
+              En créant un compte, vous acceptez les{" "}
+              <a
+                href="/conditions"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-brand-violet underline"
+              >
+                conditions
+              </a>{" "}
+              et la{" "}
+              <a
+                href="/confidentialite"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-brand-violet underline"
+              >
+                politique de confidentialité
+              </a>
+              .
+            </p>
           </>
         )}
         </div>

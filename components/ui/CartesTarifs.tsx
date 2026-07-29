@@ -4,7 +4,7 @@ import { useState } from "react";
 import { createCheckoutSessionAction } from "@/lib/data/abonnement-actions";
 import { BoutonEffetVerre } from "./BoutonEffetVerre";
 
-const FONCTIONNALITES_COMMUNES = [
+const FONCTIONNALITES_SOLO = [
   "Patients illimités",
   "Agenda de tournée",
   "Transmissions, rappels & photos de suivi",
@@ -18,6 +18,7 @@ interface PlanDef {
   fondCheck: string;
   description: string;
   prixMensuel: number;
+  fonctionnalites: string[];
   note: string | null;
   populaire: boolean;
 }
@@ -30,17 +31,22 @@ const PLANS: PlanDef[] = [
     fondCheck: "rgba(124,58,237,.12)",
     description: "Pour une IDEL indépendante qui gère sa tournée seule.",
     prixMensuel: 19,
+    fonctionnalites: FONCTIONNALITES_SOLO,
     note: null,
     populaire: true,
   },
   {
     id: "cabinet",
+    // Cette offre reprend aujourd'hui les mêmes fonctionnalités que Solo :
+    // la liste renvoie donc à celle-ci plutôt que de la recopier à
+    // l'identique, ce qui donnait deux cartes indiscernables.
     nom: "Cabinet",
     accent: "#c026d3",
     fondCheck: "rgba(192,38,211,.1)",
-    description: "Pour un cabinet infirmier IDEL.",
+    description: "Pour plusieurs infirmiers exerçant au sein d'un même cabinet.",
     prixMensuel: 39,
-    note: "Chaque infirmière du cabinet crée son propre compte pour le moment — le partage entre comptes arrive plus tard.",
+    fonctionnalites: ["Tout ce que comprend l'offre Solo"],
+    note: "Chaque infirmier du cabinet dispose de son propre compte. Le partage du dossier entre comptes arrive prochainement.",
     populaire: false,
   },
 ];
@@ -64,11 +70,11 @@ export function CartesTarifs({ estConnecte, planActuel, joursRestantsEssai }: Ca
   const [annuel, setAnnuel] = useState(false);
 
   const baseToggle =
-    "flex items-center rounded-full px-5 py-2.5 text-sm font-bold transition-colors duration-200";
+    "flex items-center rounded-[10px] px-5 py-2.5 text-sm font-bold transition-colors duration-200";
 
   return (
     <>
-      <div className="mb-10 mt-8 inline-flex items-center gap-1 rounded-full border border-[#e9defb] bg-white/70 p-1 backdrop-blur">
+      <div className="mb-10 mt-8 inline-flex items-center gap-1 rounded-[13px] border border-[#e9defb] bg-white/70 p-1 backdrop-blur">
         <button
           type="button"
           onClick={() => setAnnuel(false)}
@@ -90,7 +96,7 @@ export function CartesTarifs({ estConnecte, planActuel, joursRestantsEssai }: Ca
           }`}
         >
           Annuel
-          <span className="ml-1.5 rounded-full bg-white/25 px-1.5 py-0.5 text-[11px] font-extrabold">-20%</span>
+          <span className="ml-1.5 rounded-[7px] bg-white/25 px-1.5 py-0.5 text-[11px] font-extrabold">-20%</span>
         </button>
       </div>
 
@@ -155,7 +161,7 @@ export function CartesTarifs({ estConnecte, planActuel, joursRestantsEssai }: Ca
               className={`${CLASSE_CARTE_BASE} ${plan.populaire ? CLASSE_CARTE_POPULAIRE : CLASSE_CARTE_PLAINE}`}
             >
               {plan.populaire && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-gradient-to-br from-brand-violet to-brand-rose px-4 py-1.5 text-[11.5px] font-extrabold text-white shadow-[0_8px_20px_rgba(124,58,237,.4)]">
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-[10px] bg-gradient-to-br from-brand-violet to-brand-rose px-4 py-1.5 text-[11.5px] font-extrabold text-white shadow-[0_8px_20px_rgba(124,58,237,.4)]">
                   ★ Le plus choisi
                 </div>
               )}
@@ -170,7 +176,7 @@ export function CartesTarifs({ estConnecte, planActuel, joursRestantsEssai }: Ca
               <p className="mb-5 text-[12.5px] text-[#9a92b3]">{noteAffichee}</p>
               <div className="mb-5 h-px w-full bg-gradient-to-r from-transparent via-brand-violet/20 to-transparent" />
               <ul className="mb-6 flex flex-1 flex-col gap-3">
-                {FONCTIONNALITES_COMMUNES.map((f) => (
+                {plan.fonctionnalites.map((f) => (
                   <li key={f} className="flex items-start gap-2.5 text-sm leading-tight text-[#3d3956]">
                     <span
                       aria-hidden="true"

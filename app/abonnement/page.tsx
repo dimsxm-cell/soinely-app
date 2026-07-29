@@ -37,7 +37,7 @@ export default async function AbonnementPage() {
           <LienRetour href="/compte" label="Mon compte" />
         </div>
 
-        <div className="mt-8 inline-flex items-center gap-1.5 rounded-full border border-[#e9defb] bg-white/70 px-4 py-1.5 text-[13px] font-bold text-brand-violet backdrop-blur">
+        <div className="mt-8 inline-flex items-center gap-1.5 rounded-[10px] border border-[#e9defb] bg-white/70 px-4 py-1.5 text-[13px] font-bold text-brand-violet backdrop-blur">
           Sans engagement · Résiliable à tout moment
         </div>
 

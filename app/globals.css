@@ -163,6 +163,22 @@ body {
 }
 .rbtn:hover { transform: translateY(-2px); filter: brightness(1.03); }
 .rbtn:active { transform: translateY(0) scale(.97); }
+
+/* Même reflet glacé que les autres boutons de l'application. Il se place
+   au-dessus de la teinte de verre (couche 1) mais sous le libellé (couche 3). */
+.rbtn::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: -50%;
+  left: 0;
+  width: 16%;
+  height: 200%;
+  background: linear-gradient(115deg, transparent, rgba(255,255,255,.65) 50%, transparent);
+  transform: skewX(-20deg) translateX(-350%);
+  pointer-events: none;
+}
+.rbtn:hover::after { animation: glace-sweep 1s ease; }
 @keyframes ripple-anim { from { transform: scale(0); opacity: .5; } to { transform: scale(1); opacity: 0; } }
 .ripple-dot {
   position: absolute;
