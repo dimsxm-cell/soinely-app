@@ -11,6 +11,7 @@ import {
   uploadPhotoAction,
 } from "@/lib/data/ma-journee-actions";
 import { Button } from "@/components/ui/Button";
+import { ChampFichier } from "@/components/ui/ChampFichier";
 import { Chronometre } from "@/components/ui/Chronometre";
 import { IconeSoin } from "@/components/ui/IconeSoin";
 import { LienRetour } from "@/components/ui/LienRetour";
@@ -337,7 +338,13 @@ export default async function ArriveePatientPage({
             )}
             <form action={uploadPhotoAction} className="mt-2 flex flex-col gap-3">
               <input type="hidden" name="missionId" value={mission.id} />
-              <input type="file" name="photo" accept="image/*" capture="environment" className="text-[14px]" />
+              <ChampFichier
+                name="photo"
+                accept="image/*"
+                capture="environment"
+                ariaLabel="Photo de cette visite"
+                libelle="Prendre une photo"
+              />
               <Button type="submit" variant="tertiary" className="self-start !min-h-0 !px-0 !py-0">
                 Envoyer
               </Button>

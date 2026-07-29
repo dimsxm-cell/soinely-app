@@ -9,6 +9,7 @@ import { uploadAvatarAction } from "@/lib/data/profil-actions";
 import { signOutAction } from "@/app/login/actions";
 import { BasculeEcoutePermanenteEly } from "@/components/ui/BasculeEcoutePermanenteEly";
 import { Button } from "@/components/ui/Button";
+import { ChampFichier } from "@/components/ui/ChampFichier";
 import type { PlanAbonnement, StatutAbonnement } from "@/lib/types/abonnement";
 
 const PLAN_LABEL: Record<PlanAbonnement, string> = {
@@ -79,12 +80,11 @@ export default async function ComptePage() {
               </div>
             </div>
             <form action={uploadAvatarAction} className="mt-4 flex flex-wrap items-center gap-3">
-              <input
-                type="file"
+              <ChampFichier
                 name="photo"
                 accept="image/*"
-                className="min-w-0 max-w-full flex-1 text-[13px] text-navy/70 file:mr-3 file:rounded-full file:border-0 file:bg-brand-violet/10 file:px-3 file:py-1.5 file:text-[12.5px] file:font-semibold file:text-brand-violet"
-                aria-label="Changer la photo de profil"
+                ariaLabel="Changer la photo de profil"
+                libelle="Choisir une photo"
               />
               <Button type="submit" variant="tertiary" className="!min-h-0 shrink-0 !px-0 !py-0">
                 Enregistrer
