@@ -17,7 +17,7 @@ const LABEL_CLASS =
   "mb-[7px] block text-[11.5px] font-semibold uppercase tracking-[0.06em] text-[#8a8a8e]";
 
 const CTA_CLASS =
-  "btn-glace mt-1 flex min-h-[52px] w-full items-center justify-center rounded-full bg-gradient-to-r from-brand-violet to-purple-500 text-[17px] font-semibold tracking-[-0.3px] text-white shadow-[0_8px_20px_rgba(124,58,237,0.32)]";
+  "btn-glace mt-1 flex min-h-[52px] w-full items-center justify-center rounded-[12px] bg-gradient-to-r from-brand-violet to-purple-500 text-[17px] font-semibold tracking-[-0.3px] text-white shadow-[0_8px_20px_rgba(124,58,237,0.32)]";
 
 const CONFETTI_COLORS = ["#7c3aed", "#a855f7", "#ec4899", "#5856d6", "#22c55e", "#f59e0b"];
 
@@ -129,7 +129,7 @@ export default function LoginPage() {
         {/* Retour */}
         <Link
           href="/"
-          className="glass-pill appbtn inline-flex w-fit items-center gap-1 self-start rounded-full border border-white/50 px-4 py-[9px] text-[15px] font-medium text-[#1d1d1f]"
+          className="glass-pill appbtn inline-flex w-fit items-center gap-1 self-start rounded-[12px] border border-white/50 px-4 py-[9px] text-[15px] font-medium text-[#1d1d1f]"
         >
           <span className="glass-pill-effect" aria-hidden="true" />
           <span className="glass-pill-tint" aria-hidden="true" />
@@ -158,14 +158,14 @@ export default function LoginPage() {
 
         {/* Onglets Connexion / Créer un compte */}
         {mode !== "forgot" && (
-          <div className="glass-pill mt-[26px] flex gap-[5px] rounded-full border border-white/50 p-[5px]">
+          <div className="glass-pill mt-[26px] flex gap-[5px] rounded-[14px] border border-white/50 p-[5px]">
             <span className="glass-pill-effect" aria-hidden="true" />
             <span className="glass-pill-tint" aria-hidden="true" />
             <span className="glass-pill-shine" aria-hidden="true" />
             <button
               type="button"
               onClick={() => switchMode("login")}
-              className={`glass-pill-content appbtn flex-1 rounded-full py-[11px] text-[15px] font-semibold tracking-[-0.2px] transition-colors ${
+              className={`glass-pill-content appbtn flex-1 rounded-[10px] py-[11px] text-[15px] font-semibold tracking-[-0.2px] transition-colors ${
                 mode === "login"
                   ? "bg-gradient-to-r from-brand-violet to-purple-500 text-white shadow-[0_6px_16px_rgba(124,58,237,0.3)]"
                   : "text-[#8a8a8e]"
@@ -176,7 +176,7 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => switchMode("signup")}
-              className={`glass-pill-content appbtn flex-1 rounded-full py-[11px] text-[15px] font-semibold tracking-[-0.2px] transition-colors ${
+              className={`glass-pill-content appbtn flex-1 rounded-[10px] py-[11px] text-[15px] font-semibold tracking-[-0.2px] transition-colors ${
                 mode === "signup"
                   ? "bg-gradient-to-r from-brand-violet to-purple-500 text-white shadow-[0_6px_16px_rgba(124,58,237,0.3)]"
                   : "text-[#8a8a8e]"
@@ -361,7 +361,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => handleOAuth("apple")}
-                className="btn-glace-clair flex flex-1 items-center justify-center gap-2 rounded-full border border-[#e0e0e0] bg-white py-3 text-[14.5px] font-semibold text-[#1d1d1f]"
+                className="btn-glace-clair flex flex-1 items-center justify-center gap-2 rounded-[12px] border border-[#e0e0e0] bg-white py-3 text-[14.5px] font-semibold text-[#1d1d1f]"
               >
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="#1d1d1f" aria-hidden="true">
                   <path d="M16.365 1.43c0 1.14-.493 2.27-1.177 3.08-.744.9-1.99 1.57-2.987 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.572-2.27 1.206-2.98.804-.94 2.142-1.64 3.248-1.68.03.13.05.28.05.43zm4.565 15.71c-.03.07-.463 1.58-1.518 3.12-.945 1.34-1.94 2.71-3.43 2.71-1.517 0-1.9-.88-3.63-.88-1.698 0-2.302.91-3.67.91-1.377 0-2.332-1.26-3.428-2.8-1.287-1.82-2.323-4.63-2.323-7.28 0-4.28 2.797-6.55 5.552-6.55 1.448 0 2.675.95 3.6.95.865 0 2.222-1.01 3.902-1.01.613 0 2.886.06 4.374 2.19-.13.09-2.383 1.37-2.383 4.19 0 3.26 2.854 4.42 2.955 4.45z" />
@@ -371,7 +371,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => handleOAuth("google")}
-                className="btn-glace-clair flex flex-1 items-center justify-center gap-2 rounded-full border border-[#e0e0e0] bg-white py-3 text-[14.5px] font-semibold text-[#1d1d1f]"
+                className="btn-glace-clair flex flex-1 items-center justify-center gap-2 rounded-[12px] border border-[#e0e0e0] bg-white py-3 text-[14.5px] font-semibold text-[#1d1d1f]"
               >
                 <svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true">
                   <path fill="#4285F4" d="M23.06 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h6.2a5.3 5.3 0 0 1-2.3 3.48v2.9h3.72c2.18-2 3.44-4.96 3.44-8.39z" />

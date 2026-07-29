@@ -43,7 +43,7 @@ export function BoutonEffetVerre({
   type = "button",
   filterId,
 }: BoutonEffetVerreProps) {
-  const classeBase = `rbtn relative isolate flex w-full items-center justify-center overflow-hidden rounded-full border py-3.5 text-[14.5px] font-semibold ${
+  const classeBase = `rbtn relative isolate flex w-full items-center justify-center overflow-hidden rounded-[12px] border py-3.5 text-[14.5px] font-semibold ${
     variant === "primaire" ? "border-white/50" : "border-brand-violet/30"
   } ${TEXTE[variant]} ${className}`;
 

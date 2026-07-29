@@ -60,7 +60,7 @@ export function ListeAttente() {
             </div>
             <Link
               href="/login"
-              className="btn-glace-clair mb-3 inline-flex items-center gap-[9px] rounded-full font-extrabold"
+              className="btn-glace-clair mb-3 inline-flex items-center gap-[9px] rounded-[12px] font-extrabold"
               style={{ background: "#fff", color: "#7c3aed", fontSize: 15, padding: "14px 26px", boxShadow: "0 10px 26px rgba(0,0,0,.18)", display: "inline-flex", marginBottom: 12 }}
             >
               Rejoindre la liste d&apos;attente

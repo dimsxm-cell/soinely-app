@@ -156,7 +156,7 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
             type="button"
             onClick={nouvelleConversation}
             aria-label="Nouvelle conversation"
-            className="btn-glace-clair flex h-[38px] w-[38px] items-center justify-center rounded-full border border-navy/10 bg-white text-brand-violet"
+            className="btn-glace-clair flex h-[38px] w-[38px] items-center justify-center rounded-[12px] border border-navy/10 bg-white text-brand-violet"
           >
             <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[19px] w-[19px]">
               <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
@@ -194,7 +194,7 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
                   key={label}
                   type="button"
                   onClick={() => envoyerQuestion(label)}
-                  className="btn-glace-clair rounded-full border border-navy/10 bg-white px-4 py-2.5 text-[13.5px] font-semibold text-navy shadow-[0_1px_2px_rgba(15,23,42,.04)]"
+                  className="btn-glace-clair rounded-[12px] border border-navy/10 bg-white px-4 py-2.5 text-[13.5px] font-semibold text-navy shadow-[0_1px_2px_rgba(15,23,42,.04)]"
                 >
                   {label}
                 </button>
@@ -295,7 +295,7 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
         }}
         className="mt-2 flex items-center gap-2.5"
       >
-        <div className="flex min-h-[48px] flex-1 items-center gap-2 rounded-full border border-navy/10 bg-white pl-4 pr-1.5">
+        <div className="flex min-h-[48px] flex-1 items-center gap-2 rounded-[12px] border border-navy/10 bg-white pl-4 pr-1.5">
           <input
             type="text"
             value={brouillon}
@@ -310,7 +310,7 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
               onClick={demarrerEcoute}
               aria-label="Dicter la question au micro"
               aria-pressed={ecoute}
-              className={`baguette flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-base ${
+              className={`baguette flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] text-base ${
                 ecoute ? "bg-danger/15 text-danger" : "bg-brand-violet/10 text-brand-violet"
               }`}
             >
@@ -321,7 +321,7 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
         <button
           type="submit"
           disabled={!brouillon.trim() || enChargement}
-          className="btn-glace shrink-0 rounded-full bg-gradient-to-r from-brand-violet to-purple-500 px-5 py-3 text-[15px] font-semibold text-white shadow-[0_6px_16px_rgba(124,58,237,0.28)] disabled:opacity-50"
+          className="btn-glace shrink-0 rounded-[12px] bg-gradient-to-r from-brand-violet to-purple-500 px-5 py-3 text-[15px] font-semibold text-white shadow-[0_6px_16px_rgba(124,58,237,0.28)] disabled:opacity-50"
         >
           Demander
         </button>

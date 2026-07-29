@@ -31,7 +31,7 @@ export default async function PatientsPage() {
           <h1 className="font-display text-[28px] font-semibold tracking-tight sm:text-[32px]">Patients</h1>
           <Link
             href="/patients/nouveau"
-            className="btn-glace whitespace-nowrap rounded-full bg-gradient-to-r from-brand-violet to-purple-500 px-4 py-2.5 text-[14px] font-semibold text-white shadow-[0_6px_16px_rgba(124,58,237,0.3)]"
+            className="btn-glace whitespace-nowrap rounded-[12px] bg-gradient-to-r from-brand-violet to-purple-500 px-4 py-2.5 text-[14px] font-semibold text-white shadow-[0_6px_16px_rgba(124,58,237,0.3)]"
           >
             Ajouter un patient
           </Link>

@@ -121,7 +121,7 @@ export function Hero() {
           <div className="mb-[24px] flex items-center gap-[14px]">
             <Link
               href="/login"
-              className="btn-glace inline-flex items-center gap-[9px] rounded-full font-bold text-white"
+              className="btn-glace inline-flex items-center gap-[9px] rounded-[12px] font-bold text-white"
               style={{
                 background: "linear-gradient(135deg,#7c3aed,#a855f7)",
                 fontSize: 16,

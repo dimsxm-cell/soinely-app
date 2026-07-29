@@ -64,7 +64,7 @@ export default function NouveauPatientPage() {
           <button
             type="submit"
             disabled={enCours}
-            className="btn-glace mt-1 rounded-full bg-gradient-to-r from-brand-violet to-purple-500 px-5 py-3.5 text-[15px] font-semibold text-white shadow-[0_8px_20px_rgba(124,58,237,0.28)] disabled:opacity-60"
+            className="btn-glace mt-1 rounded-[12px] bg-gradient-to-r from-brand-violet to-purple-500 px-5 py-3.5 text-[15px] font-semibold text-white shadow-[0_8px_20px_rgba(124,58,237,0.28)] disabled:opacity-60"
           >
             {enCours ? "Création en cours…" : "Créer la fiche patient"}
           </button>

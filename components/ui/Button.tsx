@@ -22,7 +22,7 @@ export function Button({ variant = "primary", type = "button", className = "", .
   return (
     <button
       type={type}
-      className={`min-h-[44px] rounded-full px-5 py-2 font-semibold ${VARIANT_CLASSES[variant]} ${className}`}
+      className={`min-h-[44px] rounded-[12px] px-5 py-2 font-semibold ${VARIANT_CLASSES[variant]} ${className}`}
       {...props}
     />
   );
