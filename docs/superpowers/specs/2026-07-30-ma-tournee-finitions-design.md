@@ -68,8 +68,11 @@ volontairement **hors de `lib/data/`** qui porte les accès Supabase :
 - constantes `STATUT_LABEL`, `STATUT_BADGE`
 
 Ces fonctions sont déplacées telles quelles depuis `page.tsx`, sans changement
-de comportement, à l'exception de `compterMissions` (`alertes`) et de la
-suppression de la prop `numero`.
+de comportement, à deux exceptions près : `filtrerMissions` et
+`compterMissions` retiennent désormais les seules missions avec allergie pour
+`alertes`, là où elles acceptaient aussi les consignes. Les deux doivent
+changer ensemble, sans quoi le badge de l'onglet annoncerait un nombre que la
+liste filtrée ne montrerait pas.
 
 ### 2. `components/ui/EnTeteTournee.tsx` (nouveau)
 
