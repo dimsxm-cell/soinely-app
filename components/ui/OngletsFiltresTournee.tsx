@@ -15,12 +15,13 @@ export function OngletsFiltresTournee({
     { label: "Validés", clef: "valides", count: counts.valides },
   ];
 
-  // Pas de conteneur défilable : les quatre onglets tiennent dans la largeur
-  // contrainte, et un conteneur défilable rogne sur ses quatre côtés — c'est
-  // ce qui tranchait le bouton actif du menu Explorer (commit 5ca03ab).
+  // Pas de conteneur défilable : un conteneur défilable rogne sur ses quatre
+  // côtés — c'est ce qui tranchait le bouton actif du menu Explorer (commit
+  // 5ca03ab). Le retour à la ligne remplace le défilement : les quatre
+  // onglets ne tiennent pas sur une seule ligne à la largeur d'un téléphone.
   return (
-    <div className="flex gap-2 border-b border-navy/[0.07] bg-white px-4 py-3">
-      <div className="mx-auto flex w-full max-w-2xl gap-2">
+    <div className="border-b border-navy/[0.07] bg-white px-4 py-3">
+      <div className="mx-auto flex w-full max-w-2xl flex-wrap gap-2">
         {onglets.map((o) => {
           const actif = filtre === o.clef;
           return (

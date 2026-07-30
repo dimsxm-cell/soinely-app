@@ -60,6 +60,8 @@ describe("CarteMissionTournee", () => {
     // Le pied est un simple filet pointillé, pas un encart coloré d'alerte.
     expect(consignes.className).toContain("text-navy/45");
     expect(consignes.closest("div")?.className).toContain("border-dashed");
+    // Le pictogramme ⚠️ n'apparaît que dans l'encart d'allergie.
+    expect(screen.queryByText("⚠️")).not.toBeInTheDocument();
   });
 
   it("propose « Valider le soin » et « Absent » pour une mission à faire", () => {

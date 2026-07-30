@@ -29,6 +29,10 @@ describe("OngletsFiltresTournee", () => {
       "href",
       "/ma-tournee?filtre=a_faire"
     );
+    expect(screen.getByRole("link", { name: /Alertes/ })).toHaveAttribute(
+      "href",
+      "/ma-tournee?filtre=alertes"
+    );
     expect(screen.getByRole("link", { name: /Validés/ })).toHaveAttribute(
       "href",
       "/ma-tournee?filtre=valides"

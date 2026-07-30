@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { EnTeteTournee } from "./EnTeteTournee";
 import type { MissionTourneeVue } from "@/lib/data/ma-journee";
 import type { StatutMission, Tournee } from "@/lib/types/clinical";
@@ -44,6 +44,18 @@ const missions = [
 ];
 
 describe("EnTeteTournee", () => {
+  // Horloge figée : le composant affiche l'heure actuelle en direct, et sans
+  // ça le test devient instable une minute par jour (quand « maintenant »
+  // coïncide avec l'heure de fin estimée « 18:05 » affichée plus bas).
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-07-30T09:00:00"));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("affiche le compteur de soins validés sur le total", () => {
     render(<EnTeteTournee missions={missions} tournee={tournee} />);
 
