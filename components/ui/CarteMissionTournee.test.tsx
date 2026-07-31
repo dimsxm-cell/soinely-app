@@ -136,7 +136,7 @@ describe("CarteMissionTournee", () => {
 
 describe("CarteMissionTournee — actes", () => {
   it("affiche un chip par acte, code en tête", () => {
-    render(
+    const { container } = render(
       <CarteMissionTournee
         mission={creerMission({
           actes: [
@@ -152,6 +152,13 @@ describe("CarteMissionTournee — actes", () => {
     expect(screen.getByText("toilette")).toBeInTheDocument();
     expect(screen.getByText("AMI 1")).toBeInTheDocument();
     expect(screen.getByText("insuline")).toBeInTheDocument();
+
+    // Vérifier qu'aucune icône n'est rendue dans la zone des chips cotés.
+    // IconeSoin produit un <svg aria-hidden="true">; on cherche dans le
+    // conteneur flex flex-wrap uniquement pour éviter les autres SVG de la carte
+    // (adresse, boutons d'action).
+    const chipContainer = container.querySelector(".flex.flex-wrap");
+    expect(chipContainer?.querySelectorAll("svg")).toHaveLength(0);
   });
 
   it("affiche le libellé seul pour un acte sans cotation", () => {
