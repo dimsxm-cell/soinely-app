@@ -96,20 +96,22 @@ describe("updateMissionStatutAction", () => {
     expect(revalidatePath).not.toHaveBeenCalled();
   });
 
-  it("n'applique pas une transition invalide (terminee vers a_faire)", async () => {
-    eqSelectMock.mockResolvedValue({ data: { statut: "terminee" }, error: null });
+  it("applique une transition valide (en_cours vers terminee) et invalide le cache", async () => {
+    eqSelectMock.mockResolvedValue({ data: { statut: "en_cours" }, error: null });
+    eqUpdateMock.mockResolvedValue({ error: null });
 
     const { updateMissionStatutAction } = await import("./ma-journee-actions");
     const { revalidatePath } = await import("next/cache");
 
     const formData = new FormData();
     formData.set("missionId", "m1");
-    formData.set("nouveauStatut", "a_faire");
+    formData.set("nouveauStatut", "terminee");
 
     await updateMissionStatutAction(formData);
 
-    expect(updateMock).not.toHaveBeenCalled();
-    expect(revalidatePath).not.toHaveBeenCalled();
+    expect(updateMock).toHaveBeenCalledWith({ statut: "terminee" });
+    expect(revalidatePath).toHaveBeenCalledWith("/ma-journee");
+    expect(revalidatePath).toHaveBeenCalledWith("/ma-journee/m1");
   });
 
   it("n'applique pas une transition invalide (a_faire directement vers terminee)", async () => {
@@ -158,6 +160,68 @@ describe("updateMissionStatutAction", () => {
 
     expect(updateMock).not.toHaveBeenCalled();
     expect(revalidatePath).not.toHaveBeenCalled();
+  });
+
+  it("annule une validation en ramenant la mission à « à faire »", async () => {
+    eqSelectMock.mockResolvedValue({ data: { statut: "terminee" }, error: null });
+    eqUpdateMock.mockResolvedValue({ error: null });
+
+    const { updateMissionStatutAction } = await import("./ma-journee-actions");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("nouveauStatut", "a_faire");
+
+    await updateMissionStatutAction(formData);
+
+    // Le motif part avec l'absence qu'il expliquait.
+    expect(updateMock).toHaveBeenCalledWith({ statut: "a_faire", motif_absence: null });
+  });
+
+  it("annule une absence en ramenant la mission à « à faire »", async () => {
+    eqSelectMock.mockResolvedValue({ data: { statut: "absent" }, error: null });
+    eqUpdateMock.mockResolvedValue({ error: null });
+
+    const { updateMissionStatutAction } = await import("./ma-journee-actions");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("nouveauStatut", "a_faire");
+
+    await updateMissionStatutAction(formData);
+
+    expect(updateMock).toHaveBeenCalledWith({ statut: "a_faire", motif_absence: null });
+  });
+
+  it("marque absente une mission à faire, sans toucher au motif", async () => {
+    eqSelectMock.mockResolvedValue({ data: { statut: "a_faire" }, error: null });
+    eqUpdateMock.mockResolvedValue({ error: null });
+
+    const { updateMissionStatutAction } = await import("./ma-journee-actions");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("nouveauStatut", "absent");
+
+    await updateMissionStatutAction(formData);
+
+    expect(updateMock).toHaveBeenCalledWith({ statut: "absent" });
+  });
+
+  it("refuse de passer directement de « validé » à « absent »", async () => {
+    eqSelectMock.mockResolvedValue({ data: { statut: "terminee" }, error: null });
+
+    const { updateMissionStatutAction } = await import("./ma-journee-actions");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("nouveauStatut", "absent");
+
+    await updateMissionStatutAction(formData);
+
+    // La correction passe par « À faire » : deux gestes valent mieux qu'une
+    // bascule déclenchée par mégarde.
+    expect(updateMock).not.toHaveBeenCalled();
   });
 });
 

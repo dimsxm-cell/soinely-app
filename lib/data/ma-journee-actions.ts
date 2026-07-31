@@ -5,9 +5,15 @@ import { createClient } from "@/lib/supabase/server";
 import type { StatutMission } from "@/lib/types/clinical";
 import { journaliserEchec } from "@/lib/journal";
 
-const TRANSITIONS_VALIDES: Partial<Record<StatutMission, StatutMission>> = {
-  a_faire: "en_cours",
-  en_cours: "terminee",
+// Chaque statut liste ses suites possibles. Les deux retours vers « à faire »
+// rattrapent l'appui de trop sur « Valider » ou « Absent », geste fait à une
+// main sur le pas d'une porte. Passer directement de « validé » à « absent »
+// n'est volontairement pas offert.
+const TRANSITIONS_VALIDES: Record<StatutMission, StatutMission[]> = {
+  a_faire: ["en_cours", "absent"],
+  en_cours: ["terminee"],
+  terminee: ["a_faire"],
+  absent: ["a_faire"],
 };
 
 export async function updateMissionStatutAction(formData: FormData): Promise<void> {
@@ -25,15 +31,22 @@ export async function updateMissionStatutAction(formData: FormData): Promise<voi
   if (!mission) return;
 
   const statutActuel = mission.statut as StatutMission;
-  const transitionValide =
-    TRANSITIONS_VALIDES[statutActuel] === nouveauStatut ||
-    (statutActuel === "a_faire" && nouveauStatut === "absent");
 
-  if (!transitionValide) return;
+  // L'accès optionnel protège d'un statut inattendu venu de la base : sans lui,
+  // une valeur hors des quatre connues ferait planter l'action au lieu de la
+  // refuser. TypeScript garantit les clés, pas la donnée lue.
+  if (!TRANSITIONS_VALIDES[statutActuel]?.includes(nouveauStatut)) return;
+
+  // Revenir à « à faire » efface le motif d'absence : conservé, il décrirait
+  // une absence qui n'existe plus.
+  const misAJour =
+    nouveauStatut === "a_faire"
+      ? { statut: nouveauStatut, motif_absence: null }
+      : { statut: nouveauStatut };
 
   const { error } = await supabase
     .from("missions_du_jour")
-    .update({ statut: nouveauStatut })
+    .update(misAJour)
     .eq("id", missionId);
 
   if (error) journaliserEchec("updateMissionStatutAction", error);
