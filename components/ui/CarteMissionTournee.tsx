@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { IconeSoin } from "@/components/ui/IconeSoin";
 import type { MissionTourneeVue } from "@/lib/data/ma-journee";
-import { updateMissionStatutAction } from "@/lib/data/ma-journee-actions";
+import { updateMissionStatutAction, updateMotifAbsenceAction } from "@/lib/data/ma-journee-actions";
 import { formaterNomPropre } from "@/lib/format";
 import {
   STATUT_BADGE,
@@ -256,6 +256,71 @@ export function CarteMissionTournee({
                 </form>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Correction d'un statut posé par erreur. La carte reste atténuée :
+            l'annulation est offerte sans être mise en avant. */}
+        {terminee && (
+          <div className="border-t border-navy/[0.06] px-4 py-3">
+            <form action={updateMissionStatutAction}>
+              <input type="hidden" name="missionId" value={mission.id} />
+              <input type="hidden" name="nouveauStatut" value="a_faire" />
+              <button
+                type="submit"
+                className="rounded-[12px] border border-navy/12 bg-navy/[0.03] px-4 py-2.5 text-[13px] font-semibold text-navy/50 hover:bg-navy/[0.07]"
+              >
+                Annuler la validation
+              </button>
+            </form>
+          </div>
+        )}
+
+        {absent && (
+          <div className="border-t border-navy/[0.06] px-4 py-3">
+            {mission.motifAbsence && (
+              <div className="mb-2.5 flex items-start gap-2 rounded-[10px] bg-amber-50 px-3 py-2">
+                <span className="mt-px shrink-0 text-[13px]" aria-hidden="true">
+                  ⚠️
+                </span>
+                <p className="text-[12.5px] font-medium text-amber-700">
+                  {mission.motifAbsence}
+                </p>
+              </div>
+            )}
+
+            {/* Deux formulaires frères : HTML interdit de les imbriquer. */}
+            <form action={updateMotifAbsenceAction} className="flex min-w-0 gap-2">
+              <input type="hidden" name="missionId" value={mission.id} />
+              <label className="sr-only" htmlFor={`motif-${mission.id}`}>
+                Motif de l&apos;absence de {nomFormate}
+              </label>
+              <input
+                id={`motif-${mission.id}`}
+                name="motif"
+                type="text"
+                defaultValue={mission.motifAbsence ?? ""}
+                placeholder="Motif (facultatif)"
+                className="min-w-0 flex-1 rounded-[12px] border border-navy/15 px-3 py-2 text-[13px] text-navy placeholder:text-navy/35"
+              />
+              <button
+                type="submit"
+                className="shrink-0 rounded-[12px] border border-navy/12 bg-navy/[0.03] px-3 py-2 text-[13px] font-semibold text-navy/60 hover:bg-navy/[0.07]"
+              >
+                Enregistrer
+              </button>
+            </form>
+
+            <form action={updateMissionStatutAction} className="mt-2">
+              <input type="hidden" name="missionId" value={mission.id} />
+              <input type="hidden" name="nouveauStatut" value="a_faire" />
+              <button
+                type="submit"
+                className="rounded-[12px] border border-navy/12 bg-navy/[0.03] px-4 py-2.5 text-[13px] font-semibold text-navy/50 hover:bg-navy/[0.07]"
+              >
+                Annuler l&apos;absence
+              </button>
+            </form>
           </div>
         )}
 

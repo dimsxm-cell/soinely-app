@@ -5,6 +5,7 @@ import type { MissionTourneeVue } from "@/lib/data/ma-journee";
 
 vi.mock("@/lib/data/ma-journee-actions", () => ({
   updateMissionStatutAction: vi.fn(),
+  updateMotifAbsenceAction: vi.fn(),
 }));
 
 function creerMission(surcharge: Partial<MissionTourneeVue> = {}): MissionTourneeVue {
@@ -87,16 +88,22 @@ describe("CarteMissionTournee", () => {
     expect(screen.getByRole("button", { name: /Valider/ })).toBeInTheDocument();
   });
 
-  it("n'affiche aucune action pour une mission validée", () => {
+  it("n'affiche plus les actions de soin pour une mission validée", () => {
     render(<CarteMissionTournee mission={creerMission({ statut: "terminee" })} estDerniere={false} />);
 
-    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Valider le soin" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Absent" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /GPS/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Appeler/ })).not.toBeInTheDocument();
   });
 
-  it("n'affiche aucune action pour une mission absente", () => {
+  it("n'affiche plus les actions de soin pour une mission absente", () => {
     render(<CarteMissionTournee mission={creerMission({ statut: "absent" })} estDerniere={false} />);
 
-    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Valider le soin" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Absent" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /GPS/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Appeler/ })).not.toBeInTheDocument();
   });
 
   it("affiche les consignes même sur une mission validée", () => {
@@ -200,5 +207,62 @@ describe("CarteMissionTournee — actes", () => {
     );
 
     expect(screen.getByText("Pansement")).toBeInTheDocument();
+  });
+});
+
+describe("CarteMissionTournee — correction d'un statut", () => {
+  it("propose d'annuler la validation d'une mission validée", () => {
+    render(
+      <CarteMissionTournee mission={creerMission({ statut: "terminee" })} estDerniere={false} />
+    );
+
+    expect(screen.getByRole("button", { name: "Annuler la validation" })).toBeInTheDocument();
+  });
+
+  it("propose d'annuler l'absence et de saisir un motif", () => {
+    render(
+      <CarteMissionTournee mission={creerMission({ statut: "absent" })} estDerniere={false} />
+    );
+
+    expect(screen.getByRole("button", { name: "Annuler l'absence" })).toBeInTheDocument();
+    expect(screen.getByLabelText(/Motif de l'absence/)).toBeInTheDocument();
+  });
+
+  it("affiche le motif déjà saisi, et le prérenseigne dans le champ", () => {
+    render(
+      <CarteMissionTournee
+        mission={creerMission({ statut: "absent", motifAbsence: "Hospitalisée depuis hier" })}
+        estDerniere={false}
+      />
+    );
+
+    expect(screen.getByText("Hospitalisée depuis hier")).toBeInTheDocument();
+    expect(screen.getByLabelText(/Motif de l'absence/)).toHaveValue("Hospitalisée depuis hier");
+  });
+
+  it("laisse le champ vide et n'affiche aucun encart quand l'absence n'a pas de motif", () => {
+    render(
+      <CarteMissionTournee mission={creerMission({ statut: "absent" })} estDerniere={false} />
+    );
+
+    expect(screen.getByLabelText(/Motif de l'absence/)).toHaveValue("");
+    expect(screen.queryByText("⚠️")).not.toBeInTheDocument();
+  });
+
+  // Deux tests plutôt qu'un : deux `render` dans un même test s'empilent dans
+  // le même conteneur — Testing Library ne nettoie qu'entre les tests — et la
+  // requête porterait alors sur les deux cartes à la fois.
+  it("ne propose aucune annulation sur une mission à faire", () => {
+    render(<CarteMissionTournee mission={creerMission()} estDerniere={false} />);
+
+    expect(screen.queryByRole("button", { name: /Annuler/ })).not.toBeInTheDocument();
+  });
+
+  it("ne propose aucune annulation sur une mission en cours", () => {
+    render(
+      <CarteMissionTournee mission={creerMission({ statut: "en_cours" })} estDerniere={false} />
+    );
+
+    expect(screen.queryByRole("button", { name: /Annuler/ })).not.toBeInTheDocument();
   });
 });
