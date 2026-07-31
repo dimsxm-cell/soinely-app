@@ -8,6 +8,7 @@ import type {
   Tournee,
 } from "@/lib/types/clinical";
 import { genererTourneeDuJour } from "@/lib/data/generation-tournee";
+import { echouer, journaliserEchec } from "@/lib/journal";
 
 const BUCKET_PHOTOS = "photos-visites";
 
@@ -23,7 +24,10 @@ async function lireTourneeDuJour(
     .eq("date", date)
     .maybeSingle();
 
-  if (error || !data) return null;
+  // L'absence de tournée est un fait métier — une journée sans patient. Seule
+  // une erreur de lecture est une panne.
+  if (error) echouer("lireTourneeDuJour", error);
+  if (!data) return null;
 
   return {
     id: data.id,
@@ -60,7 +64,8 @@ export async function getMissionsDuJour(
     .eq("tournee_id", tourneeId)
     .order("heure_prevue");
 
-  if (error || !data) return [];
+  if (error) echouer("getMissionsDuJour", error);
+  if (!data) return [];
 
   return data.map((row) => {
     const patientEmbed = row.patients as unknown;
@@ -203,7 +208,8 @@ export async function getMissionDetail(
     .eq("id", missionId)
     .maybeSingle();
 
-  if (error || !data) return null;
+  if (error) echouer("getMissionDetail", error);
+  if (!data) return null;
 
   const patientEmbed = data.patients as unknown;
   type PatientRow = {
@@ -262,6 +268,7 @@ export async function getPhotoUrl(
 ): Promise<string | null> {
   const { data, error } = await supabase.storage.from(BUCKET_PHOTOS).createSignedUrl(path, 300);
 
+  if (error) journaliserEchec("getPhotoUrl", error);
   if (error || !data) return null;
 
   return data.signedUrl;
@@ -278,6 +285,7 @@ export async function getMissionEnCoursHref(
     .eq("statut", "en_cours")
     .limit(1);
 
+  if (error) journaliserEchec("getMissionEnCoursHref", error);
   if (error || !data || data.length === 0) return null;
 
   const mission = data[0];
@@ -330,7 +338,8 @@ export async function getMissionsTourneeVue(
     .eq("tournee_id", tourneeId)
     .order("heure_prevue");
 
-  if (error || !data) return [];
+  if (error) echouer("getMissionsTourneeVue", error);
+  if (!data) return [];
 
   return data.map((row) => {
     type PatientRow = {

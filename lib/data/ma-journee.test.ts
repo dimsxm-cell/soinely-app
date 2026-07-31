@@ -95,6 +95,27 @@ describe("getTourneeDuJour", () => {
   });
 });
 
+describe("getTourneeDuJour — échecs", () => {
+  it("lève quand la lecture de la tournée échoue", async () => {
+    const fakeClient = {
+      from: () => ({
+        select: () => ({
+          eq: () => ({
+            eq: () => ({
+              maybeSingle: () =>
+                Promise.resolve({ data: null, error: { message: "boom" } }),
+            }),
+          }),
+        }),
+      }),
+    } as unknown as SupabaseClient;
+
+    const { getTourneeDuJour } = await import("./ma-journee");
+
+    await expect(getTourneeDuJour(fakeClient, "u1")).rejects.toThrow(/lireTourneeDuJour/);
+  });
+});
+
 describe("getMissionsDuJour", () => {
   it("mappe les colonnes snake_case Supabase vers MissionDuJour, avec le nom du patient joint, triées par heure", async () => {
     const fakeClient = {
@@ -196,7 +217,7 @@ describe("getMissionsDuJour", () => {
     ]);
   });
 
-  it("retourne un tableau vide en cas d'erreur", async () => {
+  it("lève en cas d'erreur de lecture", async () => {
     const fakeClient = {
       from: () => ({
         select: () => ({
@@ -208,9 +229,8 @@ describe("getMissionsDuJour", () => {
     } as unknown as SupabaseClient;
 
     const { getMissionsDuJour } = await import("./ma-journee");
-    const missions = await getMissionsDuJour(fakeClient, "t1");
 
-    expect(missions).toEqual([]);
+    await expect(getMissionsDuJour(fakeClient, "t1")).rejects.toThrow(/getMissionsDuJour/);
   });
 });
 
@@ -434,6 +454,32 @@ describe("getMissionDetail", () => {
   });
 });
 
+describe("getMissionDetail — échecs", () => {
+  function fakeClientDetail(resultat: { data: unknown; error: unknown }) {
+    return {
+      from: () => ({
+        select: () => ({
+          eq: () => ({ maybeSingle: () => Promise.resolve(resultat) }),
+        }),
+      }),
+    } as unknown as SupabaseClient;
+  }
+
+  it("lève quand la lecture échoue", async () => {
+    const { getMissionDetail } = await import("./ma-journee");
+
+    await expect(
+      getMissionDetail(fakeClientDetail({ data: null, error: { message: "boom" } }), "m1")
+    ).rejects.toThrow(/getMissionDetail/);
+  });
+
+  it("rend null quand la mission est simplement introuvable", async () => {
+    const { getMissionDetail } = await import("./ma-journee");
+
+    expect(await getMissionDetail(fakeClientDetail({ data: null, error: null }), "m1")).toBeNull();
+  });
+});
+
 describe("getPhotoUrl", () => {
   it("retourne l'URL signée si Supabase Storage répond sans erreur", async () => {
     const fakeClient = {
@@ -556,6 +602,26 @@ describe("getMissionsTourneeVue", () => {
     const missions = await getMissionsTourneeVue(fakeClient, "t1");
 
     expect(missions[0].actes).toEqual([]);
+  });
+});
+
+describe("getMissionsTourneeVue — échecs", () => {
+  it("lève quand la lecture échoue", async () => {
+    const fakeClient = {
+      from: () => ({
+        select: () => ({
+          eq: () => ({
+            order: () => Promise.resolve({ data: null, error: { message: "boom" } }),
+          }),
+        }),
+      }),
+    } as unknown as SupabaseClient;
+
+    const { getMissionsTourneeVue } = await import("./ma-journee");
+
+    await expect(getMissionsTourneeVue(fakeClient, "t1")).rejects.toThrow(
+      /getMissionsTourneeVue/
+    );
   });
 });
 
