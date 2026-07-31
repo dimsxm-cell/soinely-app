@@ -148,30 +148,35 @@ export default async function PatientPage({ params }: { params: Promise<{ id: st
                     {decrireRecurrence(soin)} · {soin.heures.join(", ")}
                   </p>
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <form action={coterSoinPrescritAction} className="flex items-center gap-2">
-                    <input type="hidden" name="soinId" value={soin.id} />
-                    <input type="hidden" name="patientId" value={patient.id} />
-                    <label className="sr-only" htmlFor={`cotation-${soin.id}`}>
-                      Cotation NGAP de « {soin.typeSoin} »
-                    </label>
-                    <select
-                      id={`cotation-${soin.id}`}
-                      name="ngapCodeId"
-                      defaultValue={soin.ngapCodeId ?? ""}
-                      className="rounded-card border border-navy/20 p-2 text-sm"
-                    >
-                      <option value="">Aucune</option>
-                      {codesNgap.map((code) => (
-                        <option key={code.id} value={code.id}>
-                          {code.code} — {code.libelle}
-                        </option>
-                      ))}
-                    </select>
-                    <Button type="submit" variant="tertiary">
-                      Enregistrer
-                    </Button>
-                  </form>
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                  {codesNgap.length > 0 && (
+                    // Un catalogue vide signale un échec de lecture : le sélecteur ne peut
+                    // alors pas afficher la cotation en cours, donc il ne doit pas pouvoir
+                    // l'effacer.
+                    <form action={coterSoinPrescritAction} className="flex items-center gap-2">
+                      <input type="hidden" name="soinId" value={soin.id} />
+                      <input type="hidden" name="patientId" value={patient.id} />
+                      <label className="sr-only" htmlFor={`cotation-${soin.id}`}>
+                        Cotation NGAP de « {soin.typeSoin} »
+                      </label>
+                      <select
+                        id={`cotation-${soin.id}`}
+                        name="ngapCodeId"
+                        defaultValue={soin.ngapCodeId ?? ""}
+                        className="max-w-full min-w-0 rounded-card border border-navy/20 p-2 text-sm"
+                      >
+                        <option value="">Aucune</option>
+                        {codesNgap.map((code) => (
+                          <option key={code.id} value={code.id}>
+                            {code.code} — {code.libelle}
+                          </option>
+                        ))}
+                      </select>
+                      <Button type="submit" variant="tertiary">
+                        Enregistrer
+                      </Button>
+                    </form>
+                  )}
                   <form action={arreterSoinPrescritAction}>
                     <input type="hidden" name="soinId" value={soin.id} />
                     <input type="hidden" name="patientId" value={patient.id} />
