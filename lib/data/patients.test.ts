@@ -173,6 +173,8 @@ describe("getSoinsPrescrits", () => {
                     date_debut: "2026-07-01",
                     date_fin: null,
                     actif: true,
+                    ngap_code_id: "c1",
+                    ngap_codes: { code: "AIS 3" },
                   },
                   {
                     id: "s2",
@@ -185,6 +187,8 @@ describe("getSoinsPrescrits", () => {
                     date_debut: "2026-06-01",
                     date_fin: "2026-06-30",
                     actif: false,
+                    ngap_code_id: null,
+                    ngap_codes: null,
                   },
                 ],
                 error: null,
@@ -209,6 +213,8 @@ describe("getSoinsPrescrits", () => {
         dateDebut: "2026-07-01",
         dateFin: null,
         actif: true,
+        ngapCodeId: "c1",
+        ngapCode: "AIS 3",
       },
       {
         id: "s2",
@@ -221,6 +227,8 @@ describe("getSoinsPrescrits", () => {
         dateDebut: "2026-06-01",
         dateFin: "2026-06-30",
         actif: false,
+        ngapCodeId: null,
+        ngapCode: null,
       },
     ]);
   });

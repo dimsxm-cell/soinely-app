@@ -208,8 +208,51 @@ describe("createSoinPrescritAction", () => {
       heures: ["07:00", "19:00"],
       date_debut: "2026-07-15",
       date_fin: null,
+      ngap_code_id: null,
     });
     expect(revalidatePath).toHaveBeenCalledWith("/patients/p1");
+  });
+
+  it("enregistre le code NGAP choisi", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } } });
+    singleInsertMock.mockResolvedValue({ data: { id: "s3" }, error: null });
+
+    const { createSoinPrescritAction } = await import("./patients-actions");
+
+    const formData = new FormData();
+    formData.set("patientId", "p1");
+    formData.set("typeSoin", "Toilette");
+    formData.set("frequenceType", "quotidien");
+    formData.set("heures", "08:00");
+    formData.set("dateDebut", "2026-07-15");
+    formData.set("ngapCodeId", "c-ais3");
+
+    await createSoinPrescritAction(formData);
+
+    expect(insertMock).toHaveBeenCalledWith(
+      expect.objectContaining({ ngap_code_id: "c-ais3" })
+    );
+  });
+
+  it("enregistre un code nul quand aucune cotation n'est choisie", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } } });
+    singleInsertMock.mockResolvedValue({ data: { id: "s4" }, error: null });
+
+    const { createSoinPrescritAction } = await import("./patients-actions");
+
+    const formData = new FormData();
+    formData.set("patientId", "p1");
+    formData.set("typeSoin", "Toilette");
+    formData.set("frequenceType", "quotidien");
+    formData.set("heures", "08:00");
+    formData.set("dateDebut", "2026-07-15");
+    formData.set("ngapCodeId", "");
+
+    await createSoinPrescritAction(formData);
+
+    expect(insertMock).toHaveBeenCalledWith(
+      expect.objectContaining({ ngap_code_id: null })
+    );
   });
 
   it("crée un soin à jours de semaine précis avec les jours cochés", async () => {

@@ -105,6 +105,8 @@ export async function createSoinPrescritAction(formData: FormData): Promise<void
     .filter(Boolean);
   const dateDebut = String(formData.get("dateDebut") ?? "");
   const dateFin = champTexteOuNull(formData, "dateFin");
+  // Cotation facultative : un soin peut exister sans code NGAP.
+  const ngapCodeId = String(formData.get("ngapCodeId") ?? "") || null;
 
   const heuresValides = heuresBrut.length > 0 && heuresBrut.every((h) => /^([01]\d|2[0-3]):[0-5]\d$/.test(h));
 
@@ -142,6 +144,7 @@ export async function createSoinPrescritAction(formData: FormData): Promise<void
       heures: heuresBrut,
       date_debut: dateDebut,
       date_fin: dateFin,
+      ngap_code_id: ngapCodeId,
     })
     .select("id")
     .single();

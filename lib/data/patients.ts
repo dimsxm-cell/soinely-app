@@ -82,23 +82,30 @@ export async function getSoinsPrescrits(
   const { data, error } = await supabase
     .from("soins_prescrits")
     .select(
-      "id, patient_id, type_soin, frequence_type, jours_semaine, intervalle_jours, heures, date_debut, date_fin, actif"
+      "id, patient_id, type_soin, frequence_type, jours_semaine, intervalle_jours, heures, date_debut, date_fin, actif, ngap_code_id, ngap_codes(code)"
     )
     .eq("patient_id", patientId)
     .order("created_at", { ascending: false });
 
   if (error || !data) return [];
 
-  return data.map((row) => ({
-    id: row.id,
-    patientId: row.patient_id,
-    typeSoin: row.type_soin,
-    frequenceType: row.frequence_type as FrequenceSoin,
-    joursSemaine: row.jours_semaine,
-    intervalleJours: row.intervalle_jours,
-    heures: row.heures,
-    dateDebut: row.date_debut,
-    dateFin: row.date_fin,
-    actif: row.actif,
-  }));
+  return data.map((row) => {
+    const ngapEmbed = row.ngap_codes as { code: string } | { code: string }[] | null;
+    const ngap = Array.isArray(ngapEmbed) ? ngapEmbed[0] : ngapEmbed;
+
+    return {
+      id: row.id,
+      patientId: row.patient_id,
+      typeSoin: row.type_soin,
+      frequenceType: row.frequence_type as FrequenceSoin,
+      joursSemaine: row.jours_semaine,
+      intervalleJours: row.intervalle_jours,
+      heures: row.heures,
+      dateDebut: row.date_debut,
+      dateFin: row.date_fin,
+      actif: row.actif,
+      ngapCodeId: row.ngap_code_id,
+      ngapCode: ngap?.code ?? null,
+    };
+  });
 }

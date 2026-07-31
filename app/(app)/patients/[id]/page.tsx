@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getPatient, getSoinsPrescrits } from "@/lib/data/patients";
 import { createSoinPrescritAction, arreterSoinPrescritAction, updatePatientAction } from "@/lib/data/patients-actions";
+import { getCodesNgap } from "@/lib/data/ngap";
 import { formaterNomPropre } from "@/lib/format";
 import type { SoinPrescrit } from "@/lib/types/clinical";
 import { Button } from "@/components/ui/Button";
@@ -42,7 +43,11 @@ function decrireRecurrence(soin: SoinPrescrit): string {
 export default async function PatientPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
-  const [patient, soins] = await Promise.all([getPatient(supabase, id), getSoinsPrescrits(supabase, id)]);
+  const [patient, soins, codesNgap] = await Promise.all([
+    getPatient(supabase, id),
+    getSoinsPrescrits(supabase, id),
+    getCodesNgap(supabase),
+  ]);
 
   if (!patient) notFound();
   const soinsActifs = soins.filter((soin) => soin.actif);
@@ -131,7 +136,10 @@ export default async function PatientPage({ params }: { params: Promise<{ id: st
                 className="flex items-center justify-between gap-3 rounded-card border border-navy/10 p-3"
               >
                 <div>
-                  <p className="text-navy">{soin.typeSoin}</p>
+                  <p className="text-navy">
+                    {soin.ngapCode ? `${soin.ngapCode} — ` : ""}
+                    {soin.typeSoin}
+                  </p>
                   <p className="text-sm text-navy/60">
                     {decrireRecurrence(soin)} · {soin.heures.join(", ")}
                   </p>
@@ -171,6 +179,21 @@ export default async function PatientPage({ params }: { params: Promise<{ id: st
           <label className="flex flex-col gap-1 text-sm text-navy">
             Type de soin
             <input name="typeSoin" required className="rounded-card border border-navy/20 p-2" />
+          </label>
+          <label className="flex flex-col gap-1 text-sm text-navy">
+            Cotation NGAP (facultatif)
+            <select
+              name="ngapCodeId"
+              defaultValue=""
+              className="rounded-card border border-navy/20 p-2"
+            >
+              <option value="">Aucune</option>
+              {codesNgap.map((code) => (
+                <option key={code.id} value={code.id}>
+                  {code.code} — {code.libelle}
+                </option>
+              ))}
+            </select>
           </label>
           <label className="flex flex-col gap-1 text-sm text-navy">
             Récurrence

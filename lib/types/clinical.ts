@@ -63,6 +63,8 @@ export interface SoinPrescrit {
   dateDebut: string;
   dateFin: string | null;
   actif: boolean;
+  ngapCodeId: string | null;
+  ngapCode: string | null;
 }
 
 export interface ProchaineMission {
