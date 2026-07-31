@@ -86,6 +86,45 @@ export type Database = {
           },
         ]
       }
+      actes_mission: {
+        Row: {
+          id: string
+          mission_id: string
+          libelle: string
+          ngap_code_id: string | null
+          ordre: number
+        }
+        Insert: {
+          id?: string
+          mission_id: string
+          libelle: string
+          ngap_code_id?: string | null
+          ordre?: number
+        }
+        Update: {
+          id?: string
+          mission_id?: string
+          libelle?: string
+          ngap_code_id?: string | null
+          ordre?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "actes_mission_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions_du_jour"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "actes_mission_ngap_code_id_fkey"
+            columns: ["ngap_code_id"]
+            isOneToOne: false
+            referencedRelation: "ngap_codes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fiches_dossier_soins: {
         Row: {
           contenu: Json
@@ -233,23 +272,29 @@ export type Database = {
       ngap_codes: {
         Row: {
           code: string
+          coefficient: number | null
           conditions: string | null
           cotation: number
           id: string
+          lettre_cle: string | null
           libelle: string
         }
         Insert: {
           code: string
+          coefficient?: number | null
           conditions?: string | null
           cotation: number
           id?: string
+          lettre_cle?: string | null
           libelle: string
         }
         Update: {
           code?: string
+          coefficient?: number | null
           conditions?: string | null
           cotation?: number
           id?: string
+          lettre_cle?: string | null
           libelle?: string
         }
         Relationships: []
@@ -412,6 +457,7 @@ export type Database = {
           idel_id: string
           intervalle_jours: number | null
           jours_semaine: number[] | null
+          ngap_code_id: string | null
           patient_id: string
           type_soin: string
         }
@@ -426,6 +472,7 @@ export type Database = {
           idel_id: string
           intervalle_jours?: number | null
           jours_semaine?: number[] | null
+          ngap_code_id?: string | null
           patient_id: string
           type_soin: string
         }
@@ -440,6 +487,7 @@ export type Database = {
           idel_id?: string
           intervalle_jours?: number | null
           jours_semaine?: number[] | null
+          ngap_code_id?: string | null
           patient_id?: string
           type_soin?: string
         }
@@ -456,6 +504,13 @@ export type Database = {
             columns: ["idel_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "soins_prescrits_ngap_code_id_fkey"
+            columns: ["ngap_code_id"]
+            isOneToOne: false
+            referencedRelation: "ngap_codes"
             referencedColumns: ["id"]
           },
         ]
