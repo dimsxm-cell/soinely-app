@@ -48,8 +48,13 @@ describe("EnTeteTournee", () => {
   // Horloge figée : le composant affiche l'heure actuelle en direct, et sans
   // ça le test devient instable une minute par jour (quand « maintenant »
   // coïncide avec l'heure de fin estimée « 18:05 » affichée plus bas).
+  //
+  // On ne feint que Date. Feindre tous les minuteurs — le défaut — gèle aussi
+  // setTimeout, queueMicrotask et process.nextTick, dont React 19 se sert pour
+  // achever un rendu : selon la charge de la machine, render() partait alors
+  // attendre un minuteur figé et le test expirait au bout de cinq secondes.
   beforeEach(() => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ toFake: ["Date"] });
     vi.setSystemTime(new Date("2026-07-30T09:00:00"));
   });
 
@@ -63,6 +68,14 @@ describe("EnTeteTournee", () => {
     expect(screen.getByText("2")).toBeInTheDocument();
     expect(screen.getByText("/5")).toBeInTheDocument();
     expect(screen.getByText("passages validés")).toBeInTheDocument();
+  });
+
+  it("affiche l'heure courante, prise sur l'horloge figée", () => {
+    render(<EnTeteTournee missions={missions} tournee={tournee} />);
+
+    // Prouve que Date est bien feinte : sans cela, cette assertion échouerait
+    // 1439 minutes sur 1440, et le gel de l'horloge deviendrait décoratif.
+    expect(screen.getByText("09:00")).toBeInTheDocument();
   });
 
   it("la barre de progression annonce le pourcentage validé", () => {
