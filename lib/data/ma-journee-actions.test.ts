@@ -2,6 +2,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const eqSelectMock = vi.fn();
 const selectMock = vi.fn(() => ({ eq: () => ({ maybeSingle: eqSelectMock }) }));
+// Deux niveaux de `.eq()` : le premier filtre sur l'id (comme avant), le
+// second porte désormais le garde-fou sur le statut. Les actions qui
+// n'enchaînent qu'un seul `.eq()` continuent d'utiliser eqUpdateMock seul,
+// via mockResolvedValue, exactement comme avant.
+const eqUpdateMock2 = vi.fn();
 const eqUpdateMock = vi.fn();
 const updateMock = vi.fn(() => ({ eq: eqUpdateMock }));
 const fromMock = vi.fn(() => ({ select: selectMock, update: updateMock }));
@@ -28,7 +33,8 @@ beforeEach(() => {
 describe("updateMissionStatutAction", () => {
   it("applique une transition valide (a_faire vers en_cours) et invalide le cache des deux écrans", async () => {
     eqSelectMock.mockResolvedValue({ data: { statut: "a_faire" }, error: null });
-    eqUpdateMock.mockResolvedValue({ error: null });
+    eqUpdateMock.mockReturnValue({ eq: eqUpdateMock2 });
+    eqUpdateMock2.mockResolvedValue({ error: null });
 
     const { updateMissionStatutAction } = await import("./ma-journee-actions");
     const { revalidatePath } = await import("next/cache");
@@ -42,13 +48,17 @@ describe("updateMissionStatutAction", () => {
     expect(fromMock).toHaveBeenCalledWith("missions_du_jour");
     expect(updateMock).toHaveBeenCalledWith({ statut: "en_cours" });
     expect(eqUpdateMock).toHaveBeenCalledWith("id", "m1");
+    // Le garde-fou porte sur le statut lu avant l'écriture : ferme la fenêtre
+    // entre la lecture et la mise à jour.
+    expect(eqUpdateMock2).toHaveBeenCalledWith("statut", "a_faire");
     expect(revalidatePath).toHaveBeenCalledWith("/ma-journee");
     expect(revalidatePath).toHaveBeenCalledWith("/ma-journee/m1");
   });
 
   it("applique la transition a_faire vers absent et invalide le cache", async () => {
     eqSelectMock.mockResolvedValue({ data: { statut: "a_faire" }, error: null });
-    eqUpdateMock.mockResolvedValue({ error: null });
+    eqUpdateMock.mockReturnValue({ eq: eqUpdateMock2 });
+    eqUpdateMock2.mockResolvedValue({ error: null });
 
     const { updateMissionStatutAction } = await import("./ma-journee-actions");
     const { revalidatePath } = await import("next/cache");
@@ -60,6 +70,7 @@ describe("updateMissionStatutAction", () => {
     await updateMissionStatutAction(formData);
 
     expect(updateMock).toHaveBeenCalledWith({ statut: "absent" });
+    expect(eqUpdateMock2).toHaveBeenCalledWith("statut", "a_faire");
     expect(revalidatePath).toHaveBeenCalledWith("/ma-journee");
     expect(revalidatePath).toHaveBeenCalledWith("/ma-journee/m1");
   });
@@ -98,7 +109,8 @@ describe("updateMissionStatutAction", () => {
 
   it("applique une transition valide (en_cours vers terminee) et invalide le cache", async () => {
     eqSelectMock.mockResolvedValue({ data: { statut: "en_cours" }, error: null });
-    eqUpdateMock.mockResolvedValue({ error: null });
+    eqUpdateMock.mockReturnValue({ eq: eqUpdateMock2 });
+    eqUpdateMock2.mockResolvedValue({ error: null });
 
     const { updateMissionStatutAction } = await import("./ma-journee-actions");
     const { revalidatePath } = await import("next/cache");
@@ -110,6 +122,7 @@ describe("updateMissionStatutAction", () => {
     await updateMissionStatutAction(formData);
 
     expect(updateMock).toHaveBeenCalledWith({ statut: "terminee" });
+    expect(eqUpdateMock2).toHaveBeenCalledWith("statut", "en_cours");
     expect(revalidatePath).toHaveBeenCalledWith("/ma-journee");
     expect(revalidatePath).toHaveBeenCalledWith("/ma-journee/m1");
   });
@@ -164,7 +177,8 @@ describe("updateMissionStatutAction", () => {
 
   it("annule une validation en ramenant la mission à « à faire »", async () => {
     eqSelectMock.mockResolvedValue({ data: { statut: "terminee" }, error: null });
-    eqUpdateMock.mockResolvedValue({ error: null });
+    eqUpdateMock.mockReturnValue({ eq: eqUpdateMock2 });
+    eqUpdateMock2.mockResolvedValue({ error: null });
 
     const { updateMissionStatutAction } = await import("./ma-journee-actions");
 
@@ -176,11 +190,13 @@ describe("updateMissionStatutAction", () => {
 
     // Le motif part avec l'absence qu'il expliquait.
     expect(updateMock).toHaveBeenCalledWith({ statut: "a_faire", motif_absence: null });
+    expect(eqUpdateMock2).toHaveBeenCalledWith("statut", "terminee");
   });
 
   it("annule une absence en ramenant la mission à « à faire »", async () => {
     eqSelectMock.mockResolvedValue({ data: { statut: "absent" }, error: null });
-    eqUpdateMock.mockResolvedValue({ error: null });
+    eqUpdateMock.mockReturnValue({ eq: eqUpdateMock2 });
+    eqUpdateMock2.mockResolvedValue({ error: null });
 
     const { updateMissionStatutAction } = await import("./ma-journee-actions");
 
@@ -191,11 +207,13 @@ describe("updateMissionStatutAction", () => {
     await updateMissionStatutAction(formData);
 
     expect(updateMock).toHaveBeenCalledWith({ statut: "a_faire", motif_absence: null });
+    expect(eqUpdateMock2).toHaveBeenCalledWith("statut", "absent");
   });
 
   it("marque absente une mission à faire, sans toucher au motif", async () => {
     eqSelectMock.mockResolvedValue({ data: { statut: "a_faire" }, error: null });
-    eqUpdateMock.mockResolvedValue({ error: null });
+    eqUpdateMock.mockReturnValue({ eq: eqUpdateMock2 });
+    eqUpdateMock2.mockResolvedValue({ error: null });
 
     const { updateMissionStatutAction } = await import("./ma-journee-actions");
 
@@ -206,6 +224,7 @@ describe("updateMissionStatutAction", () => {
     await updateMissionStatutAction(formData);
 
     expect(updateMock).toHaveBeenCalledWith({ statut: "absent" });
+    expect(eqUpdateMock2).toHaveBeenCalledWith("statut", "a_faire");
   });
 
   it("refuse de passer directement de « validé » à « absent »", async () => {
@@ -415,7 +434,8 @@ describe("uploadPhotoAction", () => {
 describe("updateMotifAbsenceAction", () => {
   it("enregistre le motif sur une mission absente", async () => {
     eqSelectMock.mockResolvedValue({ data: { statut: "absent" }, error: null });
-    eqUpdateMock.mockResolvedValue({ error: null });
+    eqUpdateMock.mockReturnValue({ eq: eqUpdateMock2 });
+    eqUpdateMock2.mockResolvedValue({ error: null });
 
     const { updateMotifAbsenceAction } = await import("./ma-journee-actions");
     const { revalidatePath } = await import("next/cache");
@@ -428,12 +448,16 @@ describe("updateMotifAbsenceAction", () => {
 
     expect(updateMock).toHaveBeenCalledWith({ motif_absence: "Hospitalisée depuis hier" });
     expect(eqUpdateMock).toHaveBeenCalledWith("id", "m1");
+    // Le garde-fou referme la fenêtre entre la relecture du statut et
+    // l'écriture du motif.
+    expect(eqUpdateMock2).toHaveBeenCalledWith("statut", "absent");
     expect(revalidatePath).toHaveBeenCalledWith("/ma-tournee");
   });
 
   it("efface le motif quand le champ est vidé", async () => {
     eqSelectMock.mockResolvedValue({ data: { statut: "absent" }, error: null });
-    eqUpdateMock.mockResolvedValue({ error: null });
+    eqUpdateMock.mockReturnValue({ eq: eqUpdateMock2 });
+    eqUpdateMock2.mockResolvedValue({ error: null });
 
     const { updateMotifAbsenceAction } = await import("./ma-journee-actions");
 
@@ -442,6 +466,16 @@ describe("updateMotifAbsenceAction", () => {
     formData.set("motif", "");
 
     await updateMotifAbsenceAction(formData);
+
+    expect(updateMock).toHaveBeenCalledWith({ motif_absence: null });
+
+    // Un motif composé uniquement d'espaces ne doit pas non plus survivre :
+    // il produirait un encart amber vide, pire qu'aucun encart.
+    const formDataEspaces = new FormData();
+    formDataEspaces.set("missionId", "m1");
+    formDataEspaces.set("motif", "   ");
+
+    await updateMotifAbsenceAction(formDataEspaces);
 
     expect(updateMock).toHaveBeenCalledWith({ motif_absence: null });
   });

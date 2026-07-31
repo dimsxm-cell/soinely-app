@@ -44,10 +44,15 @@ export async function updateMissionStatutAction(formData: FormData): Promise<voi
       ? { statut: nouveauStatut, motif_absence: null }
       : { statut: nouveauStatut };
 
+  // Le filtre sur le statut lu referme la fenêtre entre la lecture et
+  // l'écriture : si une autre requête a fait bouger le statut entre-temps,
+  // la mise à jour ne trouve plus de ligne à modifier plutôt que d'écraser
+  // un état qu'elle n'a pas vérifié.
   const { error } = await supabase
     .from("missions_du_jour")
     .update(misAJour)
-    .eq("id", missionId);
+    .eq("id", missionId)
+    .eq("statut", statutActuel);
 
   if (error) journaliserEchec("updateMissionStatutAction", error);
 
@@ -58,7 +63,7 @@ export async function updateMissionStatutAction(formData: FormData): Promise<voi
 
 export async function updateMotifAbsenceAction(formData: FormData): Promise<void> {
   const missionId = String(formData.get("missionId"));
-  const motif = String(formData.get("motif") ?? "") || null;
+  const motif = String(formData.get("motif") ?? "").trim() || null;
 
   const supabase = await createClient();
 
@@ -72,10 +77,15 @@ export async function updateMotifAbsenceAction(formData: FormData): Promise<void
   // explication orpheline qu'aucun écran n'afficherait.
   if (!mission || mission.statut !== "absent") return;
 
+  // Le filtre sur le statut referme la fenêtre entre la lecture et
+  // l'écriture : si une annulation d'absence est arrivée entre-temps, le
+  // motif ne se dépose plus sur une mission redevenue « à faire », où il
+  // resterait invisible jusqu'à ressurgir lors d'une prochaine absence.
   const { error } = await supabase
     .from("missions_du_jour")
     .update({ motif_absence: motif })
-    .eq("id", missionId);
+    .eq("id", missionId)
+    .eq("statut", "absent");
 
   if (error) journaliserEchec("updateMotifAbsenceAction", error);
 

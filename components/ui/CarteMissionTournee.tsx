@@ -68,10 +68,16 @@ export function CarteMissionTournee({
           enCours
             ? "border-brand-violet/40 shadow-[0_6px_24px_rgba(124,58,237,0.18)]"
             : "border-navy/[0.07] shadow-[0_1px_4px_rgba(15,23,42,0.05)]"
-        } ${terminee || absent ? "opacity-55" : ""}`}
+        }`}
       >
-        {/* En-tête de la carte */}
-        <div className="flex items-start gap-3 px-4 py-3.5">
+        {/* En-tête de la carte. L'atténuation d'une mission close vit ici,
+            et non plus sur la carte entière : `opacity` sur le conteneur
+            ouvrait un groupe de fusion (compositing group) qu'aucun enfant
+            ne peut annuler de l'intérieur, ce qui rendait illisibles jusqu'aux
+            blocs de correction plus bas. */}
+        <div
+          className={`flex items-start gap-3 px-4 py-3.5 ${terminee || absent ? "opacity-55" : ""}`}
+        >
           {/* Avatar */}
           <div
             className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[13px] font-bold ${couleur.bg} ${couleur.text}`}
@@ -121,8 +127,11 @@ export function CarteMissionTournee({
           </span>
         </div>
 
-        {/* Type de soin (chip) + alertes */}
-        <div className="border-t border-navy/[0.06] px-4 py-3">
+        {/* Type de soin (chip) + alertes : même atténuation que l'en-tête,
+            et pour la même raison. */}
+        <div
+          className={`border-t border-navy/[0.06] px-4 py-3 ${terminee || absent ? "opacity-55" : ""}`}
+        >
           {/* Un chip par acte. Le code NGAP porte l'information de facturation :
               il passe en tête, en gras. Un acte sans code — tout l'historique
               repris — garde l'icône et le libellé seuls. */}
@@ -301,6 +310,7 @@ export function CarteMissionTournee({
                 type="text"
                 defaultValue={mission.motifAbsence ?? ""}
                 placeholder="Motif (facultatif)"
+                maxLength={120}
                 className="min-w-0 flex-1 rounded-[12px] border border-navy/15 px-3 py-2 text-[13px] text-navy placeholder:text-navy/35"
               />
               <button
