@@ -398,6 +398,36 @@ describe("genererTourneeDuJour", () => {
     expect(tourneeDeleteEqMock).toHaveBeenCalledWith("id", "t-nouvelle");
   });
 
+  it("supprime la tournée si un passage relu ne se rattache à aucune mission insérée", async () => {
+    const soins = [
+      {
+        patient_id: "p1",
+        type_soin: "Pansement",
+        ngap_code_id: null,
+        frequence_type: "quotidien",
+        jours_semaine: null,
+        intervalle_jours: null,
+        heures: ["08:00:00"],
+        date_debut: "2026-07-01",
+        date_fin: null,
+      },
+    ];
+    const { fakeClient, missionsSelectMock, actesInsertMock, tourneeDeleteEqMock } = buildFakeClient(soins);
+    // La relecture renvoie l'heure sous une autre forme que celle insérée
+    // ("08:00" au lieu de "08:00:00") : la clé de rattachement ne correspond
+    // plus à aucun passage.
+    missionsSelectMock.mockResolvedValueOnce({
+      data: [{ id: "m-1", patient_id: "p1", heure_prevue: "08:00" }],
+      error: null,
+    });
+
+    const { genererTourneeDuJour } = await import("./generation-tournee");
+    await genererTourneeDuJour(fakeClient, "u1", "2026-07-15");
+
+    expect(tourneeDeleteEqMock).toHaveBeenCalledWith("id", "t-nouvelle");
+    expect(actesInsertMock).not.toHaveBeenCalled();
+  });
+
   it("compte 'Injection Lovenox' comme une injection", async () => {
     const soins = [
       {

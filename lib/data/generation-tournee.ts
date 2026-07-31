@@ -166,9 +166,24 @@ export async function genererTourneeDuJour(
     missionsCreees.map((mission) => [`${mission.patient_id}|${mission.heure_prevue}`, mission.id])
   );
 
+  const passageSansMission = passagesTries.some(
+    (passage) => !idParPassage.has(`${passage.patient_id}|${passage.heure_prevue}`)
+  );
+
+  // Un passage relu sous une clé différente de celle insérée (par exemple une
+  // heure reformatée par Postgres, "08:00" au lieu de "08:00:00") resterait
+  // introuvable dans idParPassage. Sauter silencieusement ce passage laisserait
+  // sa mission exister sans le moindre acte : une perte de cotation invisible,
+  // pire qu'une tournée absente. On traite donc ce rattachement manquant comme
+  // un échec d'insertion à part entière et on annule toute la tournée plutôt
+  // que de créer des missions orphelines de leurs actes.
+  if (missionsCreees.length !== passagesTries.length || passageSansMission) {
+    await supabase.from("tournees").delete().eq("id", tournee.id);
+    return;
+  }
+
   const actes = passagesTries.flatMap((passage) => {
-    const missionId = idParPassage.get(`${passage.patient_id}|${passage.heure_prevue}`);
-    if (!missionId) return [];
+    const missionId = idParPassage.get(`${passage.patient_id}|${passage.heure_prevue}`)!;
     return passage.actes.map((acte, index) => ({
       mission_id: missionId,
       libelle: acte.libelle,
