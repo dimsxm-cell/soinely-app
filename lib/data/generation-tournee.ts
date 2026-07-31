@@ -55,6 +55,14 @@ interface PassageAGenerer {
   actes: ActeAGenerer[];
 }
 
+// Seule productrice du libellé de synthèse porté par `missions_du_jour.type_soin`,
+// lu par une vingtaine d'écrans. L'invariant « type_soin === actes joints par
+// " + " » doit passer par ici, y compris après le lot A2 où les actes
+// deviendront modifiables.
+export function libelleDeSynthese(actes: { libelle: string }[]): string {
+  return actes.map((acte) => acte.libelle).join(" + ");
+}
+
 export async function genererTourneeDuJour(
   supabase: SupabaseClient<Database>,
   idelId: string,
@@ -150,7 +158,7 @@ export async function genererTourneeDuJour(
       passagesTries.map((passage) => ({
         tournee_id: tournee.id,
         patient_id: passage.patient_id,
-        type_soin: passage.actes.map((acte) => acte.libelle).join(" + "),
+        type_soin: libelleDeSynthese(passage.actes),
         heure_prevue: passage.heure_prevue,
         statut: "a_faire",
       }))

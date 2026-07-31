@@ -12,6 +12,10 @@ import {
   getInitiales,
 } from "@/lib/tournee-vue";
 
+// Classe du chip d'acte, partagée entre le rendu par acte et le repli sans acte.
+const CLASSES_CHIP =
+  "inline-flex items-center gap-1.5 rounded-[8px] bg-navy/[0.05] px-2.5 py-1 text-[12px] font-medium text-navy/65";
+
 interface CarteMissionTourneeProps {
   mission: MissionTourneeVue;
   contexteHref?: string;
@@ -127,7 +131,7 @@ export function CarteMissionTournee({
               mission.actes.map((acte, index) => (
                 <span
                   key={`${acte.libelle}-${index}`}
-                  className="inline-flex items-center gap-1.5 rounded-[8px] bg-navy/[0.05] px-2.5 py-1 text-[12px] font-medium text-navy/65"
+                  className={CLASSES_CHIP}
                 >
                   {acte.code ? (
                     <span className="font-bold text-navy/80">{acte.code}</span>
@@ -143,7 +147,7 @@ export function CarteMissionTournee({
             ) : (
               // Repli : une mission sans acte n'existe pas après la migration,
               // mais une carte muette serait pire qu'un libellé de synthèse.
-              <span className="inline-flex items-center gap-1.5 rounded-[8px] bg-navy/[0.05] px-2.5 py-1 text-[12px] font-medium text-navy/65">
+              <span className={CLASSES_CHIP}>
                 <IconeSoin
                   typeSoin={mission.typeSoin}
                   className="h-3.5 w-3.5 text-brand-violet"

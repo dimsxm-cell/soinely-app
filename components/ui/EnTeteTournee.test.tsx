@@ -57,12 +57,12 @@ describe("EnTeteTournee", () => {
     vi.useRealTimers();
   });
 
-  it("affiche le compteur de soins validés sur le total", () => {
+  it("affiche le compteur de passages validés sur le total", () => {
     render(<EnTeteTournee missions={missions} tournee={tournee} />);
 
     expect(screen.getByText("2")).toBeInTheDocument();
     expect(screen.getByText("/5")).toBeInTheDocument();
-    expect(screen.getByText("soins validés")).toBeInTheDocument();
+    expect(screen.getByText("passages validés")).toBeInTheDocument();
   });
 
   it("la barre de progression annonce le pourcentage validé", () => {

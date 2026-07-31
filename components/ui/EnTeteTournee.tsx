@@ -47,7 +47,7 @@ export function EnTeteTournee({
             {valides}
           </span>
           <span className="text-[20px] font-semibold text-white/30">/{total}</span>
-          <span className="ml-1 text-[13px] text-white/45">soins validés</span>
+          <span className="ml-1 text-[13px] text-white/45">passages validés</span>
         </div>
 
         {/* Barre de progression */}

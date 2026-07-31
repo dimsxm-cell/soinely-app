@@ -1,7 +1,19 @@
 import { describe, expect, it, vi } from "vitest";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { estSoinDuAujourdhui } from "./generation-tournee";
+import { estSoinDuAujourdhui, libelleDeSynthese } from "./generation-tournee";
 import type { SoinRecurrence } from "./generation-tournee";
+
+describe("libelleDeSynthese", () => {
+  it("un seul acte donne son propre libellé", () => {
+    expect(libelleDeSynthese([{ libelle: "Toilette" }])).toBe("Toilette");
+  });
+
+  it("plusieurs actes sont joints par ' + '", () => {
+    expect(
+      libelleDeSynthese([{ libelle: "Toilette" }, { libelle: "Insuline" }])
+    ).toBe("Toilette + Insuline");
+  });
+});
 
 describe("estSoinDuAujourdhui", () => {
   it("soin ponctuel dû le jour exact", () => {
