@@ -44,10 +44,15 @@ const MOTS_CLES_COMPTEUR: { cle: "nb_injections" | "nb_pansements" | "nb_glycemi
   { cle: "nb_glycemies", motif: "glyc" },
 ];
 
-interface MissionAGenerer {
+interface ActeAGenerer {
+  libelle: string;
+  ngap_code_id: string | null;
+}
+
+interface PassageAGenerer {
   patient_id: string;
-  type_soin: string;
   heure_prevue: string;
+  actes: ActeAGenerer[];
 }
 
 export async function genererTourneeDuJour(
@@ -57,13 +62,21 @@ export async function genererTourneeDuJour(
 ): Promise<void> {
   const { data: soins, error: soinsError } = await supabase
     .from("soins_prescrits")
-    .select("patient_id, type_soin, frequence_type, jours_semaine, intervalle_jours, heures, date_debut, date_fin")
+    .select(
+      "patient_id, type_soin, ngap_code_id, frequence_type, jours_semaine, intervalle_jours, heures, date_debut, date_fin"
+    )
     .eq("idel_id", idelId)
-    .eq("actif", true);
+    .eq("actif", true)
+    // Ordre explicite : sans lui Postgres n'en garantit aucun, et le libellé
+    // de synthèse d'un passage changerait d'une génération à l'autre pour les
+    // mêmes données.
+    .order("created_at");
 
   if (soinsError) return;
 
-  const missionsAGenerer: MissionAGenerer[] = [];
+  // Un passage = un patient à une heure. Deux soins prescrits à la même heure
+  // chez le même patient sont deux actes d'un seul passage, pas deux visites.
+  const passages = new Map<string, PassageAGenerer>();
   const patientsDistincts = new Set<string>();
 
   for (const soin of soins ?? []) {
@@ -78,18 +91,36 @@ export async function genererTourneeDuJour(
     if (!estSoinDuAujourdhui(recurrence, date)) continue;
 
     patientsDistincts.add(soin.patient_id);
+
     for (const heure of soin.heures) {
-      missionsAGenerer.push({ patient_id: soin.patient_id, type_soin: soin.type_soin, heure_prevue: heure });
+      const cle = `${soin.patient_id}|${heure}`;
+      const acte: ActeAGenerer = {
+        libelle: soin.type_soin,
+        ngap_code_id: soin.ngap_code_id,
+      };
+      const passage = passages.get(cle);
+
+      if (passage) passage.actes.push(acte);
+      else passages.set(cle, { patient_id: soin.patient_id, heure_prevue: heure, actes: [acte] });
     }
   }
 
-  missionsAGenerer.sort((a, b) => a.heure_prevue.localeCompare(b.heure_prevue));
+  const passagesTries = [...passages.values()].sort((a, b) =>
+    a.heure_prevue.localeCompare(b.heure_prevue)
+  );
 
+  // Les compteurs se calculent sur les actes et non sur le libellé de synthèse :
+  // deux injections dans un même passage doivent en compter deux.
   const compteurs = { nb_injections: 0, nb_pansements: 0, nb_glycemies: 0 };
-  for (const mission of missionsAGenerer) {
-    const typeSoinMinuscule = mission.type_soin.toLowerCase();
-    for (const { cle, motif } of MOTS_CLES_COMPTEUR) {
-      if (typeSoinMinuscule.includes(motif)) compteurs[cle] += 1;
+  let nbActes = 0;
+
+  for (const passage of passagesTries) {
+    for (const acte of passage.actes) {
+      nbActes += 1;
+      const libelleMinuscule = acte.libelle.toLowerCase();
+      for (const { cle, motif } of MOTS_CLES_COMPTEUR) {
+        if (libelleMinuscule.includes(motif)) compteurs[cle] += 1;
+      }
     }
   }
 
@@ -102,26 +133,55 @@ export async function genererTourneeDuJour(
       nb_injections: compteurs.nb_injections,
       nb_pansements: compteurs.nb_pansements,
       nb_glycemies: compteurs.nb_glycemies,
-      temps_estime_min: missionsAGenerer.length * DUREE_PAR_MISSION_MIN,
+      // Le regroupement supprime un déplacement, pas un temps de soin : la
+      // durée reste comptée par acte.
+      temps_estime_min: nbActes * DUREE_PAR_MISSION_MIN,
     })
     .select("id")
     .single();
 
   if (error || !tournee) return;
 
-  if (missionsAGenerer.length > 0) {
-    const { error: missionsError } = await supabase.from("missions_du_jour").insert(
-      missionsAGenerer.map((mission) => ({
+  if (passagesTries.length === 0) return;
+
+  const { data: missionsCreees, error: missionsError } = await supabase
+    .from("missions_du_jour")
+    .insert(
+      passagesTries.map((passage) => ({
         tournee_id: tournee.id,
-        patient_id: mission.patient_id,
-        type_soin: mission.type_soin,
-        heure_prevue: mission.heure_prevue,
+        patient_id: passage.patient_id,
+        type_soin: passage.actes.map((acte) => acte.libelle).join(" + "),
+        heure_prevue: passage.heure_prevue,
         statut: "a_faire",
       }))
-    );
+    )
+    .select("id, patient_id, heure_prevue");
 
-    if (missionsError) {
-      await supabase.from("tournees").delete().eq("id", tournee.id);
-    }
+  if (missionsError || !missionsCreees) {
+    await supabase.from("tournees").delete().eq("id", tournee.id);
+    return;
+  }
+
+  const idParPassage = new Map(
+    missionsCreees.map((mission) => [`${mission.patient_id}|${mission.heure_prevue}`, mission.id])
+  );
+
+  const actes = passagesTries.flatMap((passage) => {
+    const missionId = idParPassage.get(`${passage.patient_id}|${passage.heure_prevue}`);
+    if (!missionId) return [];
+    return passage.actes.map((acte, index) => ({
+      mission_id: missionId,
+      libelle: acte.libelle,
+      ngap_code_id: acte.ngap_code_id,
+      ordre: index,
+    }));
+  });
+
+  const { error: actesError } = await supabase.from("actes_mission").insert(actes);
+
+  if (actesError) {
+    // La suppression de la tournée emporte ses missions et leurs actes par
+    // cascade : une tournée sans actes vaut moins que pas de tournée du tout.
+    await supabase.from("tournees").delete().eq("id", tournee.id);
   }
 }

@@ -106,7 +106,8 @@ describe("estSoinDuAujourdhui", () => {
 
 describe("genererTourneeDuJour", () => {
   function buildFakeClient(soins: unknown[]) {
-    const soinsEqActifMock = vi.fn(() => Promise.resolve({ data: soins, error: null }));
+    const soinsOrderMock = vi.fn(() => Promise.resolve({ data: soins, error: null }));
+    const soinsEqActifMock = vi.fn(() => ({ order: soinsOrderMock }));
     const soinsEqIdelMock = vi.fn(() => ({ eq: soinsEqActifMock }));
     const soinsSelectMock = vi.fn(() => ({ eq: soinsEqIdelMock }));
 
@@ -115,7 +116,30 @@ describe("genererTourneeDuJour", () => {
         single: () => Promise.resolve({ data: { id: "t-nouvelle" }, error: null }),
       }),
     }));
-    const missionsInsertMock = vi.fn().mockResolvedValue({ error: null });
+
+    // Les missions insérées sont relues pour que leurs actes s'y rattachent :
+    // le faux client rend un identifiant par ligne reçue.
+    let lignesInserees: Array<Record<string, unknown>> = [];
+    const missionsSelectMock = vi.fn(
+      (): Promise<{
+        data: Array<{ id: string; patient_id: unknown; heure_prevue: unknown }> | null;
+        error: { message: string } | null;
+      }> =>
+        Promise.resolve({
+          data: lignesInserees.map((ligne, index) => ({
+            id: `m-${index + 1}`,
+            patient_id: ligne.patient_id,
+            heure_prevue: ligne.heure_prevue,
+          })),
+          error: null,
+        })
+    );
+    const missionsInsertMock = vi.fn((lignes: Array<Record<string, unknown>>) => {
+      lignesInserees = lignes;
+      return { select: missionsSelectMock };
+    });
+
+    const actesInsertMock = vi.fn().mockResolvedValue({ error: null });
     const tourneeDeleteEqMock = vi.fn().mockResolvedValue({ error: null });
     const tourneeDeleteMock = vi.fn(() => ({ eq: tourneeDeleteEqMock }));
 
@@ -123,6 +147,7 @@ describe("genererTourneeDuJour", () => {
       if (table === "soins_prescrits") return { select: soinsSelectMock };
       if (table === "tournees") return { insert: tourneeInsertMock, delete: tourneeDeleteMock };
       if (table === "missions_du_jour") return { insert: missionsInsertMock };
+      if (table === "actes_mission") return { insert: actesInsertMock };
       throw new Error(`table inattendue : ${table}`);
     });
 
@@ -132,8 +157,11 @@ describe("genererTourneeDuJour", () => {
       fakeClient,
       soinsEqIdelMock,
       soinsEqActifMock,
+      soinsOrderMock,
       tourneeInsertMock,
       missionsInsertMock,
+      missionsSelectMock,
+      actesInsertMock,
       tourneeDeleteEqMock,
     };
   }
@@ -153,6 +181,7 @@ describe("genererTourneeDuJour", () => {
       {
         patient_id: "p1",
         type_soin: "Pansement",
+        ngap_code_id: null,
         frequence_type: "quotidien",
         jours_semaine: null,
         intervalle_jours: null,
@@ -163,6 +192,7 @@ describe("genererTourneeDuJour", () => {
       {
         patient_id: "p2",
         type_soin: "Glycémie",
+        ngap_code_id: "c-glyc",
         frequence_type: "quotidien",
         jours_semaine: null,
         intervalle_jours: null,
@@ -173,6 +203,7 @@ describe("genererTourneeDuJour", () => {
       {
         patient_id: "p3",
         type_soin: "Prise de sang",
+        ngap_code_id: null,
         frequence_type: "ponctuel",
         jours_semaine: null,
         intervalle_jours: null,
@@ -220,11 +251,159 @@ describe("genererTourneeDuJour", () => {
     ]);
   });
 
+  it("regroupe en un seul passage deux soins du même patient à la même heure", async () => {
+    const soins = [
+      {
+        patient_id: "p1",
+        type_soin: "Toilette",
+        ngap_code_id: "c-ais3",
+        frequence_type: "quotidien",
+        jours_semaine: null,
+        intervalle_jours: null,
+        heures: ["08:00:00"],
+        date_debut: "2026-07-01",
+        date_fin: null,
+      },
+      {
+        patient_id: "p1",
+        type_soin: "Insuline",
+        ngap_code_id: "c-ami1",
+        frequence_type: "quotidien",
+        jours_semaine: null,
+        intervalle_jours: null,
+        heures: ["08:00:00"],
+        date_debut: "2026-07-01",
+        date_fin: null,
+      },
+    ];
+    const { fakeClient, missionsInsertMock, actesInsertMock } = buildFakeClient(soins);
+
+    const { genererTourneeDuJour } = await import("./generation-tournee");
+    await genererTourneeDuJour(fakeClient, "u1", "2026-07-15");
+
+    expect(missionsInsertMock).toHaveBeenCalledWith([
+      {
+        tournee_id: "t-nouvelle",
+        patient_id: "p1",
+        type_soin: "Toilette + Insuline",
+        heure_prevue: "08:00:00",
+        statut: "a_faire",
+      },
+    ]);
+    expect(actesInsertMock).toHaveBeenCalledWith([
+      { mission_id: "m-1", libelle: "Toilette", ngap_code_id: "c-ais3", ordre: 0 },
+      { mission_id: "m-1", libelle: "Insuline", ngap_code_id: "c-ami1", ordre: 1 },
+    ]);
+  });
+
+  it("garde deux passages distincts pour deux heures différentes", async () => {
+    const soins = [
+      {
+        patient_id: "p1",
+        type_soin: "Toilette",
+        ngap_code_id: null,
+        frequence_type: "quotidien",
+        jours_semaine: null,
+        intervalle_jours: null,
+        heures: ["08:00:00"],
+        date_debut: "2026-07-01",
+        date_fin: null,
+      },
+      {
+        patient_id: "p1",
+        type_soin: "Insuline",
+        ngap_code_id: null,
+        frequence_type: "quotidien",
+        jours_semaine: null,
+        intervalle_jours: null,
+        heures: ["19:00:00"],
+        date_debut: "2026-07-01",
+        date_fin: null,
+      },
+    ];
+    const { fakeClient, missionsInsertMock } = buildFakeClient(soins);
+
+    const { genererTourneeDuJour } = await import("./generation-tournee");
+    await genererTourneeDuJour(fakeClient, "u1", "2026-07-15");
+
+    expect(missionsInsertMock.mock.calls[0][0]).toHaveLength(2);
+  });
+
+  it("compte deux injections d'un même passage comme deux injections", async () => {
+    const soins = [
+      {
+        patient_id: "p1",
+        type_soin: "Injection Lovenox",
+        ngap_code_id: null,
+        frequence_type: "quotidien",
+        jours_semaine: null,
+        intervalle_jours: null,
+        heures: ["08:00:00"],
+        date_debut: "2026-07-01",
+        date_fin: null,
+      },
+      {
+        patient_id: "p1",
+        type_soin: "Injection insuline",
+        ngap_code_id: null,
+        frequence_type: "quotidien",
+        jours_semaine: null,
+        intervalle_jours: null,
+        heures: ["08:00:00"],
+        date_debut: "2026-07-01",
+        date_fin: null,
+      },
+    ];
+    const { fakeClient, tourneeInsertMock } = buildFakeClient(soins);
+
+    const { genererTourneeDuJour } = await import("./generation-tournee");
+    await genererTourneeDuJour(fakeClient, "u1", "2026-07-15");
+
+    // Le libellé de synthèse ne contient qu'une fois le mot « injection » par
+    // acte : compter sur lui en aurait perdu une.
+    expect(tourneeInsertMock).toHaveBeenCalledWith(
+      expect.objectContaining({ nb_injections: 2, temps_estime_min: 40 })
+    );
+  });
+
+  it("lit les soins dans l'ordre de leur création", async () => {
+    const { fakeClient, soinsOrderMock } = buildFakeClient([]);
+
+    const { genererTourneeDuJour } = await import("./generation-tournee");
+    await genererTourneeDuJour(fakeClient, "u1", "2026-07-15");
+
+    expect(soinsOrderMock).toHaveBeenCalledWith("created_at");
+  });
+
+  it("supprime la tournée si l'insertion des actes échoue", async () => {
+    const soins = [
+      {
+        patient_id: "p1",
+        type_soin: "Pansement",
+        ngap_code_id: null,
+        frequence_type: "quotidien",
+        jours_semaine: null,
+        intervalle_jours: null,
+        heures: ["10:00:00"],
+        date_debut: "2026-07-01",
+        date_fin: null,
+      },
+    ];
+    const { fakeClient, actesInsertMock, tourneeDeleteEqMock } = buildFakeClient(soins);
+    actesInsertMock.mockResolvedValueOnce({ error: { message: "boom" } });
+
+    const { genererTourneeDuJour } = await import("./generation-tournee");
+    await genererTourneeDuJour(fakeClient, "u1", "2026-07-15");
+
+    expect(tourneeDeleteEqMock).toHaveBeenCalledWith("id", "t-nouvelle");
+  });
+
   it("compte 'Injection Lovenox' comme une injection", async () => {
     const soins = [
       {
         patient_id: "p4",
         type_soin: "Injection Lovenox",
+        ngap_code_id: null,
         frequence_type: "quotidien",
         jours_semaine: null,
         intervalle_jours: null,
@@ -248,6 +427,7 @@ describe("genererTourneeDuJour", () => {
       {
         patient_id: "p5",
         type_soin: "Toilette",
+        ngap_code_id: null,
         frequence_type: "quotidien",
         jours_semaine: null,
         intervalle_jours: null,
@@ -271,6 +451,7 @@ describe("genererTourneeDuJour", () => {
       {
         patient_id: "p1",
         type_soin: "Prise de sang",
+        ngap_code_id: null,
         frequence_type: "ponctuel",
         jours_semaine: null,
         intervalle_jours: null,
@@ -297,7 +478,8 @@ describe("genererTourneeDuJour", () => {
   });
 
   it("n'insère aucune tournée si la lecture des soins échoue", async () => {
-    const soinsEqActifMock = vi.fn(() => Promise.resolve({ data: null, error: { message: "boom" } }));
+    const soinsOrderMock = vi.fn(() => Promise.resolve({ data: null, error: { message: "boom" } }));
+    const soinsEqActifMock = vi.fn(() => ({ order: soinsOrderMock }));
     const soinsEqIdelMock = vi.fn(() => ({ eq: soinsEqActifMock }));
     const soinsSelectMock = vi.fn(() => ({ eq: soinsEqIdelMock }));
     const tourneeInsertMock = vi.fn();
@@ -319,6 +501,7 @@ describe("genererTourneeDuJour", () => {
       {
         patient_id: "p1",
         type_soin: "Pansement",
+        ngap_code_id: null,
         frequence_type: "quotidien",
         jours_semaine: null,
         intervalle_jours: null,
@@ -327,8 +510,8 @@ describe("genererTourneeDuJour", () => {
         date_fin: null,
       },
     ];
-    const { fakeClient, missionsInsertMock, tourneeDeleteEqMock } = buildFakeClient(soins);
-    missionsInsertMock.mockResolvedValueOnce({ error: { message: "boom" } });
+    const { fakeClient, missionsSelectMock, tourneeDeleteEqMock } = buildFakeClient(soins);
+    missionsSelectMock.mockResolvedValueOnce({ data: null, error: { message: "boom" } });
 
     const { genererTourneeDuJour } = await import("./generation-tournee");
     await genererTourneeDuJour(fakeClient, "u1", "2026-07-15");
