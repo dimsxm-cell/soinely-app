@@ -467,6 +467,98 @@ describe("getPhotoUrl", () => {
   });
 });
 
+describe("getMissionsTourneeVue", () => {
+  function fakeClientAvecMissions(rows: unknown[]) {
+    return {
+      from: () => ({
+        select: () => ({
+          eq: () => ({
+            order: () => Promise.resolve({ data: rows, error: null }),
+          }),
+        }),
+      }),
+    } as unknown as SupabaseClient;
+  }
+
+  const patient = {
+    nom_complet: "Mme Dupont",
+    adresse: "12 rue des Lilas",
+    telephone: "06 12 34 56 78",
+    allergies: null,
+    consignes: null,
+    date_naissance: "1944-03-12",
+  };
+
+  it("remonte les actes triés par ordre, avec leur code NGAP", async () => {
+    const fakeClient = fakeClientAvecMissions([
+      {
+        id: "m1",
+        patient_id: "p1",
+        type_soin: "Toilette + Insuline",
+        heure_prevue: "08:00:00",
+        statut: "a_faire",
+        mission_clinique_id: null,
+        patients: patient,
+        missions_cliniques: null,
+        actes_mission: [
+          { libelle: "Insuline", ordre: 1, ngap_codes: { code: "AMI 1" } },
+          { libelle: "Toilette", ordre: 0, ngap_codes: { code: "AIS 3" } },
+        ],
+      },
+    ]);
+
+    const { getMissionsTourneeVue } = await import("./ma-journee");
+    const missions = await getMissionsTourneeVue(fakeClient, "t1");
+
+    expect(missions[0].actes).toEqual([
+      { libelle: "Toilette", code: "AIS 3" },
+      { libelle: "Insuline", code: "AMI 1" },
+    ]);
+  });
+
+  it("rend un code nul pour un acte sans cotation", async () => {
+    const fakeClient = fakeClientAvecMissions([
+      {
+        id: "m1",
+        patient_id: "p1",
+        type_soin: "Pansement",
+        heure_prevue: "10:00:00",
+        statut: "a_faire",
+        mission_clinique_id: null,
+        patients: patient,
+        missions_cliniques: null,
+        actes_mission: [{ libelle: "Pansement", ordre: 0, ngap_codes: null }],
+      },
+    ]);
+
+    const { getMissionsTourneeVue } = await import("./ma-journee");
+    const missions = await getMissionsTourneeVue(fakeClient, "t1");
+
+    expect(missions[0].actes).toEqual([{ libelle: "Pansement", code: null }]);
+  });
+
+  it("rend une liste d'actes vide quand la mission n'en porte aucun", async () => {
+    const fakeClient = fakeClientAvecMissions([
+      {
+        id: "m1",
+        patient_id: "p1",
+        type_soin: "Pansement",
+        heure_prevue: "10:00:00",
+        statut: "a_faire",
+        mission_clinique_id: null,
+        patients: patient,
+        missions_cliniques: null,
+        actes_mission: null,
+      },
+    ]);
+
+    const { getMissionsTourneeVue } = await import("./ma-journee");
+    const missions = await getMissionsTourneeVue(fakeClient, "t1");
+
+    expect(missions[0].actes).toEqual([]);
+  });
+});
+
 describe("getMissionEnCoursHref", () => {
   it("retourne un lien direct vers la situation terrain si un protocole est lié", async () => {
     const fakeClient = {

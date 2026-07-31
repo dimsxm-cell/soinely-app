@@ -22,6 +22,7 @@ function creerMission(surcharge: Partial<MissionTourneeVue> = {}): MissionTourne
     statut: "a_faire",
     missionCliniqueId: null,
     dureeEstimeeMin: 25,
+    actes: [],
     ...surcharge,
   };
 }

@@ -296,6 +296,11 @@ export async function getMissionEnCoursHref(
 
 // ── Vue enrichie pour la page Ma tournée ────────────────────────────────────
 
+export interface ActeVue {
+  libelle: string;
+  code: string | null;
+}
+
 export interface MissionTourneeVue {
   id: string;
   patientId: string;
@@ -310,6 +315,7 @@ export interface MissionTourneeVue {
   statut: StatutMission;
   missionCliniqueId: string | null;
   dureeEstimeeMin: number;
+  actes: ActeVue[];
 }
 
 export async function getMissionsTourneeVue(
@@ -319,7 +325,7 @@ export async function getMissionsTourneeVue(
   const { data, error } = await supabase
     .from("missions_du_jour")
     .select(
-      "id, patient_id, type_soin, heure_prevue, statut, mission_clinique_id, patients(nom_complet, adresse, telephone, allergies, consignes, date_naissance), missions_cliniques(duree_estimee_min)"
+      "id, patient_id, type_soin, heure_prevue, statut, mission_clinique_id, patients(nom_complet, adresse, telephone, allergies, consignes, date_naissance), missions_cliniques(duree_estimee_min), actes_mission(libelle, ordre, ngap_codes(code))"
     )
     .eq("tournee_id", tourneeId)
     .order("heure_prevue");
@@ -336,6 +342,11 @@ export async function getMissionsTourneeVue(
       date_naissance: string | null;
     };
     type MCRow = { duree_estimee_min: number };
+    type ActeRow = {
+      libelle: string;
+      ordre: number;
+      ngap_codes: { code: string } | { code: string }[] | null;
+    };
 
     const patientEmbed = row.patients as unknown;
     const patient = (
@@ -344,6 +355,15 @@ export async function getMissionsTourneeVue(
 
     const mcEmbed = row.missions_cliniques as unknown;
     const mc = (Array.isArray(mcEmbed) ? mcEmbed[0] : mcEmbed) as MCRow | null;
+
+    const actesEmbed = (row.actes_mission ?? []) as ActeRow[];
+    const actes: ActeVue[] = [...actesEmbed]
+      .sort((a, b) => a.ordre - b.ordre)
+      .map((acte) => {
+        const codeEmbed = acte.ngap_codes;
+        const ngap = Array.isArray(codeEmbed) ? codeEmbed[0] : codeEmbed;
+        return { libelle: acte.libelle, code: ngap?.code ?? null };
+      });
 
     return {
       id: row.id,
@@ -359,6 +379,7 @@ export async function getMissionsTourneeVue(
       statut: row.statut as StatutMission,
       missionCliniqueId: row.mission_clinique_id,
       dureeEstimeeMin: mc?.duree_estimee_min ?? 0,
+      actes,
     };
   });
 }
