@@ -53,7 +53,10 @@ l'en-tête attend d'être fiable pour apparaître.
 - **Les valeurs de cotation vivent en base, jamais dans le code.** Une
   revalorisation NGAP ne doit pas exiger un redéploiement.
 - **Le catalogue est alimenté par la liste de la fondatrice**, pas par une
-  liste devinée. Voir « Donnée d'entrée manquante ».
+  liste devinée : dix codes, fournis le 2026-07-30 (voir « Catalogue »).
+- **La lettre-clé et le coefficient sont stockés séparément** du code affiché,
+  pendant qu'on écrit ces lignes, parce que la règle de cumul d'A2 en aura
+  besoin pour classer les actes d'une même séance.
 
 ## Architecture
 
@@ -91,6 +94,15 @@ create policy "actes_mission_owner_all" on public.actes_mission
 
 alter table public.soins_prescrits
   add column ngap_code_id uuid references public.ngap_codes(id);
+
+-- La règle de cumul d'A2 classe les actes d'une même séance. Les colonnes sont
+-- ajoutées ici, pendant qu'on écrit les lignes du catalogue : les remplir plus
+-- tard imposerait une seconde migration de données, et redécouper la chaîne
+-- « AMI 4 » à l'exécution échouerait sur BSA, BSB, TLS et TLD, qui n'ont pas de
+-- coefficient.
+alter table public.ngap_codes
+  add column lettre_cle text,
+  add column coefficient numeric(5,2);
 
 -- Reprise de l'historique : un acte par mission existante, sans fusion.
 insert into public.actes_mission (mission_id, libelle, ordre)
@@ -167,18 +179,51 @@ Le reste de la carte est inchangé.
 - `lib/data/patients.ts` — la lecture des soins prescrits remonte le code, pour
   que la liste des soins de la fiche patient l'affiche à côté du libellé.
 
-## Donnée d'entrée manquante
+### 6. Catalogue `supabase/migrations/20260730000100_ngap_codes_catalogue.sql`
 
-Le catalogue `ngap_codes` doit être étoffé par une migration de seed reprenant
-la liste que la fondatrice fournira, au format `code | libellé | valeur en € |
-conditions`, accompagnée de la date à laquelle ces valeurs ont été relevées —
-cette date est stockée en commentaire de la migration pour qu'une revalorisation
-future sache ce qui doit être revu.
+Liste fournie par la fondatrice le 2026-07-30, source albus.fr. Cette date est
+portée en commentaire de la migration : une revalorisation future doit savoir à
+quand remontent ces valeurs.
 
-Cette liste conditionne **la seule tâche de seed**. Table, génération, lecture,
-affichage et sélecteur se construisent et se testent sans elle : les actes
-pointent alors sur un code nul et s'affichent dans leur forme de repli. Le plan
-d'implémentation isole donc cette tâche pour qu'elle soit la seule bloquée.
+| Code | Libellé | € | Lettre-clé | Coefficient |
+|---|---|---|---|---|
+| AMI 1 | Injection sous-cutanée ou intramusculaire | 3,15 | AMI | 1 |
+| AMI 2 | Pansement simple | 6,30 | AMI | 2 |
+| AMI 4 | Pansement lourd et complexe | 12,60 | AMI | 4 |
+| AMI 9 | Pose de perfusion courte (≤ 1h) | 28,35 | AMI | 9 |
+| AMI 14 | Pose de perfusion longue (> 1h) | 44,10 | AMI | 14 |
+| AIS 3 | Actes infirmiers de soins (ex. toilette, habillage) | 7,95 | AIS | 3 |
+| BSA | Forfait journalier prise en charge légère | 13,00 | BSA | — |
+| BSB | Forfait journalier prise en charge intermédiaire | 18,20 | BSB | — |
+| TLS | Accompagnement téléconsultation (soin prévu) | 10,00 | TLS | — |
+| TLD | Accompagnement téléconsultation (à domicile) | 15,00 | TLD | — |
+
+Les conditions de chaque code sont reprises telles que fournies dans la colonne
+`conditions` existante.
+
+**Cette migration corrige une valeur fausse déjà en base.** Le seed initial
+(`supabase/seed.sql`) donne `AMI 4` à **6,30 €**, qui est la valeur d'`AMI 2` ;
+la valeur juste est **12,60 €**, ce que confirme le rapport constant de la
+lettre-clé (4 × 3,15). L'insertion se fait donc en `on conflict (code) do
+update`, de sorte que les deux lignes déjà présentes soient corrigées plutôt
+que rejetées. `supabase/seed.sql` est mis à jour en conséquence, pour qu'une
+base recréée de zéro ne réintroduise pas l'erreur.
+
+### 7. Ce que ce lot consigne pour A2
+
+La fondatrice a fourni la règle de cumul : *lors d'une même séance, l'acte au
+coefficient le plus élevé est facturé à 100 %, le deuxième à 50 %, et les
+suivants ne sont pas cumulables, sauf dérogations spécifiques de la NGAP.*
+
+Elle n'est **pas** implémentée ici — A1 n'affiche aucun montant. Deux questions
+restent ouvertes et devront lui être posées avant d'écrire A2, plutôt que
+tranchées par déduction :
+
+- « le coefficient le plus élevé » compare des lettres-clés différentes : entre
+  un `AMI 2` (coefficient 2, 6,30 €) et un `AIS 3` (coefficient 3, 7,95 €),
+  classe-t-on par coefficient ou par montant ?
+- les forfaits `BSA` et `BSB` peuvent-ils coexister avec un `AIS 3` chez un même
+  patient, ou s'excluent-ils ?
 
 ## Tests
 
