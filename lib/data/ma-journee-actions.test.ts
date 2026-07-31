@@ -411,3 +411,68 @@ describe("uploadPhotoAction", () => {
     expect(revalidatePath).not.toHaveBeenCalled();
   });
 });
+
+describe("updateMotifAbsenceAction", () => {
+  it("enregistre le motif sur une mission absente", async () => {
+    eqSelectMock.mockResolvedValue({ data: { statut: "absent" }, error: null });
+    eqUpdateMock.mockResolvedValue({ error: null });
+
+    const { updateMotifAbsenceAction } = await import("./ma-journee-actions");
+    const { revalidatePath } = await import("next/cache");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("motif", "Hospitalisée depuis hier");
+
+    await updateMotifAbsenceAction(formData);
+
+    expect(updateMock).toHaveBeenCalledWith({ motif_absence: "Hospitalisée depuis hier" });
+    expect(eqUpdateMock).toHaveBeenCalledWith("id", "m1");
+    expect(revalidatePath).toHaveBeenCalledWith("/ma-tournee");
+  });
+
+  it("efface le motif quand le champ est vidé", async () => {
+    eqSelectMock.mockResolvedValue({ data: { statut: "absent" }, error: null });
+    eqUpdateMock.mockResolvedValue({ error: null });
+
+    const { updateMotifAbsenceAction } = await import("./ma-journee-actions");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("motif", "");
+
+    await updateMotifAbsenceAction(formData);
+
+    expect(updateMock).toHaveBeenCalledWith({ motif_absence: null });
+  });
+
+  it("n'écrit rien sur une mission qui n'est pas absente", async () => {
+    eqSelectMock.mockResolvedValue({ data: { statut: "terminee" }, error: null });
+
+    const { updateMotifAbsenceAction } = await import("./ma-journee-actions");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("motif", "Hospitalisée");
+
+    await updateMotifAbsenceAction(formData);
+
+    // Un motif ailleurs que sur une absence serait une explication orpheline,
+    // qu'aucun écran n'afficherait.
+    expect(updateMock).not.toHaveBeenCalled();
+  });
+
+  it("n'écrit rien quand la mission est introuvable", async () => {
+    eqSelectMock.mockResolvedValue({ data: null, error: null });
+
+    const { updateMotifAbsenceAction } = await import("./ma-journee-actions");
+
+    const formData = new FormData();
+    formData.set("missionId", "inconnue");
+    formData.set("motif", "Hospitalisée");
+
+    await updateMotifAbsenceAction(formData);
+
+    expect(updateMock).not.toHaveBeenCalled();
+  });
+});

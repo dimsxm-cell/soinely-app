@@ -56,6 +56,34 @@ export async function updateMissionStatutAction(formData: FormData): Promise<voi
   revalidatePath(`/ma-journee/${missionId}`);
 }
 
+export async function updateMotifAbsenceAction(formData: FormData): Promise<void> {
+  const missionId = String(formData.get("missionId"));
+  const motif = String(formData.get("motif") ?? "") || null;
+
+  const supabase = await createClient();
+
+  const { data: mission } = await supabase
+    .from("missions_du_jour")
+    .select("statut")
+    .eq("id", missionId)
+    .maybeSingle();
+
+  // Un motif n'a de sens que sur une absence : ailleurs, il resterait une
+  // explication orpheline qu'aucun écran n'afficherait.
+  if (!mission || mission.statut !== "absent") return;
+
+  const { error } = await supabase
+    .from("missions_du_jour")
+    .update({ motif_absence: motif })
+    .eq("id", missionId);
+
+  if (error) journaliserEchec("updateMotifAbsenceAction", error);
+
+  revalidatePath("/ma-journee");
+  revalidatePath("/ma-tournee");
+  revalidatePath(`/ma-journee/${missionId}`);
+}
+
 export async function updateConsignesAction(formData: FormData): Promise<void> {
   const missionId = String(formData.get("missionId"));
   const consignes = String(formData.get("consignes"));
