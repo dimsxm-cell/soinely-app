@@ -164,3 +164,23 @@ export async function arreterSoinPrescritAction(formData: FormData): Promise<voi
 
   revalidatePath(`/patients/${patientId}`);
 }
+
+export async function coterSoinPrescritAction(formData: FormData): Promise<void> {
+  const soinId = champTexteOuNull(formData, "soinId");
+  const patientId = champTexteOuNull(formData, "patientId");
+
+  if (!soinId || !patientId) return;
+
+  // Cotation facultative : l'option vide décote le soin. Une chaîne vide
+  // violerait la clé étrangère vers ngap_codes.
+  const ngapCodeId = champTexteOuNull(formData, "ngapCodeId");
+
+  const supabase = await createClient();
+
+  // La propriété du soin est garantie par la politique RLS
+  // soins_prescrits_owner_all : la redoubler ici laisserait croire que la
+  // sécurité se joue dans ce fichier.
+  await supabase.from("soins_prescrits").update({ ngap_code_id: ngapCodeId }).eq("id", soinId);
+
+  revalidatePath(`/patients/${patientId}`);
+}

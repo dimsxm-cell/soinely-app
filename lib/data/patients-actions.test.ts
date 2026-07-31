@@ -428,3 +428,64 @@ describe("arreterSoinPrescritAction", () => {
     expect(revalidatePath).toHaveBeenCalledWith("/patients/p1");
   });
 });
+
+describe("coterSoinPrescritAction", () => {
+  it("enregistre le code choisi sur le bon soin et invalide le cache", async () => {
+    eqUpdateMock.mockResolvedValue({ error: null });
+
+    const { coterSoinPrescritAction } = await import("./patients-actions");
+    const { revalidatePath } = await import("next/cache");
+
+    const formData = new FormData();
+    formData.set("soinId", "s1");
+    formData.set("patientId", "p1");
+    formData.set("ngapCodeId", "c-ais3");
+
+    await coterSoinPrescritAction(formData);
+
+    expect(fromMock).toHaveBeenCalledWith("soins_prescrits");
+    expect(updateMock).toHaveBeenCalledWith({ ngap_code_id: "c-ais3" });
+    expect(eqUpdateMock).toHaveBeenCalledWith("id", "s1");
+    expect(revalidatePath).toHaveBeenCalledWith("/patients/p1");
+  });
+
+  it("décote le soin quand aucune cotation n'est choisie", async () => {
+    eqUpdateMock.mockResolvedValue({ error: null });
+
+    const { coterSoinPrescritAction } = await import("./patients-actions");
+
+    const formData = new FormData();
+    formData.set("soinId", "s1");
+    formData.set("patientId", "p1");
+    formData.set("ngapCodeId", "");
+
+    await coterSoinPrescritAction(formData);
+
+    // null et non "" : une chaîne vide violerait la clé étrangère vers ngap_codes.
+    expect(updateMock).toHaveBeenCalledWith({ ngap_code_id: null });
+  });
+
+  it("n'écrit rien sans identifiant de soin", async () => {
+    const { coterSoinPrescritAction } = await import("./patients-actions");
+
+    const formData = new FormData();
+    formData.set("patientId", "p1");
+    formData.set("ngapCodeId", "c-ais3");
+
+    await coterSoinPrescritAction(formData);
+
+    expect(updateMock).not.toHaveBeenCalled();
+  });
+
+  it("n'écrit rien sans identifiant de patient", async () => {
+    const { coterSoinPrescritAction } = await import("./patients-actions");
+
+    const formData = new FormData();
+    formData.set("soinId", "s1");
+    formData.set("ngapCodeId", "c-ais3");
+
+    await coterSoinPrescritAction(formData);
+
+    expect(updateMock).not.toHaveBeenCalled();
+  });
+});
