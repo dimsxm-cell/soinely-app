@@ -6,6 +6,7 @@ import type {
   SituationTerrain,
   SituationTerrainDetail,
 } from "@/lib/types/clinical";
+import { journaliserEchec } from "@/lib/journal";
 
 type SituationTerrainRow = Database["public"]["Tables"]["situations_terrain"]["Row"];
 type MissionCliniqueRow = Database["public"]["Tables"]["missions_cliniques"]["Row"];
@@ -49,6 +50,7 @@ export async function searchSituationsTerrain(
     search_query: trimmed,
   });
 
+  if (error) journaliserEchec("searchSituationsTerrain", error);
   if (error || !data) return [];
 
   return data.map(mapSituationTerrain);
@@ -65,6 +67,7 @@ export async function getSituationTerrainDetail(
     .eq("published", true)
     .maybeSingle();
 
+  if (situationError) journaliserEchec("getSituationTerrainDetail", situationError);
   if (situationError || !situation) return null;
 
   const { data: missions, error: missionsError } = await supabase
@@ -72,6 +75,8 @@ export async function getSituationTerrainDetail(
     .select("*")
     .eq("situation_terrain_id", id)
     .eq("published", true);
+
+  if (missionsError) journaliserEchec("getSituationTerrainDetail", missionsError);
 
   return {
     ...mapSituationTerrain(situation),
@@ -88,6 +93,7 @@ export async function getAllSituationsTerrain(
     .eq("published", true)
     .order("titre");
 
+  if (error) journaliserEchec("getAllSituationsTerrain", error);
   if (error || !data) return [];
 
   return data.map(mapSituationTerrain);

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { FrequenceSoin } from "@/lib/types/clinical";
+import { journaliserEchec } from "@/lib/journal";
 
 function champTexteOuNull(formData: FormData, nom: string): string | null {
   const valeur = String(formData.get(nom) ?? "");
@@ -53,6 +54,7 @@ export async function createPatientAction(
     .select("id")
     .single();
 
+  if (error) journaliserEchec("createPatientAction", error);
   if (error || !patient) {
     return { success: false, error: error?.message ?? "La création du patient a échoué." };
   }
@@ -149,6 +151,7 @@ export async function createSoinPrescritAction(formData: FormData): Promise<void
     .select("id")
     .single();
 
+  if (error) journaliserEchec("createSoinPrescritAction", error);
   if (error) return;
 
   revalidatePath(`/patients/${patientId}`);

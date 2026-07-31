@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/types/database.types";
 import type { Abonnement, PlanAbonnement, StatutAbonnement } from "@/lib/types/abonnement";
+import { journaliserEchec } from "@/lib/journal";
 
 export const DUREE_ESSAI_GRATUIT_JOURS = 15;
 
@@ -23,6 +24,7 @@ export async function getAbonnement(
     .eq("profile_id", profileId)
     .maybeSingle();
 
+  if (error) journaliserEchec("getAbonnement", error);
   if (error || !data) return null;
 
   return {

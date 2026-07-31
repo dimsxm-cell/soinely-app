@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/types/database.types";
 import type { StatutMission } from "@/lib/types/clinical";
+import { journaliserEchec } from "@/lib/journal";
 
 /** Une visite passée ou prévue pour un patient, avec ce qui y a été consigné. */
 export interface VisitePatient {
@@ -47,6 +48,7 @@ export async function getVisitesPatient(
     .select("id, type_soin, heure_prevue, statut, transmission, rappel, photo_path, tournees(date)")
     .eq("patient_id", patientId);
 
+  if (error) journaliserEchec("getVisitesPatient", error);
   if (error || !data) return [];
 
   return (data as LigneVisite[])

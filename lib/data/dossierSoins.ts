@@ -6,6 +6,7 @@ import type {
   NiveauConfiance,
   SectionDossierSoin,
 } from "@/lib/types/clinical";
+import { journaliserEchec } from "@/lib/journal";
 
 type FicheDossierSoinRow = Database["public"]["Tables"]["fiches_dossier_soins"]["Row"];
 
@@ -47,6 +48,7 @@ export async function getAllFichesDossierSoins(
     .order("section")
     .order("ordre");
 
+  if (error) journaliserEchec("getAllFichesDossierSoins", error);
   if (error || !data) return [];
 
   return data.map(mapFicheDossierSoin);
@@ -63,6 +65,7 @@ export async function getFicheDossierDetail(
     .eq("published", true)
     .maybeSingle();
 
+  if (error) journaliserEchec("getFicheDossierDetail", error);
   if (error || !data) return null;
 
   return mapFicheDossierSoin(data);

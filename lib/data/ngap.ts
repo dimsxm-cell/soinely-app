@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/types/database.types";
+import { journaliserEchec } from "@/lib/journal";
 
 export interface CodeNgap {
   id: string;
@@ -18,6 +19,7 @@ export async function getCodesNgap(supabase: SupabaseClient<Database>): Promise<
     .order("lettre_cle")
     .order("coefficient");
 
+  if (error) journaliserEchec("getCodesNgap", error);
   if (error || !data) return [];
 
   return data.map((row) => ({ id: row.id, code: row.code, libelle: row.libelle }));
