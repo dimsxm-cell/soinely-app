@@ -131,5 +131,12 @@ erreurs vers un service de supervision externe, `not-found.tsx`, et
 
 - `npm test` — toute la suite passe, les nouveaux tests inclus
 - `npm run lint`, `npx tsc --noEmit`, `npm run build` — propres
-- Relecture par la fondatrice : couper le réseau, ouvrir Ma tournée, constater
-  l'écran d'erreur et non une tournée vide
+- Relecture par la fondatrice : **renommer temporairement une table** lue par la
+  page (ou en révoquer le droit de lecture), ouvrir Ma tournée, constater
+  l'écran d'erreur et non une tournée vide.
+
+  Couper le réseau de l'appareil ne prouverait rien : ces lectures s'exécutent
+  du serveur Next vers Supabase, donc la coupure tuerait la requête du document
+  elle-même et le navigateur afficherait sa page hors ligne sans jamais
+  atteindre la frontière d'erreur. Seule une lecture qui échoue **côté serveur**
+  reproduit l'incident du 31 juillet.

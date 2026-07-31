@@ -669,8 +669,12 @@ git commit -F <fichier de message>
 - [ ] `npm test` — suite complète au vert
 - [ ] `npm run lint`, `npx tsc --noEmit`, `npm run build` — propres
 - [ ] `git diff main --stat` — seuls les fichiers de la table File Structure apparaissent
-- [ ] `grep -rn "if (error" lib/data | wc -l` comparé au nombre d'appels à `echouer` ou `journaliserEchec` : plus aucune erreur ne doit être avalée sans trace
-- [ ] Relecture par la fondatrice : couper le réseau, ouvrir Ma tournée, constater l'écran d'erreur et non une tournée vide
+- [ ] Audit des erreurs sans trace. **Ne pas se contenter de `grep "if (error"`** : ce motif ne voit ni les appels qui jettent l'erreur dès la déstructuration (`const { data } = await supabase…`), ni les écritures dont le résultat est ignoré (`await supabase.from(...).update(...)`). Trois lectures et neuf écritures échappaient à ce comptage. Chercher plutôt les appels Supabase dont le résultat n'est jamais inspecté :
+  ```bash
+  grep -rn "await supabase" lib app --include=*.ts --include=*.tsx | grep -v "const {"
+  ```
+  puis, pour chaque `const { … error … }`, vérifier qu'un `echouer` ou un `journaliserEchec` suit.
+- [ ] Relecture par la fondatrice : **renommer temporairement une table** lue par la page (ou en révoquer le droit de lecture), ouvrir Ma tournée, constater l'écran d'erreur. Couper le réseau de l'appareil ne prouverait rien — ces lectures s'exécutent du serveur Next vers Supabase, et la coupure tuerait la requête du document avant que la frontière d'erreur ne soit atteinte.
 
 ## Note d'exécution
 
