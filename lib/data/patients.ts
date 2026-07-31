@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/types/database.types";
 import type { FrequenceSoin, PatientComplet, Sexe, SoinPrescrit } from "@/lib/types/clinical";
+import { echouer } from "@/lib/journal";
 
 const CHAMPS_PATIENT =
   "id, nom_complet, adresse, telephone, allergies, consignes, date_naissance, numero_secu, sexe, medecin_nom, medecin_telephone, personne_confiance_nom, personne_confiance_telephone, note_soin, antecedents, traitements_en_cours";
@@ -55,7 +56,8 @@ export async function getPatients(
     .eq("idel_id", idelId)
     .order("nom_complet");
 
-  if (error || !data) return [];
+  if (error) echouer("getPatients", error);
+  if (!data) return [];
 
   return (data as PatientRow[]).map(mapPatientRow);
 }
@@ -70,7 +72,10 @@ export async function getPatient(
     .eq("id", patientId)
     .maybeSingle();
 
-  if (error || !data) return null;
+  // Un patient introuvable n'est pas une panne : la page
+  // appelle notFound() sur ce null.
+  if (error) echouer("getPatient", error);
+  if (!data) return null;
 
   return mapPatientRow(data as PatientRow);
 }
@@ -87,7 +92,8 @@ export async function getSoinsPrescrits(
     .eq("patient_id", patientId)
     .order("created_at", { ascending: false });
 
-  if (error || !data) return [];
+  if (error) echouer("getSoinsPrescrits", error);
+  if (!data) return [];
 
   return data.map((row) => {
     const ngapEmbed = row.ngap_codes as { code: string } | { code: string }[] | null;

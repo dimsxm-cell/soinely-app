@@ -66,7 +66,7 @@ describe("getPatients", () => {
       from: () => ({
         select: () => ({
           eq: () => ({
-            order: () => Promise.resolve({ data: null, error: { message: "boom" } }),
+            order: () => Promise.resolve({ data: [], error: null }),
           }),
         }),
       }),
@@ -231,5 +231,59 @@ describe("getSoinsPrescrits", () => {
         ngapCode: null,
       },
     ]);
+  });
+});
+
+describe("lectures patients — échecs", () => {
+  function fakeClientListe(resultat: { data: unknown; error: unknown }) {
+    return {
+      from: () => ({
+        select: () => ({ eq: () => ({ order: () => Promise.resolve(resultat) }) }),
+      }),
+    } as unknown as SupabaseClient;
+  }
+
+  function fakeClientFiche(resultat: { data: unknown; error: unknown }) {
+    return {
+      from: () => ({
+        select: () => ({ eq: () => ({ maybeSingle: () => Promise.resolve(resultat) }) }),
+      }),
+    } as unknown as SupabaseClient;
+  }
+
+  it("getPatients lève quand la lecture échoue", async () => {
+    const { getPatients } = await import("./patients");
+
+    await expect(
+      getPatients(fakeClientListe({ data: null, error: { message: "boom" } }), "u1")
+    ).rejects.toThrow(/getPatients/);
+  });
+
+  it("getPatients rend une liste vide quand l'IDEL n'a aucun patient", async () => {
+    const { getPatients } = await import("./patients");
+
+    expect(await getPatients(fakeClientListe({ data: [], error: null }), "u1")).toEqual([]);
+  });
+
+  it("getPatient lève quand la lecture échoue", async () => {
+    const { getPatient } = await import("./patients");
+
+    await expect(
+      getPatient(fakeClientFiche({ data: null, error: { message: "boom" } }), "p1")
+    ).rejects.toThrow(/getPatient/);
+  });
+
+  it("getPatient rend null quand le patient est introuvable", async () => {
+    const { getPatient } = await import("./patients");
+
+    expect(await getPatient(fakeClientFiche({ data: null, error: null }), "p1")).toBeNull();
+  });
+
+  it("getSoinsPrescrits lève quand la lecture échoue", async () => {
+    const { getSoinsPrescrits } = await import("./patients");
+
+    await expect(
+      getSoinsPrescrits(fakeClientListe({ data: null, error: { message: "boom" } }), "p1")
+    ).rejects.toThrow(/getSoinsPrescrits/);
   });
 });
