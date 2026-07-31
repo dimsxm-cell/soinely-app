@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getPatient, getSoinsPrescrits } from "@/lib/data/patients";
-import { createSoinPrescritAction, arreterSoinPrescritAction, updatePatientAction } from "@/lib/data/patients-actions";
+import { createSoinPrescritAction, arreterSoinPrescritAction, coterSoinPrescritAction, updatePatientAction } from "@/lib/data/patients-actions";
 import { getCodesNgap } from "@/lib/data/ngap";
 import { formaterNomPropre } from "@/lib/format";
 import type { SoinPrescrit } from "@/lib/types/clinical";
@@ -127,13 +127,17 @@ export default async function PatientPage({ params }: { params: Promise<{ id: st
 
       <section className="rounded-card border border-navy/10 bg-white p-6">
         <p className="text-xs font-medium uppercase text-navy/60">Soins prescrits</p>
+        <p className="mt-1 text-xs text-navy/50">
+          Une cotation modifiée s&apos;applique aux tournées générées à partir du
+          lendemain.
+        </p>
 
         {soinsActifs.length > 0 ? (
           <ul className="mt-3 flex flex-col gap-3">
             {soinsActifs.map((soin) => (
               <li
                 key={soin.id}
-                className="flex items-center justify-between gap-3 rounded-card border border-navy/10 p-3"
+                className="flex flex-wrap items-center justify-between gap-3 rounded-card border border-navy/10 p-3"
               >
                 <div>
                   <p className="text-navy">
@@ -144,13 +148,38 @@ export default async function PatientPage({ params }: { params: Promise<{ id: st
                     {decrireRecurrence(soin)} · {soin.heures.join(", ")}
                   </p>
                 </div>
-                <form action={arreterSoinPrescritAction}>
-                  <input type="hidden" name="soinId" value={soin.id} />
-                  <input type="hidden" name="patientId" value={patient.id} />
-                  <Button type="submit" variant="secondary">
-                    Arrêter
-                  </Button>
-                </form>
+                <div className="flex flex-wrap items-center gap-2">
+                  <form action={coterSoinPrescritAction} className="flex items-center gap-2">
+                    <input type="hidden" name="soinId" value={soin.id} />
+                    <input type="hidden" name="patientId" value={patient.id} />
+                    <label className="sr-only" htmlFor={`cotation-${soin.id}`}>
+                      Cotation NGAP de « {soin.typeSoin} »
+                    </label>
+                    <select
+                      id={`cotation-${soin.id}`}
+                      name="ngapCodeId"
+                      defaultValue={soin.ngapCodeId ?? ""}
+                      className="rounded-card border border-navy/20 p-2 text-sm"
+                    >
+                      <option value="">Aucune</option>
+                      {codesNgap.map((code) => (
+                        <option key={code.id} value={code.id}>
+                          {code.code} — {code.libelle}
+                        </option>
+                      ))}
+                    </select>
+                    <Button type="submit" variant="tertiary">
+                      Enregistrer
+                    </Button>
+                  </form>
+                  <form action={arreterSoinPrescritAction}>
+                    <input type="hidden" name="soinId" value={soin.id} />
+                    <input type="hidden" name="patientId" value={patient.id} />
+                    <Button type="submit" variant="secondary">
+                      Arrêter
+                    </Button>
+                  </form>
+                </div>
               </li>
             ))}
           </ul>
