@@ -468,15 +468,23 @@ describe("updateMotifAbsenceAction", () => {
     await updateMotifAbsenceAction(formData);
 
     expect(updateMock).toHaveBeenCalledWith({ motif_absence: null });
+  });
 
-    // Un motif composé uniquement d'espaces ne doit pas non plus survivre :
-    // il produirait un encart amber vide, pire qu'aucun encart.
-    const formDataEspaces = new FormData();
-    formDataEspaces.set("missionId", "m1");
-    formDataEspaces.set("motif", "   ");
+  it("efface le motif quand le champ ne contient que des espaces", async () => {
+    eqSelectMock.mockResolvedValue({ data: { statut: "absent" }, error: null });
+    eqUpdateMock.mockReturnValue({ eq: eqUpdateMock2 });
+    eqUpdateMock2.mockResolvedValue({ error: null });
 
-    await updateMotifAbsenceAction(formDataEspaces);
+    const { updateMotifAbsenceAction } = await import("./ma-journee-actions");
 
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("motif", "   ");
+
+    await updateMotifAbsenceAction(formData);
+
+    // Un motif composé uniquement d'espaces ne doit pas survivre : il
+    // produirait un encart amber vide, pire qu'aucun encart.
     expect(updateMock).toHaveBeenCalledWith({ motif_absence: null });
   });
 
