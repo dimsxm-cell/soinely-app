@@ -1,5 +1,17 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { SupabaseClient } from "@supabase/supabase-js";
+
+// Les tests d'échec ci-dessous font passer une erreur par `echouer`, qui la
+// journalise via `console.error` : sans ce mock, un `npm test` vert imprime
+// des lignes `[soinely]` rouges, et une vraie erreur de console finit par ne
+// plus se remarquer.
+beforeEach(() => {
+  vi.spyOn(console, "error").mockImplementation(() => {});
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 vi.mock("./generation-tournee", () => ({
   genererTourneeDuJour: vi.fn().mockResolvedValue(undefined),

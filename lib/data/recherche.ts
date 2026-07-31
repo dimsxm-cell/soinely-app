@@ -67,7 +67,7 @@ export async function getSituationTerrainDetail(
     .eq("published", true)
     .maybeSingle();
 
-  if (situationError) journaliserEchec("getSituationTerrainDetail", situationError);
+  if (situationError) journaliserEchec("getSituationTerrainDetail — situation", situationError);
   if (situationError || !situation) return null;
 
   const { data: missions, error: missionsError } = await supabase
@@ -76,7 +76,7 @@ export async function getSituationTerrainDetail(
     .eq("situation_terrain_id", id)
     .eq("published", true);
 
-  if (missionsError) journaliserEchec("getSituationTerrainDetail", missionsError);
+  if (missionsError) journaliserEchec("getSituationTerrainDetail — missions", missionsError);
 
   return {
     ...mapSituationTerrain(situation),

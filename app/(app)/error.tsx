@@ -1,10 +1,11 @@
 "use client";
 
 export default function ErreurEspaceConnecte({
-  reset,
+  error,
+  unstable_retry,
 }: {
   error: Error & { digest?: string };
-  reset: () => void;
+  unstable_retry: () => void;
 }) {
   return (
     <main className="flex min-h-[70vh] flex-col items-center justify-center px-6 text-center">
@@ -15,9 +16,12 @@ export default function ErreurEspaceConnecte({
         Le serveur n&apos;a pas répondu. Rien n&apos;est perdu : vos données sont
         intactes, seul l&apos;affichage a échoué.
       </p>
+      {error.digest && (
+        <p className="mt-4 text-[12px] text-navy/40">Code : {error.digest}</p>
+      )}
       <button
         type="button"
-        onClick={reset}
+        onClick={unstable_retry}
         className="mt-6 rounded-[14px] bg-gradient-to-r from-brand-violet to-brand-rose px-6 py-3 text-[14px] font-semibold text-white shadow-[0_4px_16px_rgba(124,58,237,0.32)]"
       >
         Réessayer

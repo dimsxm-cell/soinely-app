@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { FrequenceSoin } from "@/lib/types/clinical";
 import type { Database } from "@/lib/types/database.types";
-import { echouer } from "@/lib/journal";
+import { echouer, journaliserEchec } from "@/lib/journal";
 
 export interface SoinRecurrence {
   frequenceType: FrequenceSoin;
@@ -151,6 +151,12 @@ export async function genererTourneeDuJour(
     .select("id")
     .single();
 
+  // Course bénigne : une autre requête a généré la tournée du jour entre
+  // notre lecture et notre insertion. L'appelant relit et trouvera la sienne.
+  if (error?.code === "23505") {
+    journaliserEchec("genererTourneeDuJour — tournée déjà générée en parallèle", error);
+    return;
+  }
   if (error || !tournee) echouer("genererTourneeDuJour — insertion de la tournée", error);
 
   if (passagesTries.length === 0) return;

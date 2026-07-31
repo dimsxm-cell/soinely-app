@@ -1,7 +1,19 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { estSoinDuAujourdhui, libelleDeSynthese } from "./generation-tournee";
 import type { SoinRecurrence } from "./generation-tournee";
+
+// Les tests d'échec ci-dessous font passer une erreur par `echouer` (ou la
+// journalisent en cas de course bénigne), ce qui appelle `console.error` :
+// sans ce mock, un `npm test` vert imprime des lignes `[soinely]` rouges, et
+// une vraie erreur de console finit par ne plus se remarquer.
+beforeEach(() => {
+  vi.spyOn(console, "error").mockImplementation(() => {});
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("libelleDeSynthese", () => {
   it("un seul acte donne son propre libellé", () => {
@@ -124,7 +136,12 @@ describe("genererTourneeDuJour", () => {
     const soinsSelectMock = vi.fn(() => ({ eq: soinsEqIdelMock }));
 
     const tourneeInsertMock = vi.fn(() => ({
-      select: () => ({
+      select: (): {
+        single: () => Promise<{
+          data: { id: string } | null;
+          error: { code?: string; message?: string } | null;
+        }>;
+      } => ({
         single: () => Promise.resolve({ data: { id: "t-nouvelle" }, error: null }),
       }),
     }));
@@ -542,6 +559,33 @@ describe("genererTourneeDuJour", () => {
       /genererTourneeDuJour/
     );
     expect(tourneeInsertMock).not.toHaveBeenCalled();
+  });
+
+  it("course bénigne : une insertion de tournée en doublon (23505) ne lève pas et n'insère aucune mission", async () => {
+    const soins = [
+      {
+        patient_id: "p1",
+        type_soin: "Pansement",
+        ngap_code_id: null,
+        frequence_type: "quotidien",
+        jours_semaine: null,
+        intervalle_jours: null,
+        heures: ["10:00:00"],
+        date_debut: "2026-07-01",
+        date_fin: null,
+      },
+    ];
+    const { fakeClient, tourneeInsertMock, missionsInsertMock } = buildFakeClient(soins);
+    tourneeInsertMock.mockReturnValueOnce({
+      select: () => ({
+        single: () => Promise.resolve({ data: null, error: { code: "23505" } }),
+      }),
+    });
+
+    const { genererTourneeDuJour } = await import("./generation-tournee");
+
+    await expect(genererTourneeDuJour(fakeClient, "u1", "2026-07-15")).resolves.toBeUndefined();
+    expect(missionsInsertMock).not.toHaveBeenCalled();
   });
 
   it("supprime la tournée si l'insertion des missions échoue", async () => {

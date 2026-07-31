@@ -90,13 +90,14 @@ async function getDerniereTransmission(
   patientId: string,
   missionIdActuelle: string
 ): Promise<string | null> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("missions_du_jour")
     .select("transmission, heure_prevue, tournees(date)")
     .eq("patient_id", patientId)
     .neq("id", missionIdActuelle)
     .not("transmission", "is", null);
 
+  if (error) journaliserEchec("getDerniereTransmission", error);
   if (!data || data.length === 0) return null;
 
   type CandidatRow = { transmission: string | null; heure_prevue: string; tournees: unknown };
@@ -118,13 +119,14 @@ async function getDernierRappel(
   patientId: string,
   missionIdActuelle: string
 ): Promise<string | null> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("missions_du_jour")
     .select("rappel, heure_prevue, tournees(date)")
     .eq("patient_id", patientId)
     .neq("id", missionIdActuelle)
     .not("rappel", "is", null);
 
+  if (error) journaliserEchec("getDernierRappel", error);
   if (!data || data.length === 0) return null;
 
   type CandidatRow = { rappel: string | null; heure_prevue: string; tournees: unknown };
@@ -146,13 +148,14 @@ async function getDernierePhoto(
   patientId: string,
   missionIdActuelle: string
 ): Promise<string | null> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("missions_du_jour")
     .select("photo_path, heure_prevue, tournees(date)")
     .eq("patient_id", patientId)
     .neq("id", missionIdActuelle)
     .not("photo_path", "is", null);
 
+  if (error) journaliserEchec("getDernierePhoto", error);
   if (!data || data.length === 0) return null;
 
   type CandidatRow = { photo_path: string | null; heure_prevue: string; tournees: unknown };
@@ -181,6 +184,7 @@ async function getProchaineMission(
     .order("heure_prevue")
     .limit(1);
 
+  if (error) journaliserEchec("getProchaineMission", error);
   if (error || !data || data.length === 0) return null;
 
   const row = data[0];

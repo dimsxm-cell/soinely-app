@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { StatutMission } from "@/lib/types/clinical";
+import { journaliserEchec } from "@/lib/journal";
 
 const TRANSITIONS_VALIDES: Partial<Record<StatutMission, StatutMission>> = {
   a_faire: "en_cours",
@@ -30,7 +31,12 @@ export async function updateMissionStatutAction(formData: FormData): Promise<voi
 
   if (!transitionValide) return;
 
-  await supabase.from("missions_du_jour").update({ statut: nouveauStatut }).eq("id", missionId);
+  const { error } = await supabase
+    .from("missions_du_jour")
+    .update({ statut: nouveauStatut })
+    .eq("id", missionId);
+
+  if (error) journaliserEchec("updateMissionStatutAction", error);
 
   revalidatePath("/ma-journee");
   revalidatePath("/ma-tournee");
@@ -51,7 +57,12 @@ export async function updateConsignesAction(formData: FormData): Promise<void> {
 
   if (!mission) return;
 
-  await supabase.from("patients").update({ consignes }).eq("id", mission.patient_id);
+  const { error } = await supabase
+    .from("patients")
+    .update({ consignes })
+    .eq("id", mission.patient_id);
+
+  if (error) journaliserEchec("updateConsignesAction", error);
 
   revalidatePath(`/ma-journee/${missionId}`);
 }
@@ -70,7 +81,12 @@ export async function updateTransmissionAction(formData: FormData): Promise<void
 
   if (!mission) return;
 
-  await supabase.from("missions_du_jour").update({ transmission }).eq("id", missionId);
+  const { error } = await supabase
+    .from("missions_du_jour")
+    .update({ transmission })
+    .eq("id", missionId);
+
+  if (error) journaliserEchec("updateTransmissionAction", error);
 
   revalidatePath(`/ma-journee/${missionId}`);
 }
@@ -89,7 +105,12 @@ export async function updateRappelAction(formData: FormData): Promise<void> {
 
   if (!mission) return;
 
-  await supabase.from("missions_du_jour").update({ rappel }).eq("id", missionId);
+  const { error } = await supabase
+    .from("missions_du_jour")
+    .update({ rappel })
+    .eq("id", missionId);
+
+  if (error) journaliserEchec("updateRappelAction", error);
 
   revalidatePath(`/ma-journee/${missionId}`);
 }
@@ -123,9 +144,17 @@ export async function uploadPhotoAction(formData: FormData): Promise<void> {
     .from("photos-visites")
     .upload(path, photo, { upsert: true, contentType: photo.type });
 
-  if (uploadError) return;
+  if (uploadError) {
+    journaliserEchec("uploadPhotoAction", uploadError);
+    return;
+  }
 
-  await supabase.from("missions_du_jour").update({ photo_path: path }).eq("id", missionId);
+  const { error } = await supabase
+    .from("missions_du_jour")
+    .update({ photo_path: path })
+    .eq("id", missionId);
+
+  if (error) journaliserEchec("uploadPhotoAction", error);
 
   revalidatePath(`/ma-journee/${missionId}`);
 }

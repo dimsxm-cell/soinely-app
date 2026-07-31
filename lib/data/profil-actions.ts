@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { journaliserEchec } from "@/lib/journal";
 
 const BUCKET_AVATARS = "avatars";
 
@@ -25,9 +26,14 @@ export async function uploadAvatarAction(formData: FormData): Promise<void> {
     .from(BUCKET_AVATARS)
     .upload(path, photo, { upsert: true, contentType: photo.type });
 
-  if (uploadError) return;
+  if (uploadError) {
+    journaliserEchec("uploadAvatarAction", uploadError);
+    return;
+  }
 
-  await supabase.auth.updateUser({ data: { avatar_path: path } });
+  const { error } = await supabase.auth.updateUser({ data: { avatar_path: path } });
+
+  if (error) journaliserEchec("uploadAvatarAction", error);
 
   revalidatePath("/compte");
 }

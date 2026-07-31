@@ -73,7 +73,7 @@ export async function updatePatientAction(formData: FormData): Promise<void> {
 
   const supabase = await createClient();
 
-  await supabase
+  const { error } = await supabase
     .from("patients")
     .update({
       nom_complet: nomComplet,
@@ -93,6 +93,8 @@ export async function updatePatientAction(formData: FormData): Promise<void> {
       traitements_en_cours: champTexteOuNull(formData, "traitementsEnCours"),
     })
     .eq("id", patientId);
+
+  if (error) journaliserEchec("updatePatientAction", error);
 
   revalidatePath(`/patients/${patientId}`);
 }
@@ -163,7 +165,9 @@ export async function arreterSoinPrescritAction(formData: FormData): Promise<voi
 
   const supabase = await createClient();
 
-  await supabase.from("soins_prescrits").update({ actif: false }).eq("id", soinId);
+  const { error } = await supabase.from("soins_prescrits").update({ actif: false }).eq("id", soinId);
+
+  if (error) journaliserEchec("arreterSoinPrescritAction", error);
 
   revalidatePath(`/patients/${patientId}`);
 }
@@ -183,7 +187,12 @@ export async function coterSoinPrescritAction(formData: FormData): Promise<void>
   // La propriété du soin est garantie par la politique RLS
   // soins_prescrits_owner_all : la redoubler ici laisserait croire que la
   // sécurité se joue dans ce fichier.
-  await supabase.from("soins_prescrits").update({ ngap_code_id: ngapCodeId }).eq("id", soinId);
+  const { error } = await supabase
+    .from("soins_prescrits")
+    .update({ ngap_code_id: ngapCodeId })
+    .eq("id", soinId);
+
+  if (error) journaliserEchec("coterSoinPrescritAction", error);
 
   revalidatePath(`/patients/${patientId}`);
 }
