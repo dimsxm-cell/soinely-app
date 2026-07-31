@@ -133,3 +133,64 @@ describe("CarteMissionTournee", () => {
     );
   });
 });
+
+describe("CarteMissionTournee — actes", () => {
+  it("affiche un chip par acte, code en tête", () => {
+    render(
+      <CarteMissionTournee
+        mission={creerMission({
+          actes: [
+            { libelle: "toilette", code: "AIS 3" },
+            { libelle: "insuline", code: "AMI 1" },
+          ],
+        })}
+        estDerniere={false}
+      />
+    );
+
+    expect(screen.getByText("AIS 3")).toBeInTheDocument();
+    expect(screen.getByText("toilette")).toBeInTheDocument();
+    expect(screen.getByText("AMI 1")).toBeInTheDocument();
+    expect(screen.getByText("insuline")).toBeInTheDocument();
+  });
+
+  it("affiche le libellé seul pour un acte sans cotation", () => {
+    render(
+      <CarteMissionTournee
+        mission={creerMission({ actes: [{ libelle: "Pansement", code: null }] })}
+        estDerniere={false}
+      />
+    );
+
+    expect(screen.getByText("Pansement")).toBeInTheDocument();
+  });
+
+  it("mêle les deux formes quand un acte est coté et l'autre non", () => {
+    render(
+      <CarteMissionTournee
+        mission={creerMission({
+          actes: [
+            { libelle: "toilette", code: "AIS 3" },
+            { libelle: "Pansement", code: null },
+          ],
+        })}
+        estDerniere={false}
+      />
+    );
+
+    expect(screen.getByText("AIS 3")).toBeInTheDocument();
+    expect(screen.getByText("toilette")).toBeInTheDocument();
+    expect(screen.getByText("Pansement")).toBeInTheDocument();
+  });
+
+  it("se rabat sur le libellé de synthèse quand la mission ne porte aucun acte", () => {
+    render(
+      <CarteMissionTournee
+        mission={creerMission({ typeSoin: "Pansement", actes: [] })}
+        estDerniere={false}
+      />
+    );
+
+    expect(screen.getByText("Pansement")).toBeInTheDocument();
+  });
+});

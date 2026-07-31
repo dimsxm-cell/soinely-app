@@ -119,15 +119,38 @@ export function CarteMissionTournee({
 
         {/* Type de soin (chip) + alertes */}
         <div className="border-t border-navy/[0.06] px-4 py-3">
-          {/* Chip du soin */}
+          {/* Un chip par acte. Le code NGAP porte l'information de facturation :
+              il passe en tête, en gras. Un acte sans code — tout l'historique
+              repris — garde l'icône et le libellé seuls. */}
           <div className="flex flex-wrap gap-1.5">
-            <span className="inline-flex items-center gap-1.5 rounded-[8px] bg-navy/[0.05] px-2.5 py-1 text-[12px] font-medium text-navy/65">
-              <IconeSoin
-                typeSoin={mission.typeSoin}
-                className="h-3.5 w-3.5 text-brand-violet"
-              />
-              {mission.typeSoin}
-            </span>
+            {mission.actes.length > 0 ? (
+              mission.actes.map((acte, index) => (
+                <span
+                  key={`${acte.libelle}-${index}`}
+                  className="inline-flex items-center gap-1.5 rounded-[8px] bg-navy/[0.05] px-2.5 py-1 text-[12px] font-medium text-navy/65"
+                >
+                  {acte.code ? (
+                    <span className="font-bold text-navy/80">{acte.code}</span>
+                  ) : (
+                    <IconeSoin
+                      typeSoin={acte.libelle}
+                      className="h-3.5 w-3.5 text-brand-violet"
+                    />
+                  )}
+                  {acte.libelle}
+                </span>
+              ))
+            ) : (
+              // Repli : une mission sans acte n'existe pas après la migration,
+              // mais une carte muette serait pire qu'un libellé de synthèse.
+              <span className="inline-flex items-center gap-1.5 rounded-[8px] bg-navy/[0.05] px-2.5 py-1 text-[12px] font-medium text-navy/65">
+                <IconeSoin
+                  typeSoin={mission.typeSoin}
+                  className="h-3.5 w-3.5 text-brand-violet"
+                />
+                {mission.typeSoin}
+              </span>
+            )}
           </div>
 
           {/* Allergie */}
