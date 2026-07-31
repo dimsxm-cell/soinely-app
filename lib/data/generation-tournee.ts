@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { FrequenceSoin } from "@/lib/types/clinical";
 import type { Database } from "@/lib/types/database.types";
+import { echouer } from "@/lib/journal";
 
 export interface SoinRecurrence {
   frequenceType: FrequenceSoin;
@@ -80,7 +81,9 @@ export async function genererTourneeDuJour(
     // mêmes données.
     .order("created_at");
 
-  if (soinsError) return;
+  // Renoncer en silence ici produit une journée sans tournée, indiscernable
+  // d'une journée sans patient — le faux vide du 31 juillet 2026.
+  if (soinsError) echouer("genererTourneeDuJour", soinsError);
 
   // Un passage = un patient à une heure. Deux soins prescrits à la même heure
   // chez le même patient sont deux actes d'un seul passage, pas deux visites.
@@ -148,7 +151,7 @@ export async function genererTourneeDuJour(
     .select("id")
     .single();
 
-  if (error || !tournee) return;
+  if (error || !tournee) echouer("genererTourneeDuJour — insertion de la tournée", error);
 
   if (passagesTries.length === 0) return;
 
@@ -167,7 +170,7 @@ export async function genererTourneeDuJour(
 
   if (missionsError || !missionsCreees) {
     await supabase.from("tournees").delete().eq("id", tournee.id);
-    return;
+    echouer("genererTourneeDuJour — insertion des missions", missionsError);
   }
 
   const idParPassage = new Map(
@@ -187,7 +190,10 @@ export async function genererTourneeDuJour(
   // que de créer des missions orphelines de leurs actes.
   if (missionsCreees.length !== passagesTries.length || passageSansMission) {
     await supabase.from("tournees").delete().eq("id", tournee.id);
-    return;
+    echouer(
+      "genererTourneeDuJour — rattachement des actes",
+      new Error("un passage relu ne correspond à aucune mission")
+    );
   }
 
   const actes = passagesTries.flatMap((passage) => {
@@ -206,5 +212,6 @@ export async function genererTourneeDuJour(
     // La suppression de la tournée emporte ses missions et leurs actes par
     // cascade : une tournée sans actes vaut moins que pas de tournée du tout.
     await supabase.from("tournees").delete().eq("id", tournee.id);
+    echouer("genererTourneeDuJour — insertion des actes", actesError);
   }
 }

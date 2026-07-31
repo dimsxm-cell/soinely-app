@@ -405,7 +405,8 @@ describe("genererTourneeDuJour", () => {
     actesInsertMock.mockResolvedValueOnce({ error: { message: "boom" } });
 
     const { genererTourneeDuJour } = await import("./generation-tournee");
-    await genererTourneeDuJour(fakeClient, "u1", "2026-07-15");
+
+    await expect(genererTourneeDuJour(fakeClient, "u1", "2026-07-15")).rejects.toThrow();
 
     expect(tourneeDeleteEqMock).toHaveBeenCalledWith("id", "t-nouvelle");
   });
@@ -434,7 +435,8 @@ describe("genererTourneeDuJour", () => {
     });
 
     const { genererTourneeDuJour } = await import("./generation-tournee");
-    await genererTourneeDuJour(fakeClient, "u1", "2026-07-15");
+
+    await expect(genererTourneeDuJour(fakeClient, "u1", "2026-07-15")).rejects.toThrow();
 
     expect(tourneeDeleteEqMock).toHaveBeenCalledWith("id", "t-nouvelle");
     expect(actesInsertMock).not.toHaveBeenCalled();
@@ -519,8 +521,10 @@ describe("genererTourneeDuJour", () => {
     expect(missionsInsertMock).not.toHaveBeenCalled();
   });
 
-  it("n'insère aucune tournée si la lecture des soins échoue", async () => {
-    const soinsOrderMock = vi.fn(() => Promise.resolve({ data: null, error: { message: "boom" } }));
+  it("lève et n'insère aucune tournée si la lecture des soins échoue", async () => {
+    const soinsOrderMock = vi.fn(() =>
+      Promise.resolve({ data: null, error: { message: "boom" } })
+    );
     const soinsEqActifMock = vi.fn(() => ({ order: soinsOrderMock }));
     const soinsEqIdelMock = vi.fn(() => ({ eq: soinsEqActifMock }));
     const soinsSelectMock = vi.fn(() => ({ eq: soinsEqIdelMock }));
@@ -533,8 +537,10 @@ describe("genererTourneeDuJour", () => {
     const fakeClient = { from: fromMock } as unknown as SupabaseClient;
 
     const { genererTourneeDuJour } = await import("./generation-tournee");
-    await genererTourneeDuJour(fakeClient, "u1", "2026-07-15");
 
+    await expect(genererTourneeDuJour(fakeClient, "u1", "2026-07-15")).rejects.toThrow(
+      /genererTourneeDuJour/
+    );
     expect(tourneeInsertMock).not.toHaveBeenCalled();
   });
 
@@ -556,7 +562,8 @@ describe("genererTourneeDuJour", () => {
     missionsSelectMock.mockResolvedValueOnce({ data: null, error: { message: "boom" } });
 
     const { genererTourneeDuJour } = await import("./generation-tournee");
-    await genererTourneeDuJour(fakeClient, "u1", "2026-07-15");
+
+    await expect(genererTourneeDuJour(fakeClient, "u1", "2026-07-15")).rejects.toThrow();
 
     expect(tourneeDeleteEqMock).toHaveBeenCalledWith("id", "t-nouvelle");
   });
