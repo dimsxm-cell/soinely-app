@@ -328,6 +328,7 @@ export interface MissionTourneeVue {
   missionCliniqueId: string | null;
   dureeEstimeeMin: number;
   actes: ActeVue[];
+  motifAbsence: string | null;
 }
 
 export async function getMissionsTourneeVue(
@@ -337,7 +338,7 @@ export async function getMissionsTourneeVue(
   const { data, error } = await supabase
     .from("missions_du_jour")
     .select(
-      "id, patient_id, type_soin, heure_prevue, statut, mission_clinique_id, patients(nom_complet, adresse, telephone, allergies, consignes, date_naissance), missions_cliniques(duree_estimee_min), actes_mission(libelle, ordre, ngap_codes(code))"
+      "id, patient_id, type_soin, heure_prevue, statut, motif_absence, mission_clinique_id, patients(nom_complet, adresse, telephone, allergies, consignes, date_naissance), missions_cliniques(duree_estimee_min), actes_mission(libelle, ordre, ngap_codes(code))"
     )
     .eq("tournee_id", tourneeId)
     .order("heure_prevue");
@@ -393,6 +394,7 @@ export async function getMissionsTourneeVue(
       missionCliniqueId: row.mission_clinique_id,
       dureeEstimeeMin: mc?.duree_estimee_min ?? 0,
       actes,
+      motifAbsence: row.motif_absence,
     };
   });
 }

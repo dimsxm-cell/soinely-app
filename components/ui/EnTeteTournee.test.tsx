@@ -30,6 +30,7 @@ function creerMission(id: string, statut: StatutMission, heurePrevue: string): M
     missionCliniqueId: null,
     dureeEstimeeMin: 25,
     actes: [],
+    motifAbsence: null,
   };
 }
 

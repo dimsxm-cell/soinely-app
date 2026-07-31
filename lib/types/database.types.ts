@@ -213,6 +213,7 @@ export type Database = {
           heure_prevue: string
           id: string
           mission_clinique_id: string | null
+          motif_absence: string | null
           patient_id: string
           photo_path: string | null
           rappel: string | null
@@ -225,6 +226,7 @@ export type Database = {
           heure_prevue: string
           id?: string
           mission_clinique_id?: string | null
+          motif_absence?: string | null
           patient_id: string
           photo_path?: string | null
           rappel?: string | null
@@ -237,6 +239,7 @@ export type Database = {
           heure_prevue?: string
           id?: string
           mission_clinique_id?: string | null
+          motif_absence?: string | null
           patient_id?: string
           photo_path?: string | null
           rappel?: string | null

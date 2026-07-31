@@ -615,6 +615,41 @@ describe("getMissionsTourneeVue", () => {
 
     expect(missions[0].actes).toEqual([]);
   });
+
+  it("remonte le motif d'absence, à null quand la colonne est vide", async () => {
+    const fakeClient = fakeClientAvecMissions([
+      {
+        id: "m1",
+        patient_id: "p1",
+        type_soin: "Toilette",
+        heure_prevue: "08:00:00",
+        statut: "absent",
+        mission_clinique_id: null,
+        motif_absence: "Hospitalisée depuis hier",
+        patients: patient,
+        missions_cliniques: null,
+        actes_mission: [],
+      },
+      {
+        id: "m2",
+        patient_id: "p2",
+        type_soin: "Pansement",
+        heure_prevue: "10:00:00",
+        statut: "a_faire",
+        mission_clinique_id: null,
+        motif_absence: null,
+        patients: patient,
+        missions_cliniques: null,
+        actes_mission: [],
+      },
+    ]);
+
+    const { getMissionsTourneeVue } = await import("./ma-journee");
+    const missions = await getMissionsTourneeVue(fakeClient, "t1");
+
+    expect(missions[0].motifAbsence).toBe("Hospitalisée depuis hier");
+    expect(missions[1].motifAbsence).toBeNull();
+  });
 });
 
 describe("getMissionsTourneeVue — échecs", () => {
