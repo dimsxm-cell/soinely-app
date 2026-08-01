@@ -137,10 +137,10 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
         <div className="flex items-center gap-2.5">
           <span className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white ring-2 ring-brand-violet/70">
             <Image
-              src="/app/ely-mascot.png"
+              src="/marketing/ely-professionnel-portrait.png"
               alt=""
-              width={936}
-              height={1400}
+              width={200}
+              height={200}
               className="h-[38px] w-auto object-contain"
             />
           </span>
@@ -177,10 +177,10 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
               />
               <span className="relative">
                 <Image
-                  src="/app/ely-mascot.png"
+                  src="/marketing/ely-professionnel-portrait.png"
                   alt=""
-                  width={936}
-                  height={1400}
+                  width={200}
+                  height={200}
                   className="h-[150px] w-auto object-contain drop-shadow-[0_18px_28px_rgba(124,58,237,0.32)]"
                 />
               </span>
@@ -215,10 +215,10 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
                 <div key={message.id} className="flex items-end gap-2.5">
                   <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center overflow-hidden rounded-full bg-white ring-2 ring-brand-violet/70">
                     <Image
-                      src="/app/ely-mascot.png"
+                      src="/marketing/ely-professionnel-portrait.png"
                       alt=""
-                      width={936}
-                      height={1400}
+                      width={200}
+                      height={200}
                       className="h-[26px] w-auto object-contain"
                     />
                   </span>
@@ -270,10 +270,10 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
               <div className="flex items-end gap-2.5">
                 <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center overflow-hidden rounded-full bg-white ring-2 ring-brand-violet/70">
                   <Image
-                    src="/app/ely-mascot.png"
+                    src="/marketing/ely-professionnel-portrait.png"
                     alt=""
-                    width={936}
-                    height={1400}
+                    width={200}
+                    height={200}
                     className="h-[26px] w-auto object-contain"
                   />
                 </span>

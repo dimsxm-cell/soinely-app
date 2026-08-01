@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import type { PatientComplet } from "@/lib/types/clinical";
 import { formaterNomPropre } from "@/lib/format";
 import { TuilesDossierPatient } from "@/components/ui/TuilesDossierPatient";
@@ -90,9 +91,18 @@ export function ListePatients({ patients, prochaineVisiteParPatient }: ListePati
         })}
 
         {patientsVisibles.length === 0 && (
-          <p className="py-7 text-center text-navy/50">
-            {requete ? "Aucun patient ne correspond." : "Aucun patient enregistré pour le moment."}
-          </p>
+          <div className="flex flex-col items-center gap-3 py-7 text-center">
+            <Image
+              src="/marketing/ely-accompagnement-portrait.png"
+              alt=""
+              width={200}
+              height={200}
+              className="h-16 w-16 object-contain"
+            />
+            <p className="text-navy/50">
+              {requete ? "Aucun patient ne correspond." : "Aucun patient enregistré pour le moment."}
+            </p>
+          </div>
         )}
       </div>
     </div>
