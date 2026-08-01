@@ -53,12 +53,16 @@ export default async function MaJourneePage({
             {formatSalutation()}
             {prenom ? `, ${prenom}` : ""}
           </h1>
+          {/* Portrait plutôt que plan en pied : à côté d'un titre, seul le
+              visage porte quelque chose, et le buste tient dans la hauteur
+              d'une ligne sans écraser la salutation. */}
           <Image
-            src="/app/ely-mascot.png"
+            src="/marketing/ely-professionnel-portrait.png"
             alt="ELY"
-            width={936}
-            height={1400}
-            className="h-[46px] w-auto object-contain drop-shadow-[0_4px_10px_rgba(124,58,237,0.28)]"
+            width={200}
+            height={200}
+            className="h-[52px] w-[52px] shrink-0 object-contain"
+            priority
           />
         </div>
         <div className="mt-1.5 flex items-center gap-2 text-[15px] text-navy/50">
@@ -88,7 +92,16 @@ export default async function MaJourneePage({
             <CarteInformation label="Glycémies" value={tournee.nbGlycemies} accentuee />
           </div>
         ) : (
-          <p className="mt-8 text-navy/60">Aucune tournée enregistrée pour aujourd&apos;hui.</p>
+          <div className="mt-8 flex items-center gap-4">
+            <Image
+              src="/marketing/ely-accompagnement-portrait.png"
+              alt=""
+              width={200}
+              height={200}
+              className="h-16 w-16 shrink-0 object-contain"
+            />
+            <p className="text-navy/60">Aucune tournée enregistrée pour aujourd&apos;hui.</p>
+          </div>
         )}
 
         {tournee && (

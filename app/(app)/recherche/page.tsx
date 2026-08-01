@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { searchSituationsTerrain } from "@/lib/data/recherche";
 import { CarteSituationTerrain } from "@/components/ui/CarteSituationTerrain";
@@ -35,7 +36,16 @@ export default async function RecherchePage({
         </form>
 
         {query.trim() && results.length === 0 && (
-          <p className="text-navy/70">Aucun résultat pour « {query} ».</p>
+          <div className="flex items-center gap-4">
+            <Image
+              src="/marketing/ely-consultation-portrait.png"
+              alt=""
+              width={200}
+              height={200}
+              className="h-16 w-16 shrink-0 object-contain"
+            />
+            <p className="text-navy/70">Aucun résultat pour « {query} ».</p>
+          </div>
         )}
 
         <div className="flex flex-col gap-4">
