@@ -138,17 +138,36 @@ export default function LoginPage() {
         className="pointer-events-none absolute bottom-0 left-[4%] hidden h-[74vh] w-auto object-contain lg:block xl:left-[10%]"
       />
 
-      <div className="mx-auto flex min-h-screen w-full max-w-[430px] flex-col px-[22px] pb-12 pt-8 sm:pt-14">
-        {/* Retour — même traitement de verre que les autres boutons clairs */}
-        <Link
-          href="/"
-          className="btn-glace-clair inline-flex w-fit shrink-0 items-center gap-1 self-start rounded-[12px] border border-[#e0e0e0] bg-white px-4 py-[9px] text-[15px] font-semibold text-[#1d1d1f]"
-        >
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="m15 18-6-6 6-6" />
-          </svg>
-          Accueil
-        </Link>
+      {/* Marges verticales resserrées sur téléphone : elles financent les
+          24 px que prend le portrait d'ELY ci-dessous, le mode Connexion
+          remplissant l'écran au pixel près. Valeurs d'origine dès sm. */}
+      <div className="mx-auto flex min-h-screen w-full max-w-[430px] flex-col px-[22px] pb-9 pt-5 sm:pb-12 sm:pt-14">
+        <div className="flex shrink-0 items-center justify-between">
+          {/* Retour — même traitement de verre que les autres boutons clairs */}
+          <Link
+            href="/"
+            className="btn-glace-clair inline-flex w-fit items-center gap-1 rounded-[12px] border border-[#e0e0e0] bg-white px-4 py-[9px] text-[15px] font-semibold text-[#1d1d1f]"
+          >
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+            Accueil
+          </Link>
+
+          {/* ELY sur petit écran, en portrait. Le personnage entier ci-dessous
+              ne tient qu'à partir de lg ; ici la colonne du formulaire remplit
+              déjà la hauteur de l'écran, au pixel près en mode Connexion. Cette
+              place est la seule qui ne coûte rien en vertical, et elle équilibre
+              la barre du haut : même cercle blanc que le bouton d'à côté. */}
+          <Image
+            src="/marketing/ely-professionnel-portrait.png"
+            alt=""
+            width={200}
+            height={200}
+            aria-hidden="true"
+            className="h-16 w-16 shrink-0 rounded-full border border-[#e0e0e0] bg-white object-cover lg:hidden"
+          />
+        </div>
 
         {/* Bloc centré verticalement : les formulaires Connexion et Créer un
             compte n'ont pas la même hauteur. Sans ce centrage, passer de l'un
