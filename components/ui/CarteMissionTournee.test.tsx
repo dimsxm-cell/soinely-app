@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import type { ContexteTarifaire } from "@/lib/cotation";
 import { CarteMissionTournee } from "./CarteMissionTournee";
 import type { MissionTourneeVue } from "@/lib/data/ma-journee";
 
@@ -30,9 +31,15 @@ function creerMission(surcharge: Partial<MissionTourneeVue> = {}): MissionTourne
   };
 }
 
+// Table vide : ces tests portent sur les chips et les actions, pas sur les
+// montants, qui ont leurs propres tests.
+const TARIFS: ContexteTarifaire = { zone: "metropole", valeurs: new Map() };
+
 describe("CarteMissionTournee", () => {
   it("affiche le patient, l'heure, la durée et le statut", () => {
-    render(<CarteMissionTournee mission={creerMission()} estDerniere={false} />);
+    render(<CarteMissionTournee mission={creerMission()} estDerniere={false}
+        dateTournee="2026-07-07"
+        contexteTarifaire={TARIFS} />);
 
     expect(screen.getByText("Mme Dupont")).toBeInTheDocument();
     expect(screen.getByText("08:00")).toBeInTheDocument();
@@ -45,6 +52,8 @@ describe("CarteMissionTournee", () => {
       <CarteMissionTournee
         mission={creerMission({ patientAllergies: "Allergie iode" })}
         estDerniere={false}
+        dateTournee="2026-07-07"
+        contexteTarifaire={TARIFS}
       />
     );
 
@@ -56,6 +65,8 @@ describe("CarteMissionTournee", () => {
       <CarteMissionTournee
         mission={creerMission({ patientConsignes: "3e étage sans ascenseur" })}
         estDerniere={false}
+        dateTournee="2026-07-07"
+        contexteTarifaire={TARIFS}
       />
     );
 
@@ -69,14 +80,18 @@ describe("CarteMissionTournee", () => {
   });
 
   it("propose « Valider le soin » et « Absent » pour une mission à faire", () => {
-    render(<CarteMissionTournee mission={creerMission()} estDerniere={false} />);
+    render(<CarteMissionTournee mission={creerMission()} estDerniere={false}
+        dateTournee="2026-07-07"
+        contexteTarifaire={TARIFS} />);
 
     expect(screen.getByRole("button", { name: "Valider le soin" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Absent" })).toBeInTheDocument();
   });
 
   it("propose GPS, Appeler et Valider pour une mission en cours", () => {
-    render(<CarteMissionTournee mission={creerMission({ statut: "en_cours" })} estDerniere={false} />);
+    render(<CarteMissionTournee mission={creerMission({ statut: "en_cours" })} estDerniere={false}
+        dateTournee="2026-07-07"
+        contexteTarifaire={TARIFS} />);
 
     expect(screen.getByRole("link", { name: /GPS/ })).toHaveAttribute(
       "href",
@@ -90,7 +105,9 @@ describe("CarteMissionTournee", () => {
   });
 
   it("n'affiche plus les actions de soin pour une mission validée", () => {
-    render(<CarteMissionTournee mission={creerMission({ statut: "terminee" })} estDerniere={false} />);
+    render(<CarteMissionTournee mission={creerMission({ statut: "terminee" })} estDerniere={false}
+        dateTournee="2026-07-07"
+        contexteTarifaire={TARIFS} />);
 
     expect(screen.queryByRole("button", { name: "Valider le soin" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Absent" })).not.toBeInTheDocument();
@@ -99,7 +116,9 @@ describe("CarteMissionTournee", () => {
   });
 
   it("n'affiche plus les actions de soin pour une mission absente", () => {
-    render(<CarteMissionTournee mission={creerMission({ statut: "absent" })} estDerniere={false} />);
+    render(<CarteMissionTournee mission={creerMission({ statut: "absent" })} estDerniere={false}
+        dateTournee="2026-07-07"
+        contexteTarifaire={TARIFS} />);
 
     expect(screen.queryByRole("button", { name: "Valider le soin" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Absent" })).not.toBeInTheDocument();
@@ -112,6 +131,8 @@ describe("CarteMissionTournee", () => {
       <CarteMissionTournee
         mission={creerMission({ statut: "terminee", patientConsignes: "Code portail 4512B" })}
         estDerniere={false}
+        dateTournee="2026-07-07"
+        contexteTarifaire={TARIFS}
       />
     );
 
@@ -119,7 +140,9 @@ describe("CarteMissionTournee", () => {
   });
 
   it("le nom du patient renvoie vers l'écran d'arrivée de la mission", () => {
-    render(<CarteMissionTournee mission={creerMission()} estDerniere={false} />);
+    render(<CarteMissionTournee mission={creerMission()} estDerniere={false}
+        dateTournee="2026-07-07"
+        contexteTarifaire={TARIFS} />);
 
     expect(screen.getByRole("link", { name: /Mme Dupont/ })).toHaveAttribute(
       "href",
@@ -133,6 +156,8 @@ describe("CarteMissionTournee", () => {
         mission={creerMission({ statut: "en_cours" })}
         contexteHref="/situations/s1"
         estDerniere={false}
+        dateTournee="2026-07-07"
+        contexteTarifaire={TARIFS}
       />
     );
 
@@ -154,6 +179,8 @@ describe("CarteMissionTournee — actes", () => {
           ],
         })}
         estDerniere={false}
+        dateTournee="2026-07-07"
+        contexteTarifaire={TARIFS}
       />
     );
 
@@ -175,6 +202,8 @@ describe("CarteMissionTournee — actes", () => {
       <CarteMissionTournee
         mission={creerMission({ actes: [{ libelle: "Pansement", code: null, cotation: null, lettreCle: null, coefficient: null, derogatoireBsi: false, eligibleMci: false }] })}
         estDerniere={false}
+        dateTournee="2026-07-07"
+        contexteTarifaire={TARIFS}
       />
     );
 
@@ -191,6 +220,8 @@ describe("CarteMissionTournee — actes", () => {
           ],
         })}
         estDerniere={false}
+        dateTournee="2026-07-07"
+        contexteTarifaire={TARIFS}
       />
     );
 
@@ -204,6 +235,8 @@ describe("CarteMissionTournee — actes", () => {
       <CarteMissionTournee
         mission={creerMission({ typeSoin: "Pansement", actes: [] })}
         estDerniere={false}
+        dateTournee="2026-07-07"
+        contexteTarifaire={TARIFS}
       />
     );
 
@@ -214,7 +247,9 @@ describe("CarteMissionTournee — actes", () => {
 describe("CarteMissionTournee — correction d'un statut", () => {
   it("propose d'annuler la validation d'une mission validée", () => {
     render(
-      <CarteMissionTournee mission={creerMission({ statut: "terminee" })} estDerniere={false} />
+      <CarteMissionTournee mission={creerMission({ statut: "terminee" })} estDerniere={false}
+        dateTournee="2026-07-07"
+        contexteTarifaire={TARIFS} />
     );
 
     expect(screen.getByRole("button", { name: "Annuler la validation" })).toBeInTheDocument();
@@ -222,7 +257,9 @@ describe("CarteMissionTournee — correction d'un statut", () => {
 
   it("propose d'annuler l'absence et de saisir un motif", () => {
     render(
-      <CarteMissionTournee mission={creerMission({ statut: "absent" })} estDerniere={false} />
+      <CarteMissionTournee mission={creerMission({ statut: "absent" })} estDerniere={false}
+        dateTournee="2026-07-07"
+        contexteTarifaire={TARIFS} />
     );
 
     expect(screen.getByRole("button", { name: "Annuler l'absence" })).toBeInTheDocument();
@@ -234,6 +271,8 @@ describe("CarteMissionTournee — correction d'un statut", () => {
       <CarteMissionTournee
         mission={creerMission({ statut: "absent", motifAbsence: "Hospitalisée depuis hier" })}
         estDerniere={false}
+        dateTournee="2026-07-07"
+        contexteTarifaire={TARIFS}
       />
     );
 
@@ -243,7 +282,9 @@ describe("CarteMissionTournee — correction d'un statut", () => {
 
   it("laisse le champ vide et n'affiche aucun encart quand l'absence n'a pas de motif", () => {
     render(
-      <CarteMissionTournee mission={creerMission({ statut: "absent" })} estDerniere={false} />
+      <CarteMissionTournee mission={creerMission({ statut: "absent" })} estDerniere={false}
+        dateTournee="2026-07-07"
+        contexteTarifaire={TARIFS} />
     );
 
     expect(screen.getByLabelText(/Motif de l'absence/)).toHaveValue("");
@@ -254,16 +295,82 @@ describe("CarteMissionTournee — correction d'un statut", () => {
   // le même conteneur — Testing Library ne nettoie qu'entre les tests — et la
   // requête porterait alors sur les deux cartes à la fois.
   it("ne propose aucune annulation sur une mission à faire", () => {
-    render(<CarteMissionTournee mission={creerMission()} estDerniere={false} />);
+    render(<CarteMissionTournee mission={creerMission()} estDerniere={false}
+        dateTournee="2026-07-07"
+        contexteTarifaire={TARIFS} />);
 
     expect(screen.queryByRole("button", { name: /Annuler/ })).not.toBeInTheDocument();
   });
 
   it("ne propose aucune annulation sur une mission en cours", () => {
     render(
-      <CarteMissionTournee mission={creerMission({ statut: "en_cours" })} estDerniere={false} />
+      <CarteMissionTournee mission={creerMission({ statut: "en_cours" })} estDerniere={false}
+        dateTournee="2026-07-07"
+        contexteTarifaire={TARIFS} />
     );
 
     expect(screen.queryByRole("button", { name: /Annuler/ })).not.toBeInTheDocument();
+  });
+});
+
+describe("CarteMissionTournee — montant du passage", () => {
+  const AVEC_TARIFS: ContexteTarifaire = {
+    zone: "metropole",
+    valeurs: new Map([
+      ["AMI", { lettreCle: "AMI", valeurMetropole: 3.15, valeurDom: 3.3 }],
+      ["IFD", { lettreCle: "IFD", valeurMetropole: 2.75, valeurDom: 2.75 }],
+      ["MDF", { lettreCle: "MDF", valeurMetropole: 8.5, valeurDom: 8.5 }],
+    ]),
+  };
+
+  const PANSEMENT = {
+    libelle: "Pansement",
+    code: "AMI 2",
+    cotation: 6.3,
+    lettreCle: "AMI",
+    coefficient: 2,
+    derogatoireBsi: false,
+    eligibleMci: false,
+  };
+
+  it("affiche ce que le passage représente", () => {
+    render(
+      <CarteMissionTournee
+        mission={creerMission({ actes: [PANSEMENT] })}
+        estDerniere={false}
+        dateTournee="2026-07-07"
+        contexteTarifaire={AVEC_TARIFS}
+      />
+    );
+
+    // 6,30 € d'acte et 2,75 € de déplacement.
+    expect(screen.getByText(/9,05/)).toBeInTheDocument();
+  });
+
+  it("détaille la part des majorations quand il y en a", () => {
+    render(
+      <CarteMissionTournee
+        mission={creerMission({ actes: [PANSEMENT] })}
+        estDerniere={false}
+        dateTournee="2026-08-02"
+        contexteTarifaire={AVEC_TARIFS}
+      />
+    );
+
+    // Dimanche : 8,50 € de majoration s'ajoutent aux 2,75 € de déplacement.
+    expect(screen.getByText(/dont 11,25.*de majorations/)).toBeInTheDocument();
+  });
+
+  it("n'affiche pas de montant sur un passage marqué absent", () => {
+    render(
+      <CarteMissionTournee
+        mission={creerMission({ actes: [PANSEMENT], statut: "absent" })}
+        estDerniere={false}
+        dateTournee="2026-07-07"
+        contexteTarifaire={AVEC_TARIFS}
+      />
+    );
+
+    expect(screen.queryByText(/€/)).not.toBeInTheDocument();
   });
 });

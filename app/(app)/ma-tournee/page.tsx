@@ -62,6 +62,8 @@ export default async function MaTourneePage({
                 <CarteMissionTournee
                   key={mission.id}
                   mission={mission}
+                  dateTournee={tournee.date}
+                  contexteTarifaire={contexteTarifaire}
                   contexteHref={mission.id === contexte?.missionId ? contexte.href : undefined}
                   estDerniere={index === missionsFiltrees.length - 1}
                 />
