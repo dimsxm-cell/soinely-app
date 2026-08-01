@@ -2,6 +2,7 @@ import type { MissionTourneeVue } from "@/lib/data/ma-journee";
 import type { Tournee } from "@/lib/types/clinical";
 import { estimerHeureFin, formatDateTournee } from "@/lib/tournee-vue";
 import { calculerMontantTournee, formaterEuros, type ContexteTarifaire } from "@/lib/cotation";
+import { calculerMajorationsTournee } from "@/lib/majorations";
 
 export function EnTeteTournee({
   missions,
@@ -22,6 +23,8 @@ export function EnTeteTournee({
   const pct = total > 0 ? Math.round((valides / total) * 100) : 0;
   const heureFin = estimerHeureFin(missions);
   const montantActes = calculerMontantTournee(missions, contexteTarifaire);
+  const montantMajorations = calculerMajorationsTournee(missions, tournee.date, contexteTarifaire);
+  const montantTotal = Math.round((montantActes + montantMajorations) * 100) / 100;
   const maintenant = new Date().toLocaleTimeString("fr-FR", {
     hour: "2-digit",
     minute: "2-digit",
@@ -55,21 +58,30 @@ export function EnTeteTournee({
             <span className="ml-1 text-[13px] text-white/45">passages validés</span>
           </div>
 
-          {/* « Actes cotés » et non « facturable » : les majorations et les
-              indemnités de déplacement n'entrent pas encore dans ce total.
-              Annoncer un montant pour un autre serait trompeur sur la seule
-              page où une IDEL vient chercher un chiffre sûr. */}
-          {montantActes > 0 && (
+          {/* Les majorations sont détaillées sous le total : ce sont elles que
+              l'on oublie en fin de journée, et les voir comptées est la moitié
+              de leur intérêt. Les indemnités kilométriques n'y sont pas, faute
+              de connaître les distances parcourues. */}
+          {montantTotal > 0 && (
             <div className="shrink-0 text-right">
               <p className="text-[9.5px] font-semibold uppercase tracking-[0.09em] text-white/30">
-                Actes cotés
+                Facturable
               </p>
               <p className="mt-0.5 font-display text-[22px] font-bold leading-none tabular-nums text-white">
-                {formaterEuros(montantActes)}
+                {formaterEuros(montantTotal)}
               </p>
             </div>
           )}
         </div>
+
+        {/* Le détail des majorations prend sa propre ligne : glissé sous le
+            montant, il élargissait la colonne de droite au point de couper
+            « passages validés » en deux sur un écran de 360 px. */}
+        {montantMajorations > 0 && (
+          <p className="mt-1.5 text-right text-[10.5px] tabular-nums text-white/40">
+            dont {formaterEuros(montantMajorations)} de majorations
+          </p>
+        )}
 
         {/* Barre de progression */}
         <div className="mt-3 h-[5px] w-full overflow-hidden rounded-full bg-white/[0.08]">

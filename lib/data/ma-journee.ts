@@ -328,6 +328,10 @@ export interface ActeVue {
    * de l'article A12 du titre XVI. Les autres basculent en AMX à 50 %.
    */
   derogatoireBsi: boolean;
+  /**
+   * Acte ouvrant droit à la majoration de coordination infirmière.
+   */
+  eligibleMci: boolean;
 }
 
 export interface MissionTourneeVue {
@@ -360,7 +364,7 @@ export async function getMissionsTourneeVue(
   const { data, error } = await supabase
     .from("missions_du_jour")
     .select(
-      "id, patient_id, type_soin, heure_prevue, statut, motif_absence, mission_clinique_id, patients(nom_complet, adresse, telephone, allergies, consignes, date_naissance, forfait_bsi), missions_cliniques(duree_estimee_min), actes_mission(libelle, ordre, ngap_codes(code, cotation, lettre_cle, coefficient, derogatoire_bsi))"
+      "id, patient_id, type_soin, heure_prevue, statut, motif_absence, mission_clinique_id, patients(nom_complet, adresse, telephone, allergies, consignes, date_naissance, forfait_bsi), missions_cliniques(duree_estimee_min), actes_mission(libelle, ordre, ngap_codes(code, cotation, lettre_cle, coefficient, derogatoire_bsi, eligible_mci))"
     )
     .eq("tournee_id", tourneeId)
     .order("heure_prevue");
@@ -385,6 +389,7 @@ export async function getMissionsTourneeVue(
       lettre_cle: string | null;
       coefficient: number | null;
       derogatoire_bsi: boolean | null;
+      eligible_mci: boolean | null;
     };
     type ActeRow = {
       libelle: string;
@@ -413,6 +418,7 @@ export async function getMissionsTourneeVue(
           lettreCle: ngap?.lettre_cle ?? null,
           coefficient: ngap?.coefficient ?? null,
           derogatoireBsi: ngap?.derogatoire_bsi ?? false,
+          eligibleMci: ngap?.eligible_mci ?? false,
         };
       });
 

@@ -8,13 +8,13 @@ import type { ValeursLettresCles } from "./zone-tarifaire";
 const SANS_TABLE: ContexteTarifaire = { zone: "metropole", valeurs: new Map() };
 
 // Tarifs du catalogue fourni par la fondatrice (source albus.fr, 2026-07-30).
-const AMI_1: ActeVue = { libelle: "Injection", code: "AMI 1", cotation: 3.15, lettreCle: "AMI", coefficient: 1, derogatoireBsi: false };
-const AMI_2: ActeVue = { libelle: "Pansement simple", code: "AMI 2", cotation: 6.3, lettreCle: "AMI", coefficient: 2, derogatoireBsi: false };
-const AMI_4: ActeVue = { libelle: "Pansement lourd", code: "AMI 4", cotation: 12.6, lettreCle: "AMI", coefficient: 4, derogatoireBsi: false };
-const AIS_3: ActeVue = { libelle: "Toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS", coefficient: 3, derogatoireBsi: false };
-const TLS: ActeVue = { libelle: "Téléconsultation", code: "TLS", cotation: 10, lettreCle: "TLS", coefficient: null, derogatoireBsi: false };
-const BSA: ActeVue = { libelle: "Forfait dépendance légère", code: "BSA", cotation: 13, lettreCle: "BSA", coefficient: null, derogatoireBsi: false };
-const SANS_CODE: ActeVue = { libelle: "Surveillance", code: null, cotation: null, lettreCle: null, coefficient: null, derogatoireBsi: false };
+const AMI_1: ActeVue = { libelle: "Injection", code: "AMI 1", cotation: 3.15, lettreCle: "AMI", coefficient: 1, derogatoireBsi: false, eligibleMci: false };
+const AMI_2: ActeVue = { libelle: "Pansement simple", code: "AMI 2", cotation: 6.3, lettreCle: "AMI", coefficient: 2, derogatoireBsi: false, eligibleMci: false };
+const AMI_4: ActeVue = { libelle: "Pansement lourd", code: "AMI 4", cotation: 12.6, lettreCle: "AMI", coefficient: 4, derogatoireBsi: false, eligibleMci: false };
+const AIS_3: ActeVue = { libelle: "Toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS", coefficient: 3, derogatoireBsi: false, eligibleMci: false };
+const TLS: ActeVue = { libelle: "Téléconsultation", code: "TLS", cotation: 10, lettreCle: "TLS", coefficient: null, derogatoireBsi: false, eligibleMci: false };
+const BSA: ActeVue = { libelle: "Forfait dépendance légère", code: "BSA", cotation: 13, lettreCle: "BSA", coefficient: null, derogatoireBsi: false, eligibleMci: false };
+const SANS_CODE: ActeVue = { libelle: "Surveillance", code: null, cotation: null, lettreCle: null, coefficient: null, derogatoireBsi: false, eligibleMci: false };
 
 function creerMission(surcharge: Partial<MissionTourneeVue> = {}): MissionTourneeVue {
   return {
@@ -83,8 +83,8 @@ describe("calculerMontantPassage", () => {
   it("reproduit l'exemple de l'article 11B", () => {
     // Pansement courant + prélèvement + injection lors de la même visite :
     // AMI 3 en entier (9,45), AMI 1,5 pour moitié (2,36), AMI 1 gratuit.
-    const AMI_3 = { libelle: "Pansement courant", code: "AMI 3", cotation: 9.45, lettreCle: "AMI", coefficient: 3, derogatoireBsi: false };
-    const AMI_1_5 = { libelle: "Prélèvement", code: "AMI 1,5", cotation: 4.725, lettreCle: "AMI", coefficient: 1.5, derogatoireBsi: false };
+    const AMI_3 = { libelle: "Pansement courant", code: "AMI 3", cotation: 9.45, lettreCle: "AMI", coefficient: 3, derogatoireBsi: false, eligibleMci: false };
+    const AMI_1_5 = { libelle: "Prélèvement", code: "AMI 1,5", cotation: 4.725, lettreCle: "AMI", coefficient: 1.5, derogatoireBsi: false, eligibleMci: false };
 
     expect(calculerMontantPassage([AMI_3, AMI_1_5, AMI_1], SANS_TABLE)).toBe(11.81);
   });
@@ -100,14 +100,14 @@ describe("calculerMontantPassage", () => {
     // AIS 4 a le coefficient le plus élevé (4 contre 3,9) mais le tarif le
     // plus faible : c'est lui qui compte en entier. Trier sur le tarif aurait
     // donné 17,59 € — plus flatteur, mais non conforme.
-    const AIS_4 = { libelle: "Soins de confort", code: "AIS 4", cotation: 10.6, lettreCle: "AIS", coefficient: 4, derogatoireBsi: false };
-    const AMI_3_9 = { libelle: "Surveillance postopératoire", code: "AMI 3,9", cotation: 12.285, lettreCle: "AMI", coefficient: 3.9, derogatoireBsi: false };
+    const AIS_4 = { libelle: "Soins de confort", code: "AIS 4", cotation: 10.6, lettreCle: "AIS", coefficient: 4, derogatoireBsi: false, eligibleMci: false };
+    const AMI_3_9 = { libelle: "Surveillance postopératoire", code: "AMI 3,9", cotation: 12.285, lettreCle: "AMI", coefficient: 3.9, derogatoireBsi: false, eligibleMci: false };
 
     expect(calculerMontantPassage([AIS_4, AMI_3_9], SANS_TABLE)).toBe(16.74);
   });
 
   it("départage deux coefficients égaux par le tarif, au bénéfice de l'IDEL", () => {
-    const AIS_4 = { libelle: "Soins de confort", code: "AIS 4", cotation: 10.6, lettreCle: "AIS", coefficient: 4, derogatoireBsi: false };
+    const AIS_4 = { libelle: "Soins de confort", code: "AIS 4", cotation: 10.6, lettreCle: "AIS", coefficient: 4, derogatoireBsi: false, eligibleMci: false };
 
     // AMI 4 (12,60) et AIS 4 (10,60) partagent le coefficient 4 : le mieux
     // tarifé prend le taux plein.
@@ -209,6 +209,7 @@ describe("cotation selon la zone tarifaire", () => {
       lettreCle: "AMI",
       coefficient: 1.5,
       derogatoireBsi: false,
+      eligibleMci: false,
     };
     const AMI_3 = {
       libelle: "Pansement courant",
@@ -217,6 +218,7 @@ describe("cotation selon la zone tarifaire", () => {
       lettreCle: "AMI",
       coefficient: 3,
       derogatoireBsi: false,
+      eligibleMci: false,
     };
 
     // 9,45 + 4,725/2 = 11,8125 → 11,81 €, le chiffre de l'article.
@@ -251,6 +253,7 @@ describe("cotation chez un patient sous forfait de dépendance", () => {
     lettreCle: "AMI",
     coefficient: 4,
     derogatoireBsi: true,
+    eligibleMci: true,
   };
 
   it("compte un acte technique pour moitié, l'acte basculant en AMX", () => {

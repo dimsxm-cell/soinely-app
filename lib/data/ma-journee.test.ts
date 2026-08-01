@@ -580,8 +580,8 @@ describe("getMissionsTourneeVue", () => {
     // classe les actes d'une séance, et rien ne le signalerait s'il cessait
     // d'être chargé.
     expect(missions[0].actes).toEqual([
-      { libelle: "Toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS", coefficient: 3, derogatoireBsi: false },
-      { libelle: "Insuline", code: "AMI 1", cotation: 3.15, lettreCle: "AMI", coefficient: 1, derogatoireBsi: false },
+      { libelle: "Toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS", coefficient: 3, derogatoireBsi: false, eligibleMci: false },
+      { libelle: "Insuline", code: "AMI 1", cotation: 3.15, lettreCle: "AMI", coefficient: 1, derogatoireBsi: false, eligibleMci: false },
     ]);
   });
 
@@ -605,7 +605,7 @@ describe("getMissionsTourneeVue", () => {
 
     // Sans code, l'acte reste affiché mais ne peut entrer dans aucun total.
     expect(missions[0].actes).toEqual([
-      { libelle: "Pansement", code: null, cotation: null, lettreCle: null, coefficient: null, derogatoireBsi: false },
+      { libelle: "Pansement", code: null, cotation: null, lettreCle: null, coefficient: null, derogatoireBsi: false, eligibleMci: false },
     ]);
   });
 

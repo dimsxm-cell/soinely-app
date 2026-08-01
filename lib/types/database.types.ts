@@ -279,6 +279,7 @@ export type Database = {
           conditions: string | null
           cotation: number
           derogatoire_bsi: boolean
+          eligible_mci: boolean
           id: string
           lettre_cle: string | null
           libelle: string
@@ -289,6 +290,7 @@ export type Database = {
           conditions?: string | null
           cotation: number
           derogatoire_bsi: boolean
+          eligible_mci: boolean
           id?: string
           lettre_cle?: string | null
           libelle: string
@@ -299,6 +301,7 @@ export type Database = {
           conditions?: string | null
           cotation?: number
           derogatoire_bsi?: boolean
+          eligible_mci?: boolean
           id?: string
           lettre_cle?: string | null
           libelle?: string
