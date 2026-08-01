@@ -6,11 +6,59 @@ import type {
   ProchaineMission,
   StatutMission,
   Tournee,
+  ActeVue,
 } from "@/lib/types/clinical";
+
+// Ré-exporté : ce type vit avec les autres types métier, mais six modules
+// l'importent d'ici.
+export type { ActeVue };
 import { genererTourneeDuJour } from "@/lib/data/generation-tournee";
 import { echouer, journaliserEchec } from "@/lib/journal";
 
 const BUCKET_PHOTOS = "photos-visites";
+
+type CodeNgapRow = {
+  code: string;
+  cotation: number;
+  lettre_cle: string | null;
+  coefficient: number | null;
+  derogatoire_bsi: boolean | null;
+  eligible_mci: boolean | null;
+};
+
+type ActeMissionRow = {
+  libelle: string;
+  ordre: number;
+  ngap_codes: CodeNgapRow | CodeNgapRow[] | null;
+};
+
+/**
+ * Actes d'un passage, dans l'ordre de saisie.
+ *
+ * PostgREST rend un embed tantôt comme objet, tantôt comme tableau selon la
+ * cardinalité qu'il déduit ; les deux formes sont donc admises. Un acte sans
+ * code reste dans la liste : il s'affiche, mais aucun total ne le compte.
+ */
+function mapperActes(embed: unknown): ActeVue[] {
+  const actes = (embed ?? []) as ActeMissionRow[];
+
+  return [...actes]
+    .sort((a, b) => a.ordre - b.ordre)
+    .map((acte) => {
+      const codeEmbed = acte.ngap_codes;
+      const ngap = Array.isArray(codeEmbed) ? codeEmbed[0] : codeEmbed;
+
+      return {
+        libelle: acte.libelle,
+        code: ngap?.code ?? null,
+        cotation: ngap?.cotation ?? null,
+        lettreCle: ngap?.lettre_cle ?? null,
+        coefficient: ngap?.coefficient ?? null,
+        derogatoireBsi: ngap?.derogatoire_bsi ?? false,
+        eligibleMci: ngap?.eligible_mci ?? false,
+      };
+    });
+}
 
 async function lireTourneeDuJour(
   supabase: SupabaseClient<Database>,
@@ -207,7 +255,7 @@ export async function getMissionDetail(
   const { data, error } = await supabase
     .from("missions_du_jour")
     .select(
-      "id, patient_id, tournee_id, type_soin, heure_prevue, statut, mission_clinique_id, transmission, rappel, photo_path, patients(id, nom_complet, adresse, telephone, allergies, consignes, date_naissance)"
+      "id, patient_id, tournee_id, type_soin, heure_prevue, statut, mission_clinique_id, transmission, rappel, photo_path, patients(id, nom_complet, adresse, telephone, allergies, consignes, date_naissance, forfait_bsi), tournees(date), actes_mission(libelle, ordre, ngap_codes(code, cotation, lettre_cle, coefficient, derogatoire_bsi, eligible_mci))"
     )
     .eq("id", missionId)
     .maybeSingle();
@@ -224,10 +272,18 @@ export async function getMissionDetail(
     allergies: string | null;
     consignes: string | null;
     date_naissance: string | null;
+    forfait_bsi: string | null;
   };
   const patientRow = Array.isArray(patientEmbed)
     ? (patientEmbed[0] as PatientRow)
     : (patientEmbed as PatientRow);
+
+  const actes = mapperActes(data.actes_mission);
+
+  // La date vient de la tournée, non du jour courant : une mission ouverte
+  // après coup doit garder les majorations de sa propre date.
+  const tourneeEmbed = data.tournees as unknown;
+  const tourneeRow = (Array.isArray(tourneeEmbed) ? tourneeEmbed[0] : tourneeEmbed) as { date: string } | null;
 
   const derniereTransmission = await getDerniereTransmission(supabase, data.patient_id, missionId);
   const dernierRappel = await getDernierRappel(supabase, data.patient_id, missionId);
@@ -254,6 +310,11 @@ export async function getMissionDetail(
     photoPath: data.photo_path,
     dernierePhotoPath,
     prochaineMission,
+    // `?? null` et non la valeur brute : tant que la migration n'est pas
+    // appliquée, la colonne est absente de la réponse et vaudrait `undefined`.
+    patientForfaitBsi: patientRow.forfait_bsi ?? null,
+    actes,
+    dateTournee: tourneeRow?.date ?? new Date().toISOString().slice(0, 10),
     patient: {
       id: patientRow.id,
       nomComplet: patientRow.nom_complet,
@@ -308,31 +369,7 @@ export async function getMissionEnCoursHref(
 
 // ── Vue enrichie pour la page Ma tournée ────────────────────────────────────
 
-export interface ActeVue {
-  libelle: string;
-  code: string | null;
-  /**
-   * Tarif de l'acte en euros, tel que le catalogue NGAP le porte. `null` pour
-   * un acte sans code : il reste affiché, mais ne compte dans aucun total.
-   */
-  cotation: number | null;
-  /** Lettre-clé du code (AMI, AIS, TLS…), qui gouverne la règle de cumul. */
-  lettreCle: string | null;
-  /**
-   * Coefficient de l'acte. C'est lui, et non le tarif, qui classe les actes
-   * d'une séance : l'article 11B raisonne en coefficients.
-   */
-  coefficient: number | null;
-  /**
-   * Acte facturable à taux plein en sus d'un forfait de dépendance, au titre
-   * de l'article A12 du titre XVI. Les autres basculent en AMX à 50 %.
-   */
-  derogatoireBsi: boolean;
-  /**
-   * Acte ouvrant droit à la majoration de coordination infirmière.
-   */
-  eligibleMci: boolean;
-}
+
 
 export interface MissionTourneeVue {
   id: string;
@@ -383,19 +420,6 @@ export async function getMissionsTourneeVue(
       forfait_bsi: string | null;
     };
     type MCRow = { duree_estimee_min: number };
-    type CodeRow = {
-      code: string;
-      cotation: number;
-      lettre_cle: string | null;
-      coefficient: number | null;
-      derogatoire_bsi: boolean | null;
-      eligible_mci: boolean | null;
-    };
-    type ActeRow = {
-      libelle: string;
-      ordre: number;
-      ngap_codes: CodeRow | CodeRow[] | null;
-    };
 
     const patientEmbed = row.patients as unknown;
     const patient = (
@@ -405,22 +429,7 @@ export async function getMissionsTourneeVue(
     const mcEmbed = row.missions_cliniques as unknown;
     const mc = (Array.isArray(mcEmbed) ? mcEmbed[0] : mcEmbed) as MCRow | null;
 
-    const actesEmbed = (row.actes_mission ?? []) as ActeRow[];
-    const actes: ActeVue[] = [...actesEmbed]
-      .sort((a, b) => a.ordre - b.ordre)
-      .map((acte) => {
-        const codeEmbed = acte.ngap_codes;
-        const ngap = Array.isArray(codeEmbed) ? codeEmbed[0] : codeEmbed;
-        return {
-          libelle: acte.libelle,
-          code: ngap?.code ?? null,
-          cotation: ngap?.cotation ?? null,
-          lettreCle: ngap?.lettre_cle ?? null,
-          coefficient: ngap?.coefficient ?? null,
-          derogatoireBsi: ngap?.derogatoire_bsi ?? false,
-          eligibleMci: ngap?.eligible_mci ?? false,
-        };
-      });
+    const actes = mapperActes(row.actes_mission);
 
     return {
       id: row.id,

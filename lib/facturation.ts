@@ -1,6 +1,6 @@
-import type { MissionTourneeVue } from "@/lib/data/ma-journee";
+import { calculerMajorationsPassage, type DetailMajorations, type PassageAMajorer } from "@/lib/majorations";
 import { calculerMontantPassage, type ContexteTarifaire } from "@/lib/cotation";
-import { calculerMajorationsPassage, type DetailMajorations } from "@/lib/majorations";
+
 
 /**
  * Ce qu'un passage représente, actes et majorations réunis.
@@ -24,7 +24,7 @@ export interface DetailPassage {
 }
 
 export function calculerDetailPassage(
-  mission: MissionTourneeVue,
+  mission: PassageAMajorer,
   dateTournee: string,
   contexte: ContexteTarifaire
 ): DetailPassage {
