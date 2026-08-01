@@ -8,13 +8,13 @@ import type { ValeursLettresCles } from "./zone-tarifaire";
 const SANS_TABLE: ContexteTarifaire = { zone: "metropole", valeurs: new Map() };
 
 // Tarifs du catalogue fourni par la fondatrice (source albus.fr, 2026-07-30).
-const AMI_1: ActeVue = { libelle: "Injection", code: "AMI 1", cotation: 3.15, lettreCle: "AMI", coefficient: 1 };
-const AMI_2: ActeVue = { libelle: "Pansement simple", code: "AMI 2", cotation: 6.3, lettreCle: "AMI", coefficient: 2 };
-const AMI_4: ActeVue = { libelle: "Pansement lourd", code: "AMI 4", cotation: 12.6, lettreCle: "AMI", coefficient: 4 };
-const AIS_3: ActeVue = { libelle: "Toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS", coefficient: 3 };
-const TLS: ActeVue = { libelle: "Téléconsultation", code: "TLS", cotation: 10, lettreCle: "TLS", coefficient: null };
-const BSA: ActeVue = { libelle: "Forfait dépendance légère", code: "BSA", cotation: 13, lettreCle: "BSA", coefficient: null };
-const SANS_CODE: ActeVue = { libelle: "Surveillance", code: null, cotation: null, lettreCle: null, coefficient: null };
+const AMI_1: ActeVue = { libelle: "Injection", code: "AMI 1", cotation: 3.15, lettreCle: "AMI", coefficient: 1, derogatoireBsi: false };
+const AMI_2: ActeVue = { libelle: "Pansement simple", code: "AMI 2", cotation: 6.3, lettreCle: "AMI", coefficient: 2, derogatoireBsi: false };
+const AMI_4: ActeVue = { libelle: "Pansement lourd", code: "AMI 4", cotation: 12.6, lettreCle: "AMI", coefficient: 4, derogatoireBsi: false };
+const AIS_3: ActeVue = { libelle: "Toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS", coefficient: 3, derogatoireBsi: false };
+const TLS: ActeVue = { libelle: "Téléconsultation", code: "TLS", cotation: 10, lettreCle: "TLS", coefficient: null, derogatoireBsi: false };
+const BSA: ActeVue = { libelle: "Forfait dépendance légère", code: "BSA", cotation: 13, lettreCle: "BSA", coefficient: null, derogatoireBsi: false };
+const SANS_CODE: ActeVue = { libelle: "Surveillance", code: null, cotation: null, lettreCle: null, coefficient: null, derogatoireBsi: false };
 
 function creerMission(surcharge: Partial<MissionTourneeVue> = {}): MissionTourneeVue {
   return {
@@ -26,6 +26,7 @@ function creerMission(surcharge: Partial<MissionTourneeVue> = {}): MissionTourne
     patientAllergies: null,
     patientConsignes: null,
     patientDateNaissance: "1944-03-12",
+    patientForfaitBsi: null,
     typeSoin: "Pansement",
     heurePrevue: "08:00:00",
     statut: "a_faire",
@@ -82,8 +83,8 @@ describe("calculerMontantPassage", () => {
   it("reproduit l'exemple de l'article 11B", () => {
     // Pansement courant + prélèvement + injection lors de la même visite :
     // AMI 3 en entier (9,45), AMI 1,5 pour moitié (2,36), AMI 1 gratuit.
-    const AMI_3 = { libelle: "Pansement courant", code: "AMI 3", cotation: 9.45, lettreCle: "AMI", coefficient: 3 };
-    const AMI_1_5 = { libelle: "Prélèvement", code: "AMI 1,5", cotation: 4.725, lettreCle: "AMI", coefficient: 1.5 };
+    const AMI_3 = { libelle: "Pansement courant", code: "AMI 3", cotation: 9.45, lettreCle: "AMI", coefficient: 3, derogatoireBsi: false };
+    const AMI_1_5 = { libelle: "Prélèvement", code: "AMI 1,5", cotation: 4.725, lettreCle: "AMI", coefficient: 1.5, derogatoireBsi: false };
 
     expect(calculerMontantPassage([AMI_3, AMI_1_5, AMI_1], SANS_TABLE)).toBe(11.81);
   });
@@ -99,14 +100,14 @@ describe("calculerMontantPassage", () => {
     // AIS 4 a le coefficient le plus élevé (4 contre 3,9) mais le tarif le
     // plus faible : c'est lui qui compte en entier. Trier sur le tarif aurait
     // donné 17,59 € — plus flatteur, mais non conforme.
-    const AIS_4 = { libelle: "Soins de confort", code: "AIS 4", cotation: 10.6, lettreCle: "AIS", coefficient: 4 };
-    const AMI_3_9 = { libelle: "Surveillance postopératoire", code: "AMI 3,9", cotation: 12.285, lettreCle: "AMI", coefficient: 3.9 };
+    const AIS_4 = { libelle: "Soins de confort", code: "AIS 4", cotation: 10.6, lettreCle: "AIS", coefficient: 4, derogatoireBsi: false };
+    const AMI_3_9 = { libelle: "Surveillance postopératoire", code: "AMI 3,9", cotation: 12.285, lettreCle: "AMI", coefficient: 3.9, derogatoireBsi: false };
 
     expect(calculerMontantPassage([AIS_4, AMI_3_9], SANS_TABLE)).toBe(16.74);
   });
 
   it("départage deux coefficients égaux par le tarif, au bénéfice de l'IDEL", () => {
-    const AIS_4 = { libelle: "Soins de confort", code: "AIS 4", cotation: 10.6, lettreCle: "AIS", coefficient: 4 };
+    const AIS_4 = { libelle: "Soins de confort", code: "AIS 4", cotation: 10.6, lettreCle: "AIS", coefficient: 4, derogatoireBsi: false };
 
     // AMI 4 (12,60) et AIS 4 (10,60) partagent le coefficient 4 : le mieux
     // tarifé prend le taux plein.
@@ -207,6 +208,7 @@ describe("cotation selon la zone tarifaire", () => {
       cotation: 4.73,
       lettreCle: "AMI",
       coefficient: 1.5,
+      derogatoireBsi: false,
     };
     const AMI_3 = {
       libelle: "Pansement courant",
@@ -214,6 +216,7 @@ describe("cotation selon la zone tarifaire", () => {
       cotation: 9.45,
       lettreCle: "AMI",
       coefficient: 3,
+      derogatoireBsi: false,
     };
 
     // 9,45 + 4,725/2 = 11,8125 → 11,81 €, le chiffre de l'article.
@@ -231,5 +234,68 @@ describe("cotation selon la zone tarifaire", () => {
     // sur la seule journée.
     expect(calculerMontantTournee(missions, METROPOLE)).toBe(94.56);
     expect(calculerMontantTournee(missions, OUTRE_MER)).toBe(99);
+  });
+});
+
+describe("cotation chez un patient sous forfait de dépendance", () => {
+  const VALEURS: ValeursLettresCles = new Map([
+    ["AMI", { lettreCle: "AMI", valeurMetropole: 3.15, valeurDom: 3.3 }],
+    ["BSA", { lettreCle: "BSA", valeurMetropole: 13, valeurDom: 13.25 }],
+  ]);
+  const CONTEXTE: ContexteTarifaire = { zone: "metropole", valeurs: VALEURS };
+
+  const PANSEMENT_LOURD: ActeVue = {
+    libelle: "Pansement lourd",
+    code: "AMI 4",
+    cotation: 12.6,
+    lettreCle: "AMI",
+    coefficient: 4,
+    derogatoireBsi: true,
+  };
+
+  it("compte un acte technique pour moitié, l'acte basculant en AMX", () => {
+    // Hors forfait, ce pansement vaut 6,30 €. Sous forfait, il se cote AMX à
+    // 50 % de son coefficient, soit 3,15 €.
+    expect(calculerMontantPassage([AMI_2], CONTEXTE, "BSA")).toBe(3.15);
+  });
+
+  it("laisse l'acte entier quand le patient n'est pas sous forfait", () => {
+    expect(calculerMontantPassage([AMI_2], CONTEXTE, null)).toBe(6.3);
+  });
+
+  it("garde son tarif plein à un acte dérogatoire", () => {
+    // Les pansements lourds et complexes relèvent de l'article A12 : leur
+    // appliquer le 50 % par réflexe est une façon courante de se sous-facturer.
+    expect(calculerMontantPassage([PANSEMENT_LOURD], CONTEXTE, "BSA")).toBe(12.6);
+  });
+
+  it("laisse le forfait lui-même à taux plein", () => {
+    expect(calculerMontantPassage([BSA], CONTEXTE, "BSA")).toBe(13);
+  });
+
+  it("compose le forfait, la dérogation et la règle du deuxième acte", () => {
+    // Forfait entier (13,00) + pansement lourd dérogatoire à taux plein
+    // (12,60) + injection basculée en AMX puis reléguée au deuxième rang
+    // (3,15 × 50 % × 50 % = 0,79).
+    expect(calculerMontantPassage([BSA, PANSEMENT_LOURD, AMI_1], CONTEXTE, "BSA")).toBe(26.39);
+  });
+
+  it("chiffre l'écart d'un passage selon que le forfait est renseigné ou non", () => {
+    // Le même passage compte 20,88 € si le patient n'est pas déclaré sous
+    // forfait, et 16,94 € s'il l'est — nettement moins, le forfait couvrant
+    // déjà la journée. Se tromper de sens expose soit à un indu, soit à un
+    // manque à gagner.
+    expect(calculerMontantPassage([BSA, AMI_2, AMI_1], CONTEXTE, null)).toBe(20.88);
+    expect(calculerMontantPassage([BSA, AMI_2, AMI_1], CONTEXTE, "BSA")).toBe(16.94);
+  });
+
+  it("applique le forfait du patient de chaque passage, tournée entière", () => {
+    const missions = [
+      creerMission({ id: "m1", actes: [AMI_2] }),
+      creerMission({ id: "m2", actes: [AMI_2], patientForfaitBsi: "BSB" }),
+    ];
+
+    // 6,30 € pour le premier, 3,15 € pour le second.
+    expect(calculerMontantTournee(missions, CONTEXTE)).toBe(9.45);
   });
 });

@@ -18,6 +18,16 @@ import {
 const PART_SECOND_ACTE = 0.5;
 
 /**
+ * Part d'un acte technique réalisé chez un patient sous forfait de dépendance.
+ *
+ * L'acte ne se cote alors plus en AMI mais en AMX, à 50 % de son coefficient.
+ * Comme l'AMX vaut exactement l'AMI, la bascule revient à compter l'acte pour
+ * moitié. Les actes dérogatoires y échappent : leur appliquer ce taux par
+ * réflexe est une façon courante de se sous-facturer.
+ */
+const PART_ACTE_SOUS_FORFAIT = 0.5;
+
+/**
  * Lettres-clés qui échappent à la règle de cumul : leur montant est toujours
  * compté en entier et ne consomme pas de rang pour les autres.
  *
@@ -81,11 +91,16 @@ function tarifDe(acte: ActeVue, contexte: ContexteTarifaire): number | null {
  */
 export function calculerMontantPassage(
   actes: ActeVue[],
-  contexte: ContexteTarifaire
+  contexte: ContexteTarifaire,
+  forfaitBsi: string | null = null
 ): number {
   const tarifes = actes
     .map((acte) => ({ acte, tarif: tarifDe(acte, contexte) }))
-    .filter((ligne): ligne is { acte: ActeVue; tarif: number } => ligne.tarif !== null);
+    .filter((ligne): ligne is { acte: ActeVue; tarif: number } => ligne.tarif !== null)
+    .map((ligne) => ({
+      ...ligne,
+      tarif: basculeEnAmx(ligne.acte, forfaitBsi) ? ligne.tarif * PART_ACTE_SOUS_FORFAIT : ligne.tarif,
+    }));
 
   const horsCumul = tarifes.filter((ligne) => estHorsCumul(ligne.acte));
   const soumisAuCumul = tarifes.filter((ligne) => !estHorsCumul(ligne.acte));
@@ -122,6 +137,19 @@ function estHorsCumul(acte: ActeVue): boolean {
 }
 
 /**
+ * L'acte doit-il basculer en AMX, chez un patient sous forfait ?
+ *
+ * Trois conditions, et elles se lisent dans cet ordre : le patient est sous
+ * forfait, l'acte n'est pas lui-même le forfait (ni une majoration), et il ne
+ * figure pas parmi les dérogations de l'article A12.
+ */
+function basculeEnAmx(acte: ActeVue, forfaitBsi: string | null): boolean {
+  if (!forfaitBsi) return false;
+  if (estHorsCumul(acte)) return false;
+  return !acte.derogatoireBsi;
+}
+
+/**
  * Montant de la tournée, passage par passage.
  *
  * Une absence ne compte pas : le soin n'a pas été réalisé. L'indemnité de
@@ -133,7 +161,11 @@ export function calculerMontantTournee(
 ): number {
   const montant = missions
     .filter((mission) => mission.statut !== "absent")
-    .reduce((somme, mission) => somme + calculerMontantPassage(mission.actes, contexte), 0);
+    .reduce(
+      (somme, mission) =>
+        somme + calculerMontantPassage(mission.actes, contexte, mission.patientForfaitBsi),
+      0
+    );
 
   return arrondirCentimes(montant);
 }

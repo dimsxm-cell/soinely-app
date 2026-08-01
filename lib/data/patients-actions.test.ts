@@ -59,6 +59,7 @@ describe("createPatientAction", () => {
       sexe: "femme",
       allergies: "Pénicilline",
       consignes: null,
+        forfait_bsi: null,
       medecin_nom: "Dr Martin",
       medecin_telephone: null,
       personne_confiance_nom: null,
@@ -155,6 +156,7 @@ describe("updatePatientAction", () => {
       sexe: null,
       allergies: null,
       consignes: null,
+        forfait_bsi: null,
       medecin_nom: "Dr Martin",
       medecin_telephone: null,
       personne_confiance_nom: null,
@@ -487,5 +489,47 @@ describe("coterSoinPrescritAction", () => {
     await coterSoinPrescritAction(formData);
 
     expect(updateMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("forfait de dépendance", () => {
+  it("enregistre le forfait choisi", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
+    singleInsertMock.mockResolvedValue({ data: { id: "p1" }, error: null });
+
+    const { createPatientAction } = await import("./patients-actions");
+
+    const formData = new FormData();
+    formData.set("nomComplet", "Mme Dupont");
+    formData.set("adresse", "12 rue des Lilas");
+    formData.set("telephone", "0612345678");
+    formData.set("forfaitBsi", "BSC");
+
+    await createPatientAction(formData);
+
+    expect(insertMock).toHaveBeenCalledWith(
+      expect.objectContaining({ forfait_bsi: "BSC" })
+    );
+  });
+
+  it("ignore une valeur hors liste plutôt que de faire échouer la fiche entière", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
+    singleInsertMock.mockResolvedValue({ data: { id: "p1" }, error: null });
+
+    const { createPatientAction } = await import("./patients-actions");
+
+    const formData = new FormData();
+    formData.set("nomComplet", "Mme Dupont");
+    formData.set("adresse", "12 rue des Lilas");
+    formData.set("telephone", "0612345678");
+    formData.set("forfaitBsi", "BSZ");
+
+    await createPatientAction(formData);
+
+    // La contrainte SQL rejetterait « BSZ » et emporterait toute la création
+    // du patient avec elle, pour un champ secondaire.
+    expect(insertMock).toHaveBeenCalledWith(
+      expect.objectContaining({ forfait_bsi: null })
+    );
   });
 });

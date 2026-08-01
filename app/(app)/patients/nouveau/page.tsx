@@ -5,6 +5,7 @@ import { createPatientAction } from "@/lib/data/patients-actions";
 import { ChampAvecDictee } from "@/components/ui/ChampAvecDictee";
 import { ChampsIdentite } from "@/components/ui/ChampsIdentite";
 import { ChampTelephone } from "@/components/ui/ChampTelephone";
+import { ChampForfaitBsi } from "@/components/ui/ChampForfaitBsi";
 import { LienRetour } from "@/components/ui/LienRetour";
 
 export default function NouveauPatientPage() {
@@ -54,6 +55,7 @@ export default function NouveauPatientPage() {
           <ChampAvecDictee name="antecedents" label="Antécédents médicaux" multiligne rows={2} />
           <ChampAvecDictee name="allergies" label="Allergies" multiligne rows={2} />
           <ChampAvecDictee name="consignes" label="Consignes spécifiques" multiligne rows={2} />
+          <ChampForfaitBsi />
 
           {erreur && (
             <p className="rounded-[12px] border border-danger/20 bg-danger/[0.06] px-3.5 py-2.5 text-[13.5px] font-medium text-danger">

@@ -8,6 +8,7 @@ import type { SoinPrescrit } from "@/lib/types/clinical";
 import { Button } from "@/components/ui/Button";
 import { ChampAvecDictee } from "@/components/ui/ChampAvecDictee";
 import { ChampsIdentite } from "@/components/ui/ChampsIdentite";
+import { ChampForfaitBsi } from "@/components/ui/ChampForfaitBsi";
 import { ChampTelephone } from "@/components/ui/ChampTelephone";
 import { LienRetour } from "@/components/ui/LienRetour";
 import Link from "next/link";
@@ -119,6 +120,7 @@ export default async function PatientPage({ params }: { params: Promise<{ id: st
             multiligne
             rows={2}
           />
+          <ChampForfaitBsi defaultValue={patient.forfaitBsi} />
           <Button type="submit" variant="tertiary" className="self-start">
             Enregistrer
           </Button>
