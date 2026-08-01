@@ -318,6 +318,11 @@ export interface ActeVue {
   cotation: number | null;
   /** Lettre-clé du code (AMI, AIS, TLS…), qui gouverne la règle de cumul. */
   lettreCle: string | null;
+  /**
+   * Coefficient de l'acte. C'est lui, et non le tarif, qui classe les actes
+   * d'une séance : l'article 11B raisonne en coefficients.
+   */
+  coefficient: number | null;
 }
 
 export interface MissionTourneeVue {
@@ -345,7 +350,7 @@ export async function getMissionsTourneeVue(
   const { data, error } = await supabase
     .from("missions_du_jour")
     .select(
-      "id, patient_id, type_soin, heure_prevue, statut, motif_absence, mission_clinique_id, patients(nom_complet, adresse, telephone, allergies, consignes, date_naissance), missions_cliniques(duree_estimee_min), actes_mission(libelle, ordre, ngap_codes(code, cotation, lettre_cle))"
+      "id, patient_id, type_soin, heure_prevue, statut, motif_absence, mission_clinique_id, patients(nom_complet, adresse, telephone, allergies, consignes, date_naissance), missions_cliniques(duree_estimee_min), actes_mission(libelle, ordre, ngap_codes(code, cotation, lettre_cle, coefficient))"
     )
     .eq("tournee_id", tourneeId)
     .order("heure_prevue");
@@ -363,7 +368,12 @@ export async function getMissionsTourneeVue(
       date_naissance: string | null;
     };
     type MCRow = { duree_estimee_min: number };
-    type CodeRow = { code: string; cotation: number; lettre_cle: string | null };
+    type CodeRow = {
+      code: string;
+      cotation: number;
+      lettre_cle: string | null;
+      coefficient: number | null;
+    };
     type ActeRow = {
       libelle: string;
       ordre: number;
@@ -389,6 +399,7 @@ export async function getMissionsTourneeVue(
           code: ngap?.code ?? null,
           cotation: ngap?.cotation ?? null,
           lettreCle: ngap?.lettre_cle ?? null,
+          coefficient: ngap?.coefficient ?? null,
         };
       });
 

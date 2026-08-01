@@ -3,12 +3,13 @@ import type { ActeVue, MissionTourneeVue } from "@/lib/data/ma-journee";
 import { calculerMontantPassage, calculerMontantTournee, formaterEuros } from "./cotation";
 
 // Tarifs du catalogue fourni par la fondatrice (source albus.fr, 2026-07-30).
-const AMI_1: ActeVue = { libelle: "Injection", code: "AMI 1", cotation: 3.15, lettreCle: "AMI" };
-const AMI_2: ActeVue = { libelle: "Pansement simple", code: "AMI 2", cotation: 6.3, lettreCle: "AMI" };
-const AMI_4: ActeVue = { libelle: "Pansement lourd", code: "AMI 4", cotation: 12.6, lettreCle: "AMI" };
-const AIS_3: ActeVue = { libelle: "Toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS" };
-const TLS: ActeVue = { libelle: "Téléconsultation", code: "TLS", cotation: 10, lettreCle: "TLS" };
-const SANS_CODE: ActeVue = { libelle: "Surveillance", code: null, cotation: null, lettreCle: null };
+const AMI_1: ActeVue = { libelle: "Injection", code: "AMI 1", cotation: 3.15, lettreCle: "AMI", coefficient: 1 };
+const AMI_2: ActeVue = { libelle: "Pansement simple", code: "AMI 2", cotation: 6.3, lettreCle: "AMI", coefficient: 2 };
+const AMI_4: ActeVue = { libelle: "Pansement lourd", code: "AMI 4", cotation: 12.6, lettreCle: "AMI", coefficient: 4 };
+const AIS_3: ActeVue = { libelle: "Toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS", coefficient: 3 };
+const TLS: ActeVue = { libelle: "Téléconsultation", code: "TLS", cotation: 10, lettreCle: "TLS", coefficient: null };
+const BSA: ActeVue = { libelle: "Forfait dépendance légère", code: "BSA", cotation: 13, lettreCle: "BSA", coefficient: null };
+const SANS_CODE: ActeVue = { libelle: "Surveillance", code: null, cotation: null, lettreCle: null, coefficient: null };
 
 function creerMission(surcharge: Partial<MissionTourneeVue> = {}): MissionTourneeVue {
   return {
@@ -71,6 +72,40 @@ describe("calculerMontantPassage", () => {
   it("applique la règle aux seuls actes non cumulables", () => {
     // TLS entier (10) + AMI 2 entier (6,30) + moitié de AMI 1 (1,575).
     expect(calculerMontantPassage([TLS, AMI_2, AMI_1])).toBe(17.88);
+  });
+
+  it("reproduit l'exemple de l'article 11B", () => {
+    // Pansement courant + prélèvement + injection lors de la même visite :
+    // AMI 3 en entier (9,45), AMI 1,5 pour moitié (2,36), AMI 1 gratuit.
+    const AMI_3 = { libelle: "Pansement courant", code: "AMI 3", cotation: 9.45, lettreCle: "AMI", coefficient: 3 };
+    const AMI_1_5 = { libelle: "Prélèvement", code: "AMI 1,5", cotation: 4.725, lettreCle: "AMI", coefficient: 1.5 };
+
+    expect(calculerMontantPassage([AMI_3, AMI_1_5, AMI_1])).toBe(11.81);
+  });
+
+  it("compte un forfait de dépendance en entier sans consommer de rang", () => {
+    // La NGAP facture BSA, BSB et BSC à taux plein « quels que soient les
+    // actes réalisés en parallèle » : le forfait couvre la journée, il n'est
+    // pas un acte de la séance que l'article 11B mettrait en concurrence.
+    expect(calculerMontantPassage([BSA, AMI_2, AMI_1])).toBe(20.88);
+  });
+
+  it("classe les actes par coefficient et non par tarif", () => {
+    // AIS 4 a le coefficient le plus élevé (4 contre 3,9) mais le tarif le
+    // plus faible : c'est lui qui compte en entier. Trier sur le tarif aurait
+    // donné 17,59 € — plus flatteur, mais non conforme.
+    const AIS_4 = { libelle: "Soins de confort", code: "AIS 4", cotation: 10.6, lettreCle: "AIS", coefficient: 4 };
+    const AMI_3_9 = { libelle: "Surveillance postopératoire", code: "AMI 3,9", cotation: 12.285, lettreCle: "AMI", coefficient: 3.9 };
+
+    expect(calculerMontantPassage([AIS_4, AMI_3_9])).toBe(16.74);
+  });
+
+  it("départage deux coefficients égaux par le tarif, au bénéfice de l'IDEL", () => {
+    const AIS_4 = { libelle: "Soins de confort", code: "AIS 4", cotation: 10.6, lettreCle: "AIS", coefficient: 4 };
+
+    // AMI 4 (12,60) et AIS 4 (10,60) partagent le coefficient 4 : le mieux
+    // tarifé prend le taux plein.
+    expect(calculerMontantPassage([AIS_4, AMI_4])).toBe(17.9);
   });
 
   it("mélange les lettres-clés sans distinction hors cumulables", () => {

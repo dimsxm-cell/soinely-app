@@ -108,13 +108,13 @@ describe("EnTeteTournee", () => {
       {
         ...creerMission("a", "terminee", "08:00:00"),
         actes: [
-          { libelle: "Pansement", code: "AMI 2", cotation: 6.3, lettreCle: "AMI" },
-          { libelle: "Injection", code: "AMI 1", cotation: 3.15, lettreCle: "AMI" },
+          { libelle: "Pansement", code: "AMI 2", cotation: 6.3, lettreCle: "AMI", coefficient: 2 },
+          { libelle: "Injection", code: "AMI 1", cotation: 3.15, lettreCle: "AMI", coefficient: 1 },
         ],
       },
       {
         ...creerMission("b", "a_faire", "10:00:00"),
-        actes: [{ libelle: "Toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS" }],
+        actes: [{ libelle: "Toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS", coefficient: 3 }],
       },
     ];
 
