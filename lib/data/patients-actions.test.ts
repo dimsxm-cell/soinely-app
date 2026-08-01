@@ -15,6 +15,11 @@ vi.mock("@/lib/supabase/server", () => ({
   }),
 }));
 
+// Le géocodage part sur le réseau : le feindre garde ces tests déterministes
+// et hors ligne. Sa propre logique est testée dans lib/geocodage.
+const geocoderMock = vi.fn().mockResolvedValue(null);
+vi.mock("@/lib/geocodage", () => ({ geocoderAdresse: geocoderMock }));
+
 vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }));
@@ -530,6 +535,52 @@ describe("forfait de dépendance", () => {
     // du patient avec elle, pour un champ secondaire.
     expect(insertMock).toHaveBeenCalledWith(
       expect.objectContaining({ forfait_bsi: null })
+    );
+  });
+});
+
+describe("position du patient", () => {
+  it("enregistre les coordonnées de l'adresse géocodée", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
+    singleInsertMock.mockResolvedValue({ data: { id: "p1" }, error: null });
+    geocoderMock.mockResolvedValueOnce({ latitude: 48.8566, longitude: 2.3522 });
+
+    const { createPatientAction } = await import("./patients-actions");
+
+    const formData = new FormData();
+    formData.set("nomComplet", "Mme Dupont");
+    formData.set("adresse", "12 rue des Lilas, 75011 Paris");
+    formData.set("telephone", "0612345678");
+
+    await createPatientAction(formData);
+
+    expect(geocoderMock).toHaveBeenCalledWith("12 rue des Lilas, 75011 Paris");
+    expect(insertMock).toHaveBeenCalledWith(
+      expect.objectContaining({ latitude: 48.8566, longitude: 2.3522 })
+    );
+  });
+
+  it("enregistre le patient sans position quand l'adresse n'est pas située", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
+    singleInsertMock.mockResolvedValue({ data: { id: "p1" }, error: null });
+    geocoderMock.mockResolvedValueOnce(null);
+
+    const { createPatientAction } = await import("./patients-actions");
+
+    const formData = new FormData();
+    formData.set("nomComplet", "Mme Dupont");
+    formData.set("adresse", "adresse introuvable");
+    formData.set("telephone", "0612345678");
+
+    await createPatientAction(formData);
+
+    // Une adresse mal orthographiée ne doit pas empêcher de créer la fiche :
+    // le patient est enregistré, il n'aura simplement pas de kilomètres.
+    expect(insertMock).toHaveBeenCalledWith(
+      expect.not.objectContaining({ latitude: expect.anything() })
+    );
+    expect(insertMock).toHaveBeenCalledWith(
+      expect.not.objectContaining({ longitude: expect.anything() })
     );
   });
 });
