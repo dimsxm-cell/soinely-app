@@ -311,6 +311,13 @@ export async function getMissionEnCoursHref(
 export interface ActeVue {
   libelle: string;
   code: string | null;
+  /**
+   * Tarif de l'acte en euros, tel que le catalogue NGAP le porte. `null` pour
+   * un acte sans code : il reste affiché, mais ne compte dans aucun total.
+   */
+  cotation: number | null;
+  /** Lettre-clé du code (AMI, AIS, TLS…), qui gouverne la règle de cumul. */
+  lettreCle: string | null;
 }
 
 export interface MissionTourneeVue {
@@ -338,7 +345,7 @@ export async function getMissionsTourneeVue(
   const { data, error } = await supabase
     .from("missions_du_jour")
     .select(
-      "id, patient_id, type_soin, heure_prevue, statut, motif_absence, mission_clinique_id, patients(nom_complet, adresse, telephone, allergies, consignes, date_naissance), missions_cliniques(duree_estimee_min), actes_mission(libelle, ordre, ngap_codes(code))"
+      "id, patient_id, type_soin, heure_prevue, statut, motif_absence, mission_clinique_id, patients(nom_complet, adresse, telephone, allergies, consignes, date_naissance), missions_cliniques(duree_estimee_min), actes_mission(libelle, ordre, ngap_codes(code, cotation, lettre_cle))"
     )
     .eq("tournee_id", tourneeId)
     .order("heure_prevue");
@@ -356,10 +363,11 @@ export async function getMissionsTourneeVue(
       date_naissance: string | null;
     };
     type MCRow = { duree_estimee_min: number };
+    type CodeRow = { code: string; cotation: number; lettre_cle: string | null };
     type ActeRow = {
       libelle: string;
       ordre: number;
-      ngap_codes: { code: string } | { code: string }[] | null;
+      ngap_codes: CodeRow | CodeRow[] | null;
     };
 
     const patientEmbed = row.patients as unknown;
@@ -376,7 +384,12 @@ export async function getMissionsTourneeVue(
       .map((acte) => {
         const codeEmbed = acte.ngap_codes;
         const ngap = Array.isArray(codeEmbed) ? codeEmbed[0] : codeEmbed;
-        return { libelle: acte.libelle, code: ngap?.code ?? null };
+        return {
+          libelle: acte.libelle,
+          code: ngap?.code ?? null,
+          cotation: ngap?.cotation ?? null,
+          lettreCle: ngap?.lettre_cle ?? null,
+        };
       });
 
     return {
