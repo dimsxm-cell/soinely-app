@@ -149,8 +149,8 @@ describe("CarteMissionTournee — actes", () => {
       <CarteMissionTournee
         mission={creerMission({
           actes: [
-            { libelle: "toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS", coefficient: 3, derogatoireBsi: false },
-            { libelle: "insuline", code: "AMI 1", cotation: 3.15, lettreCle: "AMI", coefficient: 1, derogatoireBsi: false },
+            { libelle: "toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS", coefficient: 3, derogatoireBsi: false, eligibleMci: false },
+            { libelle: "insuline", code: "AMI 1", cotation: 3.15, lettreCle: "AMI", coefficient: 1, derogatoireBsi: false, eligibleMci: false },
           ],
         })}
         estDerniere={false}
@@ -173,7 +173,7 @@ describe("CarteMissionTournee — actes", () => {
   it("affiche le libellé seul pour un acte sans cotation", () => {
     render(
       <CarteMissionTournee
-        mission={creerMission({ actes: [{ libelle: "Pansement", code: null, cotation: null, lettreCle: null, coefficient: null, derogatoireBsi: false }] })}
+        mission={creerMission({ actes: [{ libelle: "Pansement", code: null, cotation: null, lettreCle: null, coefficient: null, derogatoireBsi: false, eligibleMci: false }] })}
         estDerniere={false}
       />
     );
@@ -186,8 +186,8 @@ describe("CarteMissionTournee — actes", () => {
       <CarteMissionTournee
         mission={creerMission({
           actes: [
-            { libelle: "toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS", coefficient: 3, derogatoireBsi: false },
-            { libelle: "Pansement", code: null, cotation: null, lettreCle: null, coefficient: null, derogatoireBsi: false },
+            { libelle: "toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS", coefficient: 3, derogatoireBsi: false, eligibleMci: false },
+            { libelle: "Pansement", code: null, cotation: null, lettreCle: null, coefficient: null, derogatoireBsi: false, eligibleMci: false },
           ],
         })}
         estDerniere={false}

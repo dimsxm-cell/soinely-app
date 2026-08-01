@@ -107,26 +107,26 @@ describe("EnTeteTournee", () => {
     expect(screen.getByText("8")).toBeInTheDocument();
   });
 
-  it("affiche le montant des actes cotés de la tournée", () => {
+  it("affiche le montant facturable de la tournée", () => {
     // Un pansement (6,30 €) et une injection (3,15 €) au même passage : la
     // règle du deuxième acte à 50 % donne 7,88 €, plus 7,95 € de toilette.
     const avecActes = [
       {
         ...creerMission("a", "terminee", "08:00:00"),
         actes: [
-          { libelle: "Pansement", code: "AMI 2", cotation: 6.3, lettreCle: "AMI", coefficient: 2, derogatoireBsi: false },
-          { libelle: "Injection", code: "AMI 1", cotation: 3.15, lettreCle: "AMI", coefficient: 1, derogatoireBsi: false },
+          { libelle: "Pansement", code: "AMI 2", cotation: 6.3, lettreCle: "AMI", coefficient: 2, derogatoireBsi: false, eligibleMci: false },
+          { libelle: "Injection", code: "AMI 1", cotation: 3.15, lettreCle: "AMI", coefficient: 1, derogatoireBsi: false, eligibleMci: false },
         ],
       },
       {
         ...creerMission("b", "a_faire", "10:00:00"),
-        actes: [{ libelle: "Toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS", coefficient: 3, derogatoireBsi: false }],
+        actes: [{ libelle: "Toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS", coefficient: 3, derogatoireBsi: false, eligibleMci: false }],
       },
     ];
 
     render(<EnTeteTournee missions={avecActes} tournee={tournee} contexteTarifaire={TARIFS} />);
 
-    expect(screen.getByText("Actes cotés")).toBeInTheDocument();
+    expect(screen.getByText("Facturable")).toBeInTheDocument();
     expect(screen.getByText(/15,83/)).toBeInTheDocument();
   });
 
@@ -135,7 +135,7 @@ describe("EnTeteTournee", () => {
     // dit que l'absence de codes sur des soins bien réels.
     render(<EnTeteTournee missions={missions} tournee={tournee} contexteTarifaire={TARIFS} />);
 
-    expect(screen.queryByText("Actes cotés")).not.toBeInTheDocument();
+    expect(screen.queryByText("Facturable")).not.toBeInTheDocument();
   });
 
   it("n'affiche pas d'heure de fin quand tout est validé", () => {
@@ -148,5 +148,71 @@ describe("EnTeteTournee", () => {
 
     expect(screen.queryByText("Fin est.")).not.toBeInTheDocument();
     expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "100");
+  });
+});
+
+describe("EnTeteTournee — majorations", () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-07-07T09:00:00"));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  const AVEC_MAJORATIONS: ContexteTarifaire = {
+    zone: "metropole",
+    valeurs: new Map([
+      ["AMI", { lettreCle: "AMI", valeurMetropole: 3.15, valeurDom: 3.3 }],
+      ["IFD", { lettreCle: "IFD", valeurMetropole: 2.75, valeurDom: 2.75 }],
+      ["MN", { lettreCle: "MN", valeurMetropole: 9.15, valeurDom: 9.15 }],
+    ]),
+  };
+
+  const PANSEMENT = {
+    libelle: "Pansement",
+    code: "AMI 2",
+    cotation: 6.3,
+    lettreCle: "AMI",
+    coefficient: 2,
+    derogatoireBsi: false,
+    eligibleMci: false,
+  };
+
+  it("ajoute les majorations au total et en détaille le montant", () => {
+    // Un passage à 21 h, un mardi : 6,30 € d'acte, 2,75 € de déplacement et
+    // 9,15 € de majoration de nuit, soit 18,20 € facturables.
+    const mission = {
+      ...creerMission("a", "terminee", "21:00:00"),
+      actes: [PANSEMENT],
+    };
+
+    render(
+      <EnTeteTournee
+        missions={[mission]}
+        tournee={{ ...tournee, date: "2026-07-07" }}
+        contexteTarifaire={AVEC_MAJORATIONS}
+      />
+    );
+
+    expect(screen.getByText(/18,20/)).toBeInTheDocument();
+    expect(screen.getByText(/dont.*11,90.*de majorations/)).toBeInTheDocument();
+  });
+
+  it("tait la ligne de détail quand aucune majoration n'est due", () => {
+    // Table des valeurs sans majoration : le total reste celui des actes, et
+    // la mention n'a rien à annoncer.
+    const mission = { ...creerMission("a", "terminee", "10:00:00"), actes: [PANSEMENT] };
+
+    render(
+      <EnTeteTournee
+        missions={[mission]}
+        tournee={{ ...tournee, date: "2026-07-07" }}
+        contexteTarifaire={TARIFS}
+      />
+    );
+
+    expect(screen.queryByText(/de majorations/)).not.toBeInTheDocument();
   });
 });
