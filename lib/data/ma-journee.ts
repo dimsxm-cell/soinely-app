@@ -385,6 +385,10 @@ export interface MissionTourneeVue {
    * Sa présence bascule les actes techniques du passage en AMX à 50 %.
    */
   patientForfaitBsi: string | null;
+  /** Distance routière depuis le cabinet, aller simple. */
+  distanceKm: number | null;
+  /** Distance corrigée à la main, qui prime sur la précédente. */
+  distanceKmCorrigee: number | null;
   typeSoin: string;
   heurePrevue: string;
   statut: StatutMission;
@@ -401,7 +405,7 @@ export async function getMissionsTourneeVue(
   const { data, error } = await supabase
     .from("missions_du_jour")
     .select(
-      "id, patient_id, type_soin, heure_prevue, statut, motif_absence, mission_clinique_id, patients(nom_complet, adresse, telephone, allergies, consignes, date_naissance, forfait_bsi), missions_cliniques(duree_estimee_min), actes_mission(libelle, ordre, ngap_codes(code, cotation, lettre_cle, coefficient, derogatoire_bsi, eligible_mci))"
+      "id, patient_id, type_soin, heure_prevue, statut, motif_absence, mission_clinique_id, distance_km, distance_km_corrigee, patients(nom_complet, adresse, telephone, allergies, consignes, date_naissance, forfait_bsi), missions_cliniques(duree_estimee_min), actes_mission(libelle, ordre, ngap_codes(code, cotation, lettre_cle, coefficient, derogatoire_bsi, eligible_mci))"
     )
     .eq("tournee_id", tourneeId)
     .order("heure_prevue");
@@ -441,6 +445,8 @@ export async function getMissionsTourneeVue(
       patientConsignes: patient?.consignes ?? null,
       patientDateNaissance: patient?.date_naissance ?? null,
       patientForfaitBsi: patient?.forfait_bsi ?? null,
+      distanceKm: row.distance_km ?? null,
+      distanceKmCorrigee: row.distance_km_corrigee ?? null,
       typeSoin: row.type_soin,
       heurePrevue: row.heure_prevue,
       statut: row.statut as StatutMission,

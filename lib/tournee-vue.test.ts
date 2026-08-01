@@ -20,6 +20,8 @@ function creerMission(surcharge: Partial<MissionTourneeVue> = {}): MissionTourne
     patientConsignes: null,
     patientDateNaissance: "1944-03-12",
     patientForfaitBsi: null,
+    distanceKm: null,
+    distanceKmCorrigee: null,
     typeSoin: "Pansement",
     heurePrevue: "08:00:00",
     statut: "a_faire",

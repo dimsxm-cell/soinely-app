@@ -30,6 +30,8 @@ function creerMission(id: string, statut: StatutMission, heurePrevue: string): M
     patientConsignes: null,
     patientDateNaissance: "1944-03-12",
     patientForfaitBsi: null,
+    distanceKm: null,
+    distanceKmCorrigee: null,
     typeSoin: "Pansement",
     heurePrevue,
     statut,

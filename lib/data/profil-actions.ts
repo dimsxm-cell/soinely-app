@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { journaliserEchec } from "@/lib/journal";
+import { geocoderAdresse } from "@/lib/geocodage";
 
 const BUCKET_AVATARS = "avatars";
 
@@ -39,14 +40,14 @@ export async function uploadAvatarAction(formData: FormData): Promise<void> {
 }
 
 /**
- * Enregistre le code postal du cabinet.
+ * Enregistre le cabinet : son code postal et son adresse.
  *
- * Il ne sert pas à écrire une adresse mais à déterminer la zone tarifaire :
- * les tarifs NGAP des DOM sont supérieurs à ceux de la métropole, et sans
- * cette information une IDEL de Guadeloupe verrait ses actes sous-évalués de
- * près de 5 % sans que rien ne le signale.
+ * Les deux gouvernent des montants distincts. Le code postal fixe la zone
+ * tarifaire — sans lui, une IDEL de Guadeloupe verrait ses actes sous-évalués
+ * de près de 5 % sans que rien ne le signale. L'adresse est l'origine des
+ * trajets, donc des indemnités kilométriques.
  */
-export async function enregistrerCodePostalAction(formData: FormData): Promise<void> {
+export async function enregistrerCabinetAction(formData: FormData): Promise<void> {
   const saisi = String(formData.get("codePostal") ?? "").trim();
 
   // Cinq chiffres, ou rien. Une saisie partielle rangerait le cabinet en
@@ -54,6 +55,9 @@ export async function enregistrerCodePostalAction(formData: FormData): Promise<v
   // tous les montants — mieux vaut ne rien enregistrer.
   const codePostal = /^\d{5}$/.test(saisi) ? saisi : null;
   if (saisi !== "" && codePostal === null) return;
+
+  const adresseSaisie = String(formData.get("adresseCabinet") ?? "").trim();
+  const adresseCabinet = adresseSaisie === "" ? null : adresseSaisie;
 
   const supabase = await createClient();
 
@@ -63,17 +67,28 @@ export async function enregistrerCodePostalAction(formData: FormData): Promise<v
 
   if (!user) return;
 
+  // L'adresse est géocodée à la saisie, et non à chaque calcul de tournée :
+  // celle d'un cabinet ne bouge pas. Si elle n'est pas située, la position est
+  // effacée plutôt que laissée à l'ancienne, qui pointerait ailleurs.
+  const position = adresseCabinet ? await geocoderAdresse(adresseCabinet) : null;
+
   const { error } = await supabase
     .from("profiles")
-    .update({ code_postal: codePostal })
+    .update({
+      code_postal: codePostal,
+      adresse_cabinet: adresseCabinet,
+      cabinet_latitude: position?.latitude ?? null,
+      cabinet_longitude: position?.longitude ?? null,
+    })
     .eq("id", user.id);
 
   if (error) {
-    journaliserEchec("enregistrerCodePostalAction", error);
+    journaliserEchec("enregistrerCabinetAction", error);
     return;
   }
 
   revalidatePath("/compte");
-  // La tournée affiche les montants : ils changent avec la zone.
+  // La tournée affiche les montants : ils changent avec la zone et l'origine
+  // des trajets.
   revalidatePath("/ma-tournee");
 }

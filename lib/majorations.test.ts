@@ -37,6 +37,8 @@ function creerMission(surcharge: Partial<MissionTourneeVue> = {}): MissionTourne
     patientConsignes: null,
     patientDateNaissance: "1944-03-12",
     patientForfaitBsi: null,
+    distanceKm: null,
+    distanceKmCorrigee: null,
     typeSoin: "Pansement",
     heurePrevue: "10:00:00",
     statut: "a_faire",
@@ -200,5 +202,59 @@ describe("calculerMajorationsTournee", () => {
     // n'est inventée, le total reste celui des actes seuls.
     const vide: ContexteTarifaire = { zone: "metropole", valeurs: new Map() };
     expect(calculerMajorationsTournee([creerMission()], DIMANCHE, vide)).toBe(0);
+  });
+});
+
+describe("indemnités kilométriques", () => {
+  const AVEC_IK: ContexteTarifaire = {
+    zone: "metropole",
+    valeurs: new Map([
+      ...VALEURS,
+      ["IK", { lettreCle: "IK", valeurMetropole: 0.35, valeurDom: 0.35 }],
+    ]),
+  };
+
+  it("compte les kilomètres au-delà de l'abattement", () => {
+    // 8 km aller : 16 km parcourus, 12 indemnisables à 0,35 €.
+    const mission = creerMission({ distanceKm: 8 });
+    expect(calculerMajorationsPassage(mission, MARDI, AVEC_IK).kilometres).toBe(4.2);
+  });
+
+  it("ne compte rien pour un trajet sous l'abattement", () => {
+    const mission = creerMission({ distanceKm: 1.5 });
+    expect(calculerMajorationsPassage(mission, MARDI, AVEC_IK).kilometres).toBe(0);
+  });
+
+  it("laisse la correction manuelle primer sur la distance calculée", () => {
+    // L'itinéraire ignore le détour par la pharmacie ; la saisie fait foi.
+    const mission = creerMission({ distanceKm: 8, distanceKmCorrigee: 12 });
+    expect(calculerMajorationsPassage(mission, MARDI, AVEC_IK).kilometres).toBe(7);
+  });
+
+  it("reste dû chez un patient sous forfait, qui n'ouvre droit à rien d'autre", () => {
+    // Le forfait couvre les soins, pas la route.
+    const mission = creerMission({ distanceKm: 8, patientForfaitBsi: "BSA" });
+    const detail = calculerMajorationsPassage(mission, DIMANCHE, AVEC_IK);
+
+    expect(detail.kilometres).toBe(4.2);
+    expect(detail.dimancheFerie).toBe(0);
+    expect(detail.total).toBe(6.95);
+  });
+
+  it("ne compte rien sur un passage marqué absent", () => {
+    const mission = creerMission({ distanceKm: 20, statut: "absent" });
+    expect(calculerMajorationsPassage(mission, MARDI, AVEC_IK).kilometres).toBe(0);
+  });
+
+  it("ne compte rien sans distance connue", () => {
+    // Cabinet non renseigné, ou adresse patient non localisée.
+    const mission = creerMission({ distanceKm: null });
+    expect(calculerMajorationsPassage(mission, MARDI, AVEC_IK).kilometres).toBe(0);
+  });
+
+  it("entre dans le total du passage", () => {
+    const mission = creerMission({ distanceKm: 8 });
+    // 2,75 € de déplacement et 4,20 € de kilomètres.
+    expect(calculerMajorationsPassage(mission, MARDI, AVEC_IK).total).toBe(6.95);
   });
 });
