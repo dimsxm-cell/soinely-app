@@ -212,6 +212,8 @@ export type Database = {
         Row: {
           heure_prevue: string
           id: string
+          distance_km: number | null
+          distance_km_corrigee: number | null
           mission_clinique_id: string | null
           motif_absence: string | null
           patient_id: string
@@ -225,6 +227,8 @@ export type Database = {
         Insert: {
           heure_prevue: string
           id?: string
+          distance_km?: number | null
+          distance_km_corrigee?: number | null
           mission_clinique_id?: string | null
           motif_absence?: string | null
           patient_id: string
@@ -238,6 +242,8 @@ export type Database = {
         Update: {
           heure_prevue?: string
           id?: string
+          distance_km?: number | null
+          distance_km_corrigee?: number | null
           mission_clinique_id?: string | null
           motif_absence?: string | null
           patient_id?: string
@@ -339,6 +345,8 @@ export type Database = {
           date_naissance: string | null
           forfait_bsi: string | null
           id: string
+          latitude: number | null
+          longitude: number | null
           idel_id: string
           medecin_nom: string | null
           medecin_telephone: string | null
@@ -360,6 +368,8 @@ export type Database = {
           date_naissance?: string | null
           forfait_bsi?: string | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           idel_id: string
           medecin_nom?: string | null
           medecin_telephone?: string | null
@@ -381,6 +391,8 @@ export type Database = {
           date_naissance?: string | null
           forfait_bsi?: string | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           idel_id?: string
           medecin_nom?: string | null
           medecin_telephone?: string | null
@@ -406,6 +418,9 @@ export type Database = {
       profiles: {
         Row: {
           code_postal: string | null
+          adresse_cabinet: string | null
+          cabinet_latitude: number | null
+          cabinet_longitude: number | null
           created_at: string
           full_name: string
           id: string
@@ -413,6 +428,9 @@ export type Database = {
         }
         Insert: {
           code_postal?: string | null
+          adresse_cabinet?: string | null
+          cabinet_latitude?: number | null
+          cabinet_longitude?: number | null
           created_at?: string
           full_name: string
           id: string
@@ -420,6 +438,9 @@ export type Database = {
         }
         Update: {
           code_postal?: string | null
+          adresse_cabinet?: string | null
+          cabinet_latitude?: number | null
+          cabinet_longitude?: number | null
           created_at?: string
           full_name?: string
           id?: string

@@ -5,10 +5,23 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { FrequenceSoin } from "@/lib/types/clinical";
 import { journaliserEchec } from "@/lib/journal";
+import { geocoderAdresse } from "@/lib/geocodage";
 
 function champTexteOuNull(formData: FormData, nom: string): string | null {
   const valeur = String(formData.get(nom) ?? "");
   return valeur || null;
+}
+
+/**
+ * Position d'une adresse, prête à être fondue dans un insert ou un update.
+ *
+ * Rend un objet vide si l'adresse n'a pas pu être située : la fiche s'enregistre
+ * quand même, elle ne portera simplement pas de kilomètres. Une adresse mal
+ * orthographiée ne doit pas empêcher de créer un patient.
+ */
+async function positionDe(adresse: string): Promise<{ latitude?: number; longitude?: number }> {
+  const coordonnees = await geocoderAdresse(adresse);
+  return coordonnees ? { latitude: coordonnees.latitude, longitude: coordonnees.longitude } : {};
 }
 
 const FORFAITS_BSI = new Set(["BSA", "BSB", "BSC"]);
@@ -49,6 +62,7 @@ export async function createPatientAction(
       idel_id: user.id,
       nom_complet: nomComplet,
       adresse,
+      ...(await positionDe(adresse)),
       telephone,
       date_naissance: champTexteOuNull(formData, "dateNaissance"),
       numero_secu: champTexteOuNull(formData, "numeroSecu"),
@@ -91,6 +105,7 @@ export async function updatePatientAction(formData: FormData): Promise<void> {
     .update({
       nom_complet: nomComplet,
       adresse,
+      ...(await positionDe(adresse)),
       telephone,
       date_naissance: champTexteOuNull(formData, "dateNaissance"),
       numero_secu: champTexteOuNull(formData, "numeroSecu"),
