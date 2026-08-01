@@ -13,48 +13,75 @@ import type { ActeVue, MissionTourneeVue } from "@/lib/data/ma-journee";
 const PART_SECOND_ACTE = 0.5;
 
 /**
- * Lettres-clés qui échappent à la règle de cumul : leur acte est toujours
+ * Lettres-clés qui échappent à la règle de cumul : leur montant est toujours
  * compté en entier et ne consomme pas de rang pour les autres.
  *
- * Le catalogue le dit déjà en toutes lettres pour TLS — « Cumulable avec un
- * autre soin réalisé lors de la même séance ». Cette liste tient lieu de
- * traduction en code tant que le catalogue ne porte pas la règle dans une
- * colonne dédiée ; l'y déplacer sera le bon geste quand les exceptions se
- * multiplieront.
+ * Deux familles s'y trouvent, pour deux raisons différentes :
+ *
+ *  - les forfaits journaliers de dépendance issus du BSI (BSA, BSB, BSC), que
+ *    la NGAP facture à taux plein « quels que soient les actes réalisés en
+ *    parallèle » : le forfait n'est pas un acte de la séance, il couvre la
+ *    journée ;
+ *  - les accompagnements de téléconsultation (TLS, TLL, TLD), qui relèvent des
+ *    majorations et non des actes que l'article 11B met en concurrence.
+ *
+ * Cette liste tient lieu de règle tant que le catalogue ne porte pas cette
+ * distinction dans une colonne dédiée ; l'y déplacer sera le bon geste quand
+ * les exceptions se multiplieront.
  */
-const LETTRES_CLES_CUMULABLES = new Set(["TLS"]);
+const LETTRES_CLES_HORS_CUMUL = new Set(["BSA", "BSB", "BSC", "TLS", "TLL", "TLD"]);
 
 /**
  * Montant d'un passage, règle du deuxième acte à 50 % appliquée.
  *
- * L'acte le plus cher compte en entier, le deuxième pour moitié, les suivants
- * pour rien — l'ordre de saisie n'entre pas en compte, seul le tarif décide,
- * ce qui est toujours à l'avantage de l'IDEL. Les actes sans code ne comptent
- * pas : rien ne permet de les chiffrer.
+ * Article 11B des dispositions générales : au cours d'une même séance, l'acte
+ * au **coefficient** le plus élevé est compté en entier, le deuxième pour
+ * moitié, les suivants pour rien. C'est bien le coefficient qui classe, et non
+ * le tarif : les deux ne donnent pas toujours le même ordre, une lettre-clé
+ * pouvant valoir plus qu'une autre à coefficient égal.
+ *
+ * L'ordre de saisie n'entre jamais en compte — facturer au tarif plein le
+ * premier acte noté plutôt que le mieux coté est l'erreur la plus coûteuse
+ * relevée chez les IDEL. Les actes sans code ne comptent pas : rien ne permet
+ * de les chiffrer.
  */
 export function calculerMontantPassage(actes: ActeVue[]): number {
   const cotes = actes.filter(
     (acte): acte is ActeVue & { cotation: number } => acte.cotation !== null
   );
 
-  const cumulables = cotes.filter((acte) => estCumulable(acte));
-  const soumisAuCumul = cotes.filter((acte) => !estCumulable(acte));
+  const horsCumul = cotes.filter((acte) => estHorsCumul(acte));
+  const soumisAuCumul = cotes.filter((acte) => !estHorsCumul(acte));
 
-  const montantCumulables = cumulables.reduce((somme, acte) => somme + acte.cotation, 0);
+  const montantHorsCumul = horsCumul.reduce((somme, acte) => somme + acte.cotation, 0);
 
   const montantSoumis = [...soumisAuCumul]
-    .sort((a, b) => b.cotation - a.cotation)
+    .sort(comparerParCoefficient)
     .reduce((somme, acte, rang) => {
       if (rang === 0) return somme + acte.cotation;
       if (rang === 1) return somme + acte.cotation * PART_SECOND_ACTE;
       return somme;
     }, 0);
 
-  return arrondirCentimes(montantCumulables + montantSoumis);
+  return arrondirCentimes(montantHorsCumul + montantSoumis);
 }
 
-function estCumulable(acte: ActeVue): boolean {
-  return acte.lettreCle !== null && LETTRES_CLES_CUMULABLES.has(acte.lettreCle);
+/**
+ * Classe deux actes du mieux coté au moins coté. À coefficient égal — deux
+ * lettres-clés différentes peuvent y arriver — le tarif départage, au bénéfice
+ * de l'IDEL. Tous les codes soumis au cumul portent un coefficient dans le
+ * catalogue ; son absence ne relègue un acte que par défaut de mieux.
+ */
+function comparerParCoefficient(
+  a: ActeVue & { cotation: number },
+  b: ActeVue & { cotation: number }
+): number {
+  const ecart = (b.coefficient ?? 0) - (a.coefficient ?? 0);
+  return ecart !== 0 ? ecart : b.cotation - a.cotation;
+}
+
+function estHorsCumul(acte: ActeVue): boolean {
+  return acte.lettreCle !== null && LETTRES_CLES_HORS_CUMUL.has(acte.lettreCle);
 }
 
 /**

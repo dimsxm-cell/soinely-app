@@ -148,8 +148,8 @@ describe("CarteMissionTournee — actes", () => {
       <CarteMissionTournee
         mission={creerMission({
           actes: [
-            { libelle: "toilette", code: "AIS 3" },
-            { libelle: "insuline", code: "AMI 1" },
+            { libelle: "toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS", coefficient: 3 },
+            { libelle: "insuline", code: "AMI 1", cotation: 3.15, lettreCle: "AMI", coefficient: 1 },
           ],
         })}
         estDerniere={false}
@@ -172,7 +172,7 @@ describe("CarteMissionTournee — actes", () => {
   it("affiche le libellé seul pour un acte sans cotation", () => {
     render(
       <CarteMissionTournee
-        mission={creerMission({ actes: [{ libelle: "Pansement", code: null }] })}
+        mission={creerMission({ actes: [{ libelle: "Pansement", code: null, cotation: null, lettreCle: null, coefficient: null }] })}
         estDerniere={false}
       />
     );
@@ -185,8 +185,8 @@ describe("CarteMissionTournee — actes", () => {
       <CarteMissionTournee
         mission={creerMission({
           actes: [
-            { libelle: "toilette", code: "AIS 3" },
-            { libelle: "Pansement", code: null },
+            { libelle: "toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS", coefficient: 3 },
+            { libelle: "Pansement", code: null, cotation: null, lettreCle: null, coefficient: null },
           ],
         })}
         estDerniere={false}

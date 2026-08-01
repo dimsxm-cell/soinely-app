@@ -562,12 +562,12 @@ describe("getMissionsTourneeVue", () => {
           {
             libelle: "Insuline",
             ordre: 1,
-            ngap_codes: { code: "AMI 1", cotation: 3.15, lettre_cle: "AMI" },
+            ngap_codes: { code: "AMI 1", cotation: 3.15, lettre_cle: "AMI", coefficient: 1 },
           },
           {
             libelle: "Toilette",
             ordre: 0,
-            ngap_codes: { code: "AIS 3", cotation: 7.95, lettre_cle: "AIS" },
+            ngap_codes: { code: "AIS 3", cotation: 7.95, lettre_cle: "AIS", coefficient: 3 },
           },
         ],
       },
@@ -576,9 +576,12 @@ describe("getMissionsTourneeVue", () => {
     const { getMissionsTourneeVue } = await import("./ma-journee");
     const missions = await getMissionsTourneeVue(fakeClient, "t1");
 
+    // Le coefficient est vérifié au même titre que le tarif : c'est lui qui
+    // classe les actes d'une séance, et rien ne le signalerait s'il cessait
+    // d'être chargé.
     expect(missions[0].actes).toEqual([
-      { libelle: "Toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS" },
-      { libelle: "Insuline", code: "AMI 1", cotation: 3.15, lettreCle: "AMI" },
+      { libelle: "Toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS", coefficient: 3 },
+      { libelle: "Insuline", code: "AMI 1", cotation: 3.15, lettreCle: "AMI", coefficient: 1 },
     ]);
   });
 
@@ -602,7 +605,7 @@ describe("getMissionsTourneeVue", () => {
 
     // Sans code, l'acte reste affiché mais ne peut entrer dans aucun total.
     expect(missions[0].actes).toEqual([
-      { libelle: "Pansement", code: null, cotation: null, lettreCle: null },
+      { libelle: "Pansement", code: null, cotation: null, lettreCle: null, coefficient: null },
     ]);
   });
 
