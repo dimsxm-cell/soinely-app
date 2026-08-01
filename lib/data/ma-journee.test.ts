@@ -324,7 +324,25 @@ describe("getMissionDetail", () => {
       allergies: "Allergie pénicilline",
       consignes: "Sonner au portail.",
       date_naissance: "1948-03-14",
+      forfait_bsi: null,
     },
+    // La date vient de la tournée jointe : les majorations dimanche et fériés
+    // en dépendent, et la lire sur l'horloge ferait dériver le test.
+    tournees: { date: "2026-07-30" },
+    actes_mission: [
+      {
+        libelle: "Injection",
+        ordre: 0,
+        ngap_codes: {
+          code: "AMI 1",
+          cotation: 3.15,
+          lettre_cle: "AMI",
+          coefficient: 1,
+          derogatoire_bsi: false,
+          eligible_mci: false,
+        },
+      },
+    ],
   };
 
   it("mappe la mission et le patient joint, avec la dernière transmission, le dernier rappel et la dernière photo les plus récents", async () => {
@@ -362,6 +380,21 @@ describe("getMissionDetail", () => {
       photoPath: "u1/m1.jpg",
       dernierePhotoPath: "u1/m0-recente.jpg",
       prochaineMission: null,
+      // Le détail porte désormais de quoi coter le passage : la page de
+      // validation y affiche les actes et leur montant.
+      patientForfaitBsi: null,
+      dateTournee: "2026-07-30",
+      actes: [
+        {
+          libelle: "Injection",
+          code: "AMI 1",
+          cotation: 3.15,
+          lettreCle: "AMI",
+          coefficient: 1,
+          derogatoireBsi: false,
+          eligibleMci: false,
+        },
+      ],
       patient: {
         id: "p1",
         nomComplet: "Mme Dupont",

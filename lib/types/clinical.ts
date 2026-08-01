@@ -88,8 +88,42 @@ export interface MissionDuJour {
   missionCliniqueId: string | null;
 }
 
+export interface ActeVue {
+  libelle: string;
+  code: string | null;
+  /**
+   * Tarif de l'acte en euros, tel que le catalogue NGAP le porte. `null` pour
+   * un acte sans code : il reste affiché, mais ne compte dans aucun total.
+   */
+  cotation: number | null;
+  /** Lettre-clé du code (AMI, AIS, TLS…), qui gouverne la règle de cumul. */
+  lettreCle: string | null;
+  /**
+   * Coefficient de l'acte. C'est lui, et non le tarif, qui classe les actes
+   * d'une séance : l'article 11B raisonne en coefficients.
+   */
+  coefficient: number | null;
+  /**
+   * Acte facturable à taux plein en sus d'un forfait de dépendance, au titre
+   * de l'article A12 du titre XVI. Les autres basculent en AMX à 50 %.
+   */
+  derogatoireBsi: boolean;
+  /**
+   * Acte ouvrant droit à la majoration de coordination infirmière.
+   */
+  eligibleMci: boolean;
+}
+
 export interface MissionDetail extends MissionDuJour {
   patient: Patient;
+  /**
+   * Forfait de dépendance du patient, qui gouverne la cotation de ses actes.
+   */
+  patientForfaitBsi: string | null;
+  /** Date de la tournée, dont dépendent les majorations dimanche et fériés. */
+  dateTournee: string;
+  /** Actes cotés du passage. */
+  actes: ActeVue[];
   transmission: string | null;
   derniereTransmission: string | null;
   rappel: string | null;

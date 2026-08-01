@@ -1,8 +1,11 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUtilisateurConnecte } from "@/lib/supabase/server";
 import { getMissionDetail, getPhotoUrl } from "@/lib/data/ma-journee";
+import { getContexteTarifaire } from "@/lib/data/ngap";
+import { calculerDetailPassage } from "@/lib/facturation";
+import { formaterEuros } from "@/lib/cotation";
 import { formaterNomPropre } from "@/lib/format";
 import {
   updateConsignesAction,
@@ -79,6 +82,18 @@ export default async function ArriveePatientPage({
 
   if (!mission) notFound();
 
+  // Le passage est coté ici comme il l'est dans la tournée : mêmes règles,
+  // même zone tarifaire, donc les deux écrans ne peuvent pas diverger.
+  const utilisateur = await getUtilisateurConnecte();
+  const contexteTarifaire = utilisateur
+    ? await getContexteTarifaire(supabase, utilisateur.id)
+    : { zone: "metropole" as const, valeurs: new Map() };
+  const detailFacturation = calculerDetailPassage(
+    { ...mission, patientDateNaissance: mission.patient.dateNaissance },
+    mission.dateTournee,
+    contexteTarifaire
+  );
+
   const photoUrl = mission.photoPath ? await getPhotoUrl(supabase, mission.photoPath) : null;
   const dernierePhotoUrl = mission.dernierePhotoPath
     ? await getPhotoUrl(supabase, mission.dernierePhotoPath)
@@ -142,6 +157,42 @@ export default async function ArriveePatientPage({
             </span>
             <p className="font-display text-[19px] font-semibold tracking-tight">{mission.typeSoin}</p>
           </div>
+
+          {/* Le détail coté du passage. Il figure sur la carte de tournée : le
+              faire disparaître ici, sur la page où le soin se valide, obligeait
+              à revenir en arrière pour savoir ce qui sera facturé. */}
+          {mission.actes.length > 0 && (
+            <div className="mt-3 border-t border-navy/[0.06] pt-3">
+              <ul className="flex flex-col gap-1.5">
+                {mission.actes.map((acte, index) => (
+                  <li
+                    key={`${acte.libelle}-${index}`}
+                    className="flex items-baseline justify-between gap-3 text-[13.5px]"
+                  >
+                    <span className="min-w-0">
+                      {acte.code && (
+                        <span className="font-bold text-navy/80">{acte.code} </span>
+                      )}
+                      <span className="text-navy/60">{acte.libelle}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+
+              {detailFacturation.total > 0 && (
+                <p className="mt-3 flex items-baseline justify-between gap-3 text-[13px] text-navy/45">
+                  <span>
+                    {detailFacturation.majorations.total > 0
+                      ? `dont ${formaterEuros(detailFacturation.majorations.total)} de majorations`
+                      : "Facturable"}
+                  </span>
+                  <span className="font-bold tabular-nums text-navy/75">
+                    {formaterEuros(detailFacturation.total)}
+                  </span>
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-4 gap-2">

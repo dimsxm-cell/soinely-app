@@ -1,7 +1,22 @@
-import type { ActeVue, MissionTourneeVue } from "@/lib/data/ma-journee";
+import type { ActeVue } from "@/lib/types/clinical";
+import type { StatutMission } from "@/lib/types/clinical";
 import type { ContexteTarifaire } from "@/lib/cotation";
 import { estJourMajore } from "@/lib/jours-feries";
 import { calculerAge } from "@/lib/tournee-vue";
+
+/**
+ * Ce qu'il faut savoir d'un passage pour le majorer, et rien de plus.
+ *
+ * La vue de tournée comme le détail d'une mission le satisfont sans
+ * conversion : chacun porte déjà ces cinq champs.
+ */
+export interface PassageAMajorer {
+  statut: StatutMission;
+  heurePrevue: string;
+  actes: ActeVue[];
+  patientForfaitBsi: string | null;
+  patientDateNaissance: string | null;
+}
 
 /**
  * Majorations et indemnité de déplacement d'un passage.
@@ -83,7 +98,7 @@ function estActeMajorable(acte: ActeVue): boolean {
  * forfait de dépendance. Sans acte majorable, seul le déplacement reste dû.
  */
 export function calculerMajorationsPassage(
-  mission: MissionTourneeVue,
+  mission: PassageAMajorer,
   dateTournee: string,
   contexte: ContexteTarifaire
 ): DetailMajorations {
@@ -142,7 +157,7 @@ export function calculerMajorationsPassage(
 
 /** Somme des majorations d'une tournée. */
 export function calculerMajorationsTournee(
-  missions: MissionTourneeVue[],
+  missions: PassageAMajorer[],
   dateTournee: string,
   contexte: ContexteTarifaire
 ): number {
