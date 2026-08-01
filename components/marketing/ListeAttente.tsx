@@ -34,8 +34,11 @@ export function ListeAttente() {
             background: "linear-gradient(115deg,#4c1d95 0%,#7c3aed 42%,#c026d3 78%,#ec4899 100%)",
           }}
         >
-          {/* Mascotte ELY */}
-          <div className="mx-auto hidden sm:mx-0 sm:block" style={{ width: 130, height: 150 }}>
+          {/* Mascotte ELY — visible aussi sur téléphone, où elle prend sa
+              propre ligne au-dessus du texte : l'encart défile déjà, sa
+              hauteur n'y est pas contrainte. Un peu plus petite qu'ailleurs
+              pour ne pas repousser l'inscription hors de l'écran. */}
+          <div className="mx-auto h-[124px] w-[108px] sm:mx-0 sm:h-[150px] sm:w-[130px]">
             {/* object-contain (et non cover) : le personnage est détouré, il
                 doit tenir entier dans le cadre plutôt que d'être rogné. */}
             <Image
