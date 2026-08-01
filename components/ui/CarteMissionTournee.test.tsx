@@ -18,6 +18,7 @@ function creerMission(surcharge: Partial<MissionTourneeVue> = {}): MissionTourne
     patientAllergies: null,
     patientConsignes: null,
     patientDateNaissance: "1944-03-12",
+    patientForfaitBsi: null,
     typeSoin: "Pansement",
     heurePrevue: "08:00:00",
     statut: "a_faire",
@@ -148,8 +149,8 @@ describe("CarteMissionTournee — actes", () => {
       <CarteMissionTournee
         mission={creerMission({
           actes: [
-            { libelle: "toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS", coefficient: 3 },
-            { libelle: "insuline", code: "AMI 1", cotation: 3.15, lettreCle: "AMI", coefficient: 1 },
+            { libelle: "toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS", coefficient: 3, derogatoireBsi: false },
+            { libelle: "insuline", code: "AMI 1", cotation: 3.15, lettreCle: "AMI", coefficient: 1, derogatoireBsi: false },
           ],
         })}
         estDerniere={false}
@@ -172,7 +173,7 @@ describe("CarteMissionTournee — actes", () => {
   it("affiche le libellé seul pour un acte sans cotation", () => {
     render(
       <CarteMissionTournee
-        mission={creerMission({ actes: [{ libelle: "Pansement", code: null, cotation: null, lettreCle: null, coefficient: null }] })}
+        mission={creerMission({ actes: [{ libelle: "Pansement", code: null, cotation: null, lettreCle: null, coefficient: null, derogatoireBsi: false }] })}
         estDerniere={false}
       />
     );
@@ -185,8 +186,8 @@ describe("CarteMissionTournee — actes", () => {
       <CarteMissionTournee
         mission={creerMission({
           actes: [
-            { libelle: "toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS", coefficient: 3 },
-            { libelle: "Pansement", code: null, cotation: null, lettreCle: null, coefficient: null },
+            { libelle: "toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS", coefficient: 3, derogatoireBsi: false },
+            { libelle: "Pansement", code: null, cotation: null, lettreCle: null, coefficient: null, derogatoireBsi: false },
           ],
         })}
         estDerniere={false}

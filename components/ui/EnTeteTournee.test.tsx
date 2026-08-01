@@ -29,6 +29,7 @@ function creerMission(id: string, statut: StatutMission, heurePrevue: string): M
     patientAllergies: null,
     patientConsignes: null,
     patientDateNaissance: "1944-03-12",
+    patientForfaitBsi: null,
     typeSoin: "Pansement",
     heurePrevue,
     statut,
@@ -113,13 +114,13 @@ describe("EnTeteTournee", () => {
       {
         ...creerMission("a", "terminee", "08:00:00"),
         actes: [
-          { libelle: "Pansement", code: "AMI 2", cotation: 6.3, lettreCle: "AMI", coefficient: 2 },
-          { libelle: "Injection", code: "AMI 1", cotation: 3.15, lettreCle: "AMI", coefficient: 1 },
+          { libelle: "Pansement", code: "AMI 2", cotation: 6.3, lettreCle: "AMI", coefficient: 2, derogatoireBsi: false },
+          { libelle: "Injection", code: "AMI 1", cotation: 3.15, lettreCle: "AMI", coefficient: 1, derogatoireBsi: false },
         ],
       },
       {
         ...creerMission("b", "a_faire", "10:00:00"),
-        actes: [{ libelle: "Toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS", coefficient: 3 }],
+        actes: [{ libelle: "Toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS", coefficient: 3, derogatoireBsi: false }],
       },
     ];
 

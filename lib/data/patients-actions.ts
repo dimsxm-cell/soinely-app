@@ -11,6 +11,18 @@ function champTexteOuNull(formData: FormData, nom: string): string | null {
   return valeur || null;
 }
 
+const FORFAITS_BSI = new Set(["BSA", "BSB", "BSC"]);
+
+/**
+ * Forfait retenu, ou null. La valeur vient d une liste fermée : une saisie
+ * hors liste ferait echouer l ecriture entiere sur la contrainte SQL, alors
+ * qu elle ne doit qu etre ignoree.
+ */
+function forfaitBsiValide(formData: FormData): string | null {
+  const saisi = String(formData.get("forfaitBsi") ?? "").trim();
+  return FORFAITS_BSI.has(saisi) ? saisi : null;
+}
+
 export async function createPatientAction(
   formData: FormData
 ): Promise<{ success: true } | { success: false; error: string }> {
@@ -43,6 +55,7 @@ export async function createPatientAction(
       sexe: champTexteOuNull(formData, "sexe"),
       allergies: champTexteOuNull(formData, "allergies"),
       consignes: champTexteOuNull(formData, "consignes"),
+      forfait_bsi: forfaitBsiValide(formData),
       medecin_nom: champTexteOuNull(formData, "medecinNom"),
       medecin_telephone: champTexteOuNull(formData, "medecinTelephone"),
       personne_confiance_nom: champTexteOuNull(formData, "personneConfianceNom"),
@@ -84,6 +97,7 @@ export async function updatePatientAction(formData: FormData): Promise<void> {
       sexe: champTexteOuNull(formData, "sexe"),
       allergies: champTexteOuNull(formData, "allergies"),
       consignes: champTexteOuNull(formData, "consignes"),
+      forfait_bsi: forfaitBsiValide(formData),
       medecin_nom: champTexteOuNull(formData, "medecinNom"),
       medecin_telephone: champTexteOuNull(formData, "medecinTelephone"),
       personne_confiance_nom: champTexteOuNull(formData, "personneConfianceNom"),

@@ -4,7 +4,7 @@ import type { FrequenceSoin, PatientComplet, Sexe, SoinPrescrit } from "@/lib/ty
 import { echouer } from "@/lib/journal";
 
 const CHAMPS_PATIENT =
-  "id, nom_complet, adresse, telephone, allergies, consignes, date_naissance, numero_secu, sexe, medecin_nom, medecin_telephone, personne_confiance_nom, personne_confiance_telephone, note_soin, antecedents, traitements_en_cours";
+  "id, nom_complet, adresse, telephone, allergies, consignes, date_naissance, numero_secu, sexe, medecin_nom, medecin_telephone, personne_confiance_nom, personne_confiance_telephone, note_soin, antecedents, traitements_en_cours, forfait_bsi";
 
 type PatientRow = {
   id: string;
@@ -13,6 +13,7 @@ type PatientRow = {
   telephone: string;
   allergies: string | null;
   consignes: string | null;
+  forfait_bsi: string | null;
   date_naissance: string | null;
   numero_secu: string | null;
   sexe: string | null;
@@ -33,6 +34,7 @@ function mapPatientRow(row: PatientRow): PatientComplet {
     telephone: row.telephone,
     allergies: row.allergies,
     consignes: row.consignes,
+    forfaitBsi: row.forfait_bsi,
     dateNaissance: row.date_naissance,
     numeroSecu: row.numero_secu,
     sexe: row.sexe as Sexe | null,

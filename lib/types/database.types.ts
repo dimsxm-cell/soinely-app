@@ -278,6 +278,7 @@ export type Database = {
           coefficient: number | null
           conditions: string | null
           cotation: number
+          derogatoire_bsi: boolean
           id: string
           lettre_cle: string | null
           libelle: string
@@ -287,6 +288,7 @@ export type Database = {
           coefficient?: number | null
           conditions?: string | null
           cotation: number
+          derogatoire_bsi: boolean
           id?: string
           lettre_cle?: string | null
           libelle: string
@@ -296,6 +298,7 @@ export type Database = {
           coefficient?: number | null
           conditions?: string | null
           cotation?: number
+          derogatoire_bsi?: boolean
           id?: string
           lettre_cle?: string | null
           libelle?: string
@@ -331,6 +334,7 @@ export type Database = {
           consignes: string | null
           created_at: string
           date_naissance: string | null
+          forfait_bsi: string | null
           id: string
           idel_id: string
           medecin_nom: string | null
@@ -351,6 +355,7 @@ export type Database = {
           consignes?: string | null
           created_at?: string
           date_naissance?: string | null
+          forfait_bsi?: string | null
           id?: string
           idel_id: string
           medecin_nom?: string | null
@@ -371,6 +376,7 @@ export type Database = {
           consignes?: string | null
           created_at?: string
           date_naissance?: string | null
+          forfait_bsi?: string | null
           id?: string
           idel_id?: string
           medecin_nom?: string | null

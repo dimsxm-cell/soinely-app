@@ -39,6 +39,11 @@ export interface Patient {
 export type Sexe = "homme" | "femme";
 
 export interface PatientComplet extends Patient {
+  /**
+   * Forfait journalier de dépendance (BSA, BSB, BSC) issu du BSI, ou `null`.
+   * Sa présence bascule les actes techniques du patient en AMX à 50 %.
+   */
+  forfaitBsi: string | null;
   numeroSecu: string | null;
   sexe: Sexe | null;
   medecinNom: string | null;
