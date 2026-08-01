@@ -166,6 +166,49 @@ export async function updateRappelAction(formData: FormData): Promise<void> {
   revalidatePath(`/ma-journee/${missionId}`);
 }
 
+/**
+ * Corrige la distance d'un passage.
+ *
+ * La NGAP demande la distance réellement parcourue. L'itinéraire calculé
+ * ignore le détour par la pharmacie, la route barrée ou le second passage dans
+ * la journée : quand l'IDEL corrige, c'est elle qui a raison, et sa saisie
+ * prime sur le calcul.
+ *
+ * Un champ vidé efface la correction et rend la main au calcul, plutôt que
+ * d'enregistrer un zéro qui supprimerait les kilomètres sans le dire.
+ */
+export async function updateDistanceAction(formData: FormData): Promise<void> {
+  const missionId = String(formData.get("missionId"));
+  const saisi = String(formData.get("distanceKm") ?? "").trim();
+
+  // La virgule est ce qu'on tape sur un clavier français.
+  const normalise = saisi.replace(",", ".");
+  const distance = saisi === "" ? null : Number(normalise);
+
+  if (distance !== null && (!Number.isFinite(distance) || distance < 0)) return;
+
+  const supabase = await createClient();
+
+  const { data: mission } = await supabase
+    .from("missions_du_jour")
+    .select("id")
+    .eq("id", missionId)
+    .maybeSingle();
+
+  if (!mission) return;
+
+  const { error } = await supabase
+    .from("missions_du_jour")
+    .update({ distance_km_corrigee: distance })
+    .eq("id", missionId);
+
+  if (error) journaliserEchec("updateDistanceAction", error);
+
+  revalidatePath(`/ma-journee/${missionId}`);
+  // Le total de la tournée change avec les kilomètres du passage.
+  revalidatePath("/ma-tournee");
+}
+
 export async function uploadPhotoAction(formData: FormData): Promise<void> {
   const missionId = String(formData.get("missionId"));
   const photo = formData.get("photo");

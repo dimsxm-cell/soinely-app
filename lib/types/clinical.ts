@@ -122,6 +122,10 @@ export interface MissionDetail extends MissionDuJour {
   patientForfaitBsi: string | null;
   /** Date de la tournée, dont dépendent les majorations dimanche et fériés. */
   dateTournee: string;
+  /** Distance routière depuis le cabinet, aller simple. */
+  distanceKm: number | null;
+  /** Distance corrigée à la main, qui prime sur la précédente. */
+  distanceKmCorrigee: number | null;
   /** Actes cotés du passage. */
   actes: ActeVue[];
   transmission: string | null;

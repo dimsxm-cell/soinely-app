@@ -384,6 +384,8 @@ describe("getMissionDetail", () => {
       // validation y affiche les actes et leur montant.
       patientForfaitBsi: null,
       dateTournee: "2026-07-30",
+      distanceKm: null,
+      distanceKmCorrigee: null,
       actes: [
         {
           libelle: "Injection",

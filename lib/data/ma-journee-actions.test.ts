@@ -518,3 +518,77 @@ describe("updateMotifAbsenceAction", () => {
     expect(updateMock).not.toHaveBeenCalled();
   });
 });
+
+describe("updateDistanceAction", () => {
+  it("enregistre la distance corrigée", async () => {
+    eqSelectMock.mockResolvedValue({ data: { id: "m1" }, error: null });
+    eqUpdateMock.mockResolvedValue({ error: null });
+
+    const { updateDistanceAction } = await import("./ma-journee-actions");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("distanceKm", "12.4");
+    await updateDistanceAction(formData);
+
+    expect(updateMock).toHaveBeenCalledWith({ distance_km_corrigee: 12.4 });
+  });
+
+  it("accepte la virgule d'un clavier français", async () => {
+    eqSelectMock.mockResolvedValue({ data: { id: "m1" }, error: null });
+    eqUpdateMock.mockResolvedValue({ error: null });
+
+    const { updateDistanceAction } = await import("./ma-journee-actions");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("distanceKm", "12,4");
+    await updateDistanceAction(formData);
+
+    expect(updateMock).toHaveBeenCalledWith({ distance_km_corrigee: 12.4 });
+  });
+
+  it("rend la main au calcul quand le champ est vidé", async () => {
+    eqSelectMock.mockResolvedValue({ data: { id: "m1" }, error: null });
+    eqUpdateMock.mockResolvedValue({ error: null });
+
+    const { updateDistanceAction } = await import("./ma-journee-actions");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("distanceKm", "");
+    await updateDistanceAction(formData);
+
+    // Null et non zéro : vider le champ annule la correction, il ne supprime
+    // pas les kilomètres.
+    expect(updateMock).toHaveBeenCalledWith({ distance_km_corrigee: null });
+  });
+
+  it("refuse une saisie qui n'est pas un nombre", async () => {
+    eqSelectMock.mockResolvedValue({ data: { id: "m1" }, error: null });
+    updateMock.mockClear();
+
+    const { updateDistanceAction } = await import("./ma-journee-actions");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("distanceKm", "loin");
+    await updateDistanceAction(formData);
+
+    expect(updateMock).not.toHaveBeenCalled();
+  });
+
+  it("refuse une distance négative", async () => {
+    eqSelectMock.mockResolvedValue({ data: { id: "m1" }, error: null });
+    updateMock.mockClear();
+
+    const { updateDistanceAction } = await import("./ma-journee-actions");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("distanceKm", "-3");
+    await updateDistanceAction(formData);
+
+    expect(updateMock).not.toHaveBeenCalled();
+  });
+});

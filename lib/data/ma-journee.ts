@@ -255,7 +255,7 @@ export async function getMissionDetail(
   const { data, error } = await supabase
     .from("missions_du_jour")
     .select(
-      "id, patient_id, tournee_id, type_soin, heure_prevue, statut, mission_clinique_id, transmission, rappel, photo_path, patients(id, nom_complet, adresse, telephone, allergies, consignes, date_naissance, forfait_bsi), tournees(date), actes_mission(libelle, ordre, ngap_codes(code, cotation, lettre_cle, coefficient, derogatoire_bsi, eligible_mci))"
+      "id, patient_id, tournee_id, type_soin, heure_prevue, statut, mission_clinique_id, transmission, rappel, photo_path, distance_km, distance_km_corrigee, patients(id, nom_complet, adresse, telephone, allergies, consignes, date_naissance, forfait_bsi), tournees(date), actes_mission(libelle, ordre, ngap_codes(code, cotation, lettre_cle, coefficient, derogatoire_bsi, eligible_mci))"
     )
     .eq("id", missionId)
     .maybeSingle();
@@ -315,6 +315,8 @@ export async function getMissionDetail(
     patientForfaitBsi: patientRow.forfait_bsi ?? null,
     actes,
     dateTournee: tourneeRow?.date ?? new Date().toISOString().slice(0, 10),
+    distanceKm: data.distance_km ?? null,
+    distanceKmCorrigee: data.distance_km_corrigee ?? null,
     patient: {
       id: patientRow.id,
       nomComplet: patientRow.nom_complet,

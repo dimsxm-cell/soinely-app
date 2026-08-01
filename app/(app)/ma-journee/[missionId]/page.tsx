@@ -11,6 +11,7 @@ import {
   updateConsignesAction,
   updateMissionStatutAction,
   updateRappelAction,
+  updateDistanceAction,
   updateTransmissionAction,
   uploadPhotoAction,
 } from "@/lib/data/ma-journee-actions";
@@ -191,6 +192,39 @@ export default async function ArriveePatientPage({
                   </span>
                 </p>
               )}
+
+              {/* Correction du kilométrage. La NGAP demande la distance
+                  réellement parcourue : l'itinéraire calculé ignore le détour
+                  par la pharmacie comme la route barrée. */}
+              <form
+                action={updateDistanceAction}
+                className="mt-3 flex flex-wrap items-center gap-2 border-t border-navy/[0.06] pt-3"
+              >
+                <input type="hidden" name="missionId" value={mission.id} />
+                <label htmlFor="distanceKm" className="text-[13px] text-navy/45">
+                  Trajet aller
+                </label>
+                <input
+                  id="distanceKm"
+                  name="distanceKm"
+                  type="text"
+                  inputMode="decimal"
+                  defaultValue={mission.distanceKmCorrigee ?? ""}
+                  placeholder={
+                    mission.distanceKm !== null ? String(mission.distanceKm) : "—"
+                  }
+                  className="w-[74px] rounded-[10px] border border-navy/15 bg-white px-2.5 py-1.5 text-[13.5px] tabular-nums text-navy placeholder:text-navy/30 focus:border-brand-violet focus:outline-none focus:ring-2 focus:ring-brand-violet/25"
+                />
+                <span className="text-[13px] text-navy/45">km</span>
+                <Button type="submit" variant="tertiary" className="!min-h-0 shrink-0 !px-0 !py-0">
+                  Corriger
+                </Button>
+                {detailFacturation.majorations.kilometres > 0 && (
+                  <span className="text-[12.5px] tabular-nums text-navy/40">
+                    {formaterEuros(detailFacturation.majorations.kilometres)} d&apos;indemnités
+                  </span>
+                )}
+              </form>
             </div>
           )}
         </div>
