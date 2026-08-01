@@ -1,14 +1,16 @@
 import type { MissionTourneeVue } from "@/lib/data/ma-journee";
 import type { Tournee } from "@/lib/types/clinical";
 import { estimerHeureFin, formatDateTournee } from "@/lib/tournee-vue";
-import { calculerMontantTournee, formaterEuros } from "@/lib/cotation";
+import { calculerMontantTournee, formaterEuros, type ContexteTarifaire } from "@/lib/cotation";
 
 export function EnTeteTournee({
   missions,
   tournee,
+  contexteTarifaire,
 }: {
   missions: MissionTourneeVue[];
   tournee: Tournee;
+  contexteTarifaire: ContexteTarifaire;
 }) {
   const total = missions.length;
   const valides = missions.filter(
@@ -19,7 +21,7 @@ export function EnTeteTournee({
   ).length;
   const pct = total > 0 ? Math.round((valides / total) * 100) : 0;
   const heureFin = estimerHeureFin(missions);
-  const montantActes = calculerMontantTournee(missions);
+  const montantActes = calculerMontantTournee(missions, contexteTarifaire);
   const maintenant = new Date().toLocaleTimeString("fr-FR", {
     hour: "2-digit",
     minute: "2-digit",

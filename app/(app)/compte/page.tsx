@@ -2,10 +2,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient, getUtilisateurConnecte } from "@/lib/supabase/server";
 import { formaterNomPropre } from "@/lib/format";
+import { determinerZone } from "@/lib/zone-tarifaire";
 import { getAbonnement, getJoursRestantsEssaiGratuit } from "@/lib/data/abonnement";
 import { createBillingPortalSessionAction } from "@/lib/data/abonnement-actions";
 import { getAvatarUrl } from "@/lib/data/profil";
-import { uploadAvatarAction } from "@/lib/data/profil-actions";
+import { enregistrerCodePostalAction, uploadAvatarAction } from "@/lib/data/profil-actions";
 import { signOutAction } from "@/app/login/actions";
 import { BasculeEcoutePermanenteEly } from "@/components/ui/BasculeEcoutePermanenteEly";
 import { Button } from "@/components/ui/Button";
@@ -46,10 +47,13 @@ export default async function ComptePage() {
   const nomBrut = user.user_metadata?.full_name as string | undefined;
   const nom = nomBrut ? formaterNomPropre(nomBrut) : user.email ?? "";
   const avatarPath = user.user_metadata?.avatar_path as string | undefined;
-  const [abonnement, avatarUrl] = await Promise.all([
+  const [abonnement, avatarUrl, profil] = await Promise.all([
     getAbonnement(supabase, user.id),
     avatarPath ? getAvatarUrl(supabase, avatarPath) : Promise.resolve(null),
+    supabase.from("profiles").select("code_postal").eq("id", user.id).maybeSingle(),
   ]);
+  const codePostal = profil.data?.code_postal ?? "";
+  const zone = determinerZone(codePostal);
   const joursRestantsEssai = abonnement ? 0 : getJoursRestantsEssaiGratuit(user.created_at);
   const ecoutePermanenteActivee = Boolean(user.user_metadata?.ecoute_permanente_ely);
 
@@ -90,6 +94,40 @@ export default async function ComptePage() {
                 Enregistrer
               </Button>
             </form>
+          </section>
+
+          <section className="rounded-[20px] border border-navy/10 bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,.04),0_18px_40px_rgba(15,23,42,.06)]">
+            <p className="text-[12.5px] font-bold uppercase tracking-wider text-navy/45">
+              Code postal du cabinet
+            </p>
+            <p className="mt-2 text-sm text-navy/60">
+              Il fixe vos tarifs NGAP : ceux des départements d&apos;outre-mer sont supérieurs à
+              ceux de la métropole.
+            </p>
+            <form action={enregistrerCodePostalAction} className="mt-4 flex flex-wrap items-center gap-3">
+              <label htmlFor="codePostal" className="sr-only">
+                Code postal du cabinet
+              </label>
+              <input
+                id="codePostal"
+                name="codePostal"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]{5}"
+                maxLength={5}
+                defaultValue={codePostal}
+                placeholder="97110"
+                className="w-[110px] rounded-[12px] border border-navy/15 bg-white px-3 py-2 text-[15px] tabular-nums text-navy placeholder:text-navy/30 focus:border-brand-violet focus:outline-none focus:ring-2 focus:ring-brand-violet/30"
+              />
+              <Button type="submit" variant="tertiary" className="!min-h-0 shrink-0 !px-0 !py-0">
+                Enregistrer
+              </Button>
+            </form>
+            <p className="mt-3 text-[13px] text-navy/50">
+              {codePostal
+                ? `Grille appliquée : ${zone === "dom" ? "départements d'outre-mer" : "métropole"}.`
+                : "Sans code postal, la grille métropole s'applique."}
+            </p>
           </section>
 
           <section className="rounded-[20px] border border-navy/10 bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,.04),0_18px_40px_rgba(15,23,42,.06)]">

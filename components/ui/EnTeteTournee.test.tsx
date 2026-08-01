@@ -3,6 +3,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { EnTeteTournee } from "./EnTeteTournee";
 import type { MissionTourneeVue } from "@/lib/data/ma-journee";
 import type { StatutMission, Tournee } from "@/lib/types/clinical";
+import type { ContexteTarifaire } from "@/lib/cotation";
+
+// Table vide : les montants du catalogue servent de repli, ce qui laisse ces
+// tests porter sur l'affichage plutôt que sur la grille tarifaire.
+const TARIFS: ContexteTarifaire = { zone: "metropole", valeurs: new Map() };
 
 const tournee: Tournee = {
   id: "t1",
@@ -64,7 +69,7 @@ describe("EnTeteTournee", () => {
   });
 
   it("affiche le compteur de passages validés sur le total", () => {
-    render(<EnTeteTournee missions={missions} tournee={tournee} />);
+    render(<EnTeteTournee missions={missions} tournee={tournee} contexteTarifaire={TARIFS} />);
 
     expect(screen.getByText("2")).toBeInTheDocument();
     expect(screen.getByText("/5")).toBeInTheDocument();
@@ -72,7 +77,7 @@ describe("EnTeteTournee", () => {
   });
 
   it("affiche l'heure courante, prise sur l'horloge figée", () => {
-    render(<EnTeteTournee missions={missions} tournee={tournee} />);
+    render(<EnTeteTournee missions={missions} tournee={tournee} contexteTarifaire={TARIFS} />);
 
     // Prouve que Date est bien feinte : sans cela, cette assertion échouerait
     // 1439 minutes sur 1440, et le gel de l'horloge deviendrait décoratif.
@@ -80,13 +85,13 @@ describe("EnTeteTournee", () => {
   });
 
   it("la barre de progression annonce le pourcentage validé", () => {
-    render(<EnTeteTournee missions={missions} tournee={tournee} />);
+    render(<EnTeteTournee missions={missions} tournee={tournee} contexteTarifaire={TARIFS} />);
 
     expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "40");
   });
 
   it("affiche le nombre de missions restantes et l'heure de fin estimée", () => {
-    render(<EnTeteTournee missions={missions} tournee={tournee} />);
+    render(<EnTeteTournee missions={missions} tournee={tournee} contexteTarifaire={TARIFS} />);
 
     expect(screen.getByText("Reste")).toBeInTheDocument();
     expect(screen.getByText("3")).toBeInTheDocument();
@@ -95,7 +100,7 @@ describe("EnTeteTournee", () => {
   });
 
   it("affiche le nombre de patients de la tournée", () => {
-    render(<EnTeteTournee missions={missions} tournee={tournee} />);
+    render(<EnTeteTournee missions={missions} tournee={tournee} contexteTarifaire={TARIFS} />);
 
     expect(screen.getByText("Patients")).toBeInTheDocument();
     expect(screen.getByText("8")).toBeInTheDocument();
@@ -118,7 +123,7 @@ describe("EnTeteTournee", () => {
       },
     ];
 
-    render(<EnTeteTournee missions={avecActes} tournee={tournee} />);
+    render(<EnTeteTournee missions={avecActes} tournee={tournee} contexteTarifaire={TARIFS} />);
 
     expect(screen.getByText("Actes cotés")).toBeInTheDocument();
     expect(screen.getByText(/15,83/)).toBeInTheDocument();
@@ -127,7 +132,7 @@ describe("EnTeteTournee", () => {
   it("tait le montant tant qu'aucun acte n'est coté, plutôt que d'annoncer zéro", () => {
     // Un « 0,00 € » se lirait comme une journée sans valeur, alors qu'il ne
     // dit que l'absence de codes sur des soins bien réels.
-    render(<EnTeteTournee missions={missions} tournee={tournee} />);
+    render(<EnTeteTournee missions={missions} tournee={tournee} contexteTarifaire={TARIFS} />);
 
     expect(screen.queryByText("Actes cotés")).not.toBeInTheDocument();
   });
@@ -138,7 +143,7 @@ describe("EnTeteTournee", () => {
       creerMission("b", "terminee", "10:05:00"),
     ];
 
-    render(<EnTeteTournee missions={toutesValidees} tournee={tournee} />);
+    render(<EnTeteTournee missions={toutesValidees} tournee={tournee} contexteTarifaire={TARIFS} />);
 
     expect(screen.queryByText("Fin est.")).not.toBeInTheDocument();
     expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "100");
