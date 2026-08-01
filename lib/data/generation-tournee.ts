@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { FrequenceSoin } from "@/lib/types/clinical";
 import type { Database } from "@/lib/types/database.types";
 import { echouer, journaliserEchec } from "@/lib/journal";
+import { calculerDistanceRoutiereKm } from "@/lib/distance";
 
 export interface SoinRecurrence {
   frequenceType: FrequenceSoin;
@@ -62,6 +63,67 @@ interface PassageAGenerer {
 // deviendront modifiables.
 export function libelleDeSynthese(actes: { libelle: string }[]): string {
   return actes.map((acte) => acte.libelle).join(" + ");
+}
+
+/**
+ * Distance routière du cabinet à chaque patient, en kilomètres.
+ *
+ * Calculée une fois par patient et non par passage : deux visites le même jour
+ * chez la même personne parcourent la même route.
+ *
+ * Rend une table vide si le cabinet n'est pas situé — sans origine, aucun
+ * trajet ne peut être mesuré. La tournée se génère quand même : elle portera
+ * ses actes et ses majorations, simplement pas ses kilomètres.
+ */
+async function calculerDistancesDepuisCabinet(
+  supabase: SupabaseClient<Database>,
+  idelId: string,
+  patientIds: string[]
+): Promise<Map<string, number>> {
+  const distances = new Map<string, number>();
+  if (patientIds.length === 0) return distances;
+
+  const { data: profil, error: profilError } = await supabase
+    .from("profiles")
+    .select("cabinet_latitude, cabinet_longitude")
+    .eq("id", idelId)
+    .maybeSingle();
+
+  if (profilError) journaliserEchec("calculerDistancesDepuisCabinet", profilError);
+
+  const latitude = profil?.cabinet_latitude;
+  const longitude = profil?.cabinet_longitude;
+  if (
+    latitude === null ||
+    latitude === undefined ||
+    longitude === null ||
+    longitude === undefined
+  ) {
+    return distances;
+  }
+
+  const cabinet = { latitude, longitude };
+
+  const { data: patients, error: patientsError } = await supabase
+    .from("patients")
+    .select("id, latitude, longitude")
+    .in("id", patientIds);
+
+  if (patientsError) journaliserEchec("calculerDistancesDepuisCabinet", patientsError);
+
+  for (const patient of patients ?? []) {
+    if (patient.latitude === null || patient.longitude === null) continue;
+
+    distances.set(
+      patient.id,
+      await calculerDistanceRoutiereKm(cabinet, {
+        latitude: patient.latitude,
+        longitude: patient.longitude,
+      })
+    );
+  }
+
+  return distances;
 }
 
 export async function genererTourneeDuJour(
@@ -161,6 +223,12 @@ export async function genererTourneeDuJour(
 
   if (passagesTries.length === 0) return;
 
+  const distances = await calculerDistancesDepuisCabinet(
+    supabase,
+    idelId,
+    [...new Set(passagesTries.map((passage) => passage.patient_id))]
+  );
+
   const { data: missionsCreees, error: missionsError } = await supabase
     .from("missions_du_jour")
     .insert(
@@ -170,6 +238,7 @@ export async function genererTourneeDuJour(
         type_soin: libelleDeSynthese(passage.actes),
         heure_prevue: passage.heure_prevue,
         statut: "a_faire",
+        distance_km: distances.get(passage.patient_id) ?? null,
       }))
     )
     .select("id, patient_id, heure_prevue");

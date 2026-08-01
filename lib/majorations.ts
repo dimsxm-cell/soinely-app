@@ -3,6 +3,7 @@ import type { StatutMission } from "@/lib/types/clinical";
 import type { ContexteTarifaire } from "@/lib/cotation";
 import { estJourMajore } from "@/lib/jours-feries";
 import { calculerAge } from "@/lib/tournee-vue";
+import { calculerIndemniteKilometrique, distanceRetenue } from "@/lib/kilometrage";
 
 /**
  * Ce qu'il faut savoir d'un passage pour le majorer, et rien de plus.
@@ -16,6 +17,10 @@ export interface PassageAMajorer {
   actes: ActeVue[];
   patientForfaitBsi: string | null;
   patientDateNaissance: string | null;
+  /** Distance routière depuis le cabinet, aller simple, en kilomètres. */
+  distanceKm?: number | null;
+  /** Distance saisie à la main, qui prime sur la précédente. */
+  distanceKmCorrigee?: number | null;
 }
 
 /**
@@ -48,6 +53,8 @@ export interface DetailMajorations {
   enfant: number;
   /** Indemnité forfaitaire de déplacement. */
   deplacement: number;
+  /** Indemnités kilométriques, au-delà de l'abattement. */
+  kilometres: number;
   total: number;
 }
 
@@ -58,6 +65,7 @@ const AUCUNE: DetailMajorations = {
   coordination: 0,
   enfant: 0,
   deplacement: 0,
+  kilometres: 0,
   total: 0,
 };
 
@@ -109,9 +117,24 @@ export function calculerMajorationsPassage(
   const actesCotes = mission.actes.filter((acte) => acte.cotation !== null);
   const deplacement = actesCotes.length > 0 ? valeur("IFD", contexte) : 0;
 
+  // Les kilomètres suivent le déplacement, non les actes : ils sont dus même
+  // chez un patient sous forfait, qui n'ouvre droit à aucune autre majoration.
+  const kilometres =
+    actesCotes.length > 0
+      ? calculerIndemniteKilometrique(
+          distanceRetenue(mission.distanceKm ?? null, mission.distanceKmCorrigee ?? null),
+          contexte
+        )
+      : 0;
+
   const majorables = actesCotes.filter(estActeMajorable);
   if (majorables.length === 0 || mission.patientForfaitBsi) {
-    return { ...AUCUNE, deplacement, total: deplacement };
+    return {
+      ...AUCUNE,
+      deplacement,
+      kilometres,
+      total: arrondirCentimes(deplacement + kilometres),
+    };
   }
 
   const horaire = majorationHoraire(mission.heurePrevue, contexte);
@@ -142,7 +165,8 @@ export function calculerMajorationsPassage(
       ? valeur("MIE", contexte) * majorables.length
       : 0;
 
-  const total = horaire + dimancheFerie + acteUnique + coordination + enfant + deplacement;
+  const total =
+    horaire + dimancheFerie + acteUnique + coordination + enfant + deplacement + kilometres;
 
   return {
     horaire,
@@ -151,8 +175,13 @@ export function calculerMajorationsPassage(
     coordination,
     enfant,
     deplacement,
-    total: Math.round(total * 100) / 100,
+    kilometres,
+    total: arrondirCentimes(total),
   };
+}
+
+function arrondirCentimes(valeur: number): number {
+  return Math.round(valeur * 100) / 100;
 }
 
 /** Somme des majorations d'une tournée. */
@@ -166,5 +195,5 @@ export function calculerMajorationsTournee(
     0
   );
 
-  return Math.round(total * 100) / 100;
+  return arrondirCentimes(total);
 }

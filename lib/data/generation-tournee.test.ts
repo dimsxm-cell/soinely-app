@@ -172,11 +172,23 @@ describe("genererTourneeDuJour", () => {
     const tourneeDeleteEqMock = vi.fn().mockResolvedValue({ error: null });
     const tourneeDeleteMock = vi.fn(() => ({ eq: tourneeDeleteEqMock }));
 
+    // Cabinet non situé par défaut : la génération doit produire ses missions
+    // sans distance plutôt que de s'interrompre. Les tests qui portent sur le
+    // kilométrage fournissent leur propre position.
+    const profilSelectMock = vi.fn(() => ({
+      eq: () => ({ maybeSingle: () => Promise.resolve({ data: null, error: null }) }),
+    }));
+    const patientsSelectMock = vi.fn(() => ({
+      in: () => Promise.resolve({ data: [], error: null }),
+    }));
+
     const fromMock = vi.fn((table: string) => {
       if (table === "soins_prescrits") return { select: soinsSelectMock };
       if (table === "tournees") return { insert: tourneeInsertMock, delete: tourneeDeleteMock };
       if (table === "missions_du_jour") return { insert: missionsInsertMock };
       if (table === "actes_mission") return { insert: actesInsertMock };
+      if (table === "profiles") return { select: profilSelectMock };
+      if (table === "patients") return { select: patientsSelectMock };
       throw new Error(`table inattendue : ${table}`);
     });
 
@@ -262,6 +274,7 @@ describe("genererTourneeDuJour", () => {
         type_soin: "Glycémie",
         heure_prevue: "07:00:00",
         statut: "a_faire",
+        distance_km: null,
       },
       {
         tournee_id: "t-nouvelle",
@@ -269,6 +282,7 @@ describe("genererTourneeDuJour", () => {
         type_soin: "Pansement",
         heure_prevue: "10:00:00",
         statut: "a_faire",
+        distance_km: null,
       },
       {
         tournee_id: "t-nouvelle",
@@ -276,6 +290,7 @@ describe("genererTourneeDuJour", () => {
         type_soin: "Glycémie",
         heure_prevue: "19:00:00",
         statut: "a_faire",
+        distance_km: null,
       },
     ]);
   });
@@ -317,6 +332,7 @@ describe("genererTourneeDuJour", () => {
         type_soin: "Toilette + Insuline",
         heure_prevue: "08:00:00",
         statut: "a_faire",
+        distance_km: null,
       },
     ]);
     expect(actesInsertMock).toHaveBeenCalledWith([
