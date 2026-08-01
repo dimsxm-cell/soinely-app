@@ -40,7 +40,7 @@ describe("signInAction", () => {
     expect(result).toEqual({ success: true });
   });
 
-  it("retourne l'erreur Supabase si les identifiants sont invalides", async () => {
+  it("traduit en français l'erreur d'identifiants invalides", async () => {
     signInWithPasswordMock.mockResolvedValueOnce({ error: { message: "Invalid login credentials" } });
 
     const { signInAction } = await import("./actions");
@@ -51,7 +51,7 @@ describe("signInAction", () => {
 
     const result = await signInAction(formData);
 
-    expect(result).toEqual({ success: false, error: "Invalid login credentials" });
+    expect(result).toEqual({ success: false, error: "Adresse email ou mot de passe incorrect." });
   });
 });
 
@@ -96,7 +96,7 @@ describe("signUpAction", () => {
     });
   });
 
-  it("retourne l'erreur Supabase si l'inscription échoue", async () => {
+  it("traduit en français l'erreur d'inscription", async () => {
     signUpMock.mockResolvedValueOnce({ error: { message: "User already registered" } });
 
     const { signUpAction } = await import("./actions");
@@ -108,7 +108,10 @@ describe("signUpAction", () => {
 
     const result = await signUpAction(formData);
 
-    expect(result).toEqual({ success: false, error: "User already registered" });
+    expect(result).toEqual({
+      success: false,
+      error: "Un compte existe déjà avec cette adresse. Connectez-vous plutôt.",
+    });
   });
 
   it("signale qu'un compte existe déjà quand Supabase renvoie une identité vide (email déjà inscrit et confirmé)", async () => {

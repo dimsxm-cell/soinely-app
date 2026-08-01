@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { traduireErreurAuth } from "./messages-erreur";
 
 export async function signInAction(
   formData: FormData
@@ -14,7 +15,7 @@ export async function signInAction(
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    return { success: false, error: error.message };
+    return { success: false, error: traduireErreurAuth(error.message) };
   }
 
   return { success: true };
@@ -36,7 +37,7 @@ export async function signUpAction(
   });
 
   if (error) {
-    return { success: false, error: error.message };
+    return { success: false, error: traduireErreurAuth(error.message) };
   }
 
   // Supabase ne renvoie pas d'erreur pour un email déjà inscrit et confirmé
@@ -71,7 +72,7 @@ export async function requestPasswordResetAction(
   });
 
   if (error) {
-    return { success: false, error: error.message };
+    return { success: false, error: traduireErreurAuth(error.message) };
   }
 
   return { success: true };
