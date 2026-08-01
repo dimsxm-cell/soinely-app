@@ -3,6 +3,8 @@ import { IconeSoin } from "@/components/ui/IconeSoin";
 import type { MissionTourneeVue } from "@/lib/data/ma-journee";
 import { updateMissionStatutAction, updateMotifAbsenceAction } from "@/lib/data/ma-journee-actions";
 import { formaterNomPropre } from "@/lib/format";
+import { calculerDetailPassage } from "@/lib/facturation";
+import { formaterEuros, type ContexteTarifaire } from "@/lib/cotation";
 import {
   STATUT_BADGE,
   STATUT_LABEL,
@@ -20,13 +22,19 @@ interface CarteMissionTourneeProps {
   mission: MissionTourneeVue;
   contexteHref?: string;
   estDerniere: boolean;
+  /** Date de la tournée, dont dépendent les majorations dimanche et fériés. */
+  dateTournee: string;
+  contexteTarifaire: ContexteTarifaire;
 }
 
 export function CarteMissionTournee({
   mission,
   contexteHref,
   estDerniere,
+  dateTournee,
+  contexteTarifaire,
 }: CarteMissionTourneeProps) {
+  const detail = calculerDetailPassage(mission, dateTournee, contexteTarifaire);
   const age = calculerAge(mission.patientDateNaissance);
   const initiales = getInitiales(mission.patientNom);
   const couleur = getCouleurAvatar(mission.patientId);
@@ -165,6 +173,20 @@ export function CarteMissionTournee({
               </span>
             )}
           </div>
+
+          {/* Ce que le passage représente. Le total de la tournée naît d'un
+              cumul à 50 %, d'une éventuelle bascule AMX et de six majorations :
+              sans ce détail, il ne serait vérifiable nulle part. */}
+          {detail.total > 0 && (
+            <p className="mt-2.5 text-right text-[12px] text-navy/45">
+              {detail.majorations.total > 0 && (
+                <span>dont {formaterEuros(detail.majorations.total)} de majorations · </span>
+              )}
+              <span className="font-bold tabular-nums text-navy/70">
+                {formaterEuros(detail.total)}
+              </span>
+            </p>
+          )}
 
           {/* Allergie */}
           {mission.patientAllergies && (
