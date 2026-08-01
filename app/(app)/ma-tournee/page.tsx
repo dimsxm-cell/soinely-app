@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { createClient, getUtilisateurConnecte } from "@/lib/supabase/server";
 import {
@@ -66,22 +67,17 @@ export default async function MaTourneePage({
         </>
       ) : (
         <div className="flex min-h-[70vh] flex-col items-center justify-center px-6 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-violet/10">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-8 w-8 text-brand-violet"
-              aria-hidden="true"
-            >
-              <path d="M4 18.5h3.5a3 3 0 0 0 0-6h-3a3 3 0 0 1 0-6H20" />
-              <circle cx="18.5" cy="18.5" r="2" />
-              <path d="M17.5 6.5 20 4l-2.5-2.5" />
-            </svg>
-          </div>
+          {/* ELY plutôt qu'un pictogramme : un écran vide est décourageant, et
+              c'est le seul endroit de la tournée où la mascotte a la place de
+              se montrer en entier. */}
+          <Image
+            src="/marketing/ely-accompagnement.png"
+            alt=""
+            width={244}
+            height={570}
+            className="h-[210px] w-auto object-contain"
+            priority={false}
+          />
           <p className="mt-5 text-[18px] font-bold text-navy/80">
             Aucune tournée pour aujourd&apos;hui
           </p>

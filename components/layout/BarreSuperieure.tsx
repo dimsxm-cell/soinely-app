@@ -28,7 +28,7 @@ export function BarreSuperieure({ avatarUrl }: BarreSuperieureProps) {
     <header className="sticky top-0 z-10 border-b border-navy/10 bg-[#F6F7F5]/95 backdrop-blur print:hidden">
       <div className="mx-auto flex max-w-2xl items-center justify-between px-6 py-3">
         <Link href="/ma-journee" className="flex items-center gap-2 text-base font-bold tracking-tight text-navy">
-          <LogoSoinely className="h-5 w-5" />
+          <LogoSoinely variante="carre" className="h-7 w-7" />
           Soinely
         </Link>
         <div className="flex items-center gap-1.5">

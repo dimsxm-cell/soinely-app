@@ -14,7 +14,7 @@ export function EnTeteDocument({ titreDocument, sousTitre, nomIdel, patient }: E
     <div className="mb-8">
       <div className="flex items-center justify-between border-b border-navy/10 pb-4">
         <div className="flex items-center gap-2">
-          <LogoSoinely className="h-6 w-6" />
+          <LogoSoinely variante="carre" className="h-7 w-7" />
           <span className="font-display text-lg font-bold text-navy">Soinely</span>
         </div>
         <div className="text-right text-[13px] text-navy/60">

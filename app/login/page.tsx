@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 import { LogoSoinely } from "@/components/ui/LogoSoinely";
 import { createClient } from "@/lib/supabase/client";
@@ -125,6 +126,18 @@ export default function LoginPage() {
         ))}
       </div>
 
+      {/* ELY en accueil, à partir du grand écran seulement : la colonne du
+          formulaire est étroite et centrée, tout l'espace latéral est perdu.
+          Sur mobile il n'y a pas la place, le personnage ne s'affiche pas. */}
+      <Image
+        src="/marketing/ely-professionnel.png"
+        alt=""
+        width={258}
+        height={570}
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-0 left-[4%] hidden h-[74vh] w-auto object-contain lg:block xl:left-[10%]"
+      />
+
       <div className="mx-auto flex min-h-screen w-full max-w-[430px] flex-col px-[22px] pb-12 pt-8 sm:pt-14">
         {/* Retour — même traitement de verre que les autres boutons clairs */}
         <Link
@@ -145,7 +158,7 @@ export default function LoginPage() {
         {/* En-tête */}
         <div className="mt-8 flex flex-col items-center text-center">
           <div className="flex items-center gap-[9px]">
-            <LogoSoinely className="h-[26px] w-[26px]" />
+            <LogoSoinely variante="carre" className="h-8 w-8" />
             <span className="text-[22px] font-bold tracking-[-0.4px] text-[#1d1d1f]">Soinely</span>
           </div>
           <h1 className="mt-[22px] font-display text-[30px] font-semibold leading-[1.1] tracking-[-0.5px] text-[#1d1d1f] sm:text-[34px]">
