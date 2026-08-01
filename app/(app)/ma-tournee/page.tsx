@@ -9,6 +9,8 @@ import {
 } from "@/lib/data/ma-journee";
 import { CarteMissionTournee } from "@/components/ui/CarteMissionTournee";
 import { EnTeteTournee } from "@/components/ui/EnTeteTournee";
+import { getContexteTarifaire } from "@/lib/data/ngap";
+import type { ContexteTarifaire } from "@/lib/cotation";
 import { OngletsFiltresTournee } from "@/components/ui/OngletsFiltresTournee";
 import { compterMissions, filtrerMissions, type Filtre } from "@/lib/tournee-vue";
 import type { Tournee } from "@/lib/types/clinical";
@@ -29,12 +31,20 @@ export default async function MaTourneePage({
 
   const tournee: Tournee | null = user ? await getTourneeDuJour(supabase, user.id) : null;
 
-  const [missions, contexte] = tournee
-    ? await Promise.all([
-        getMissionsTourneeVue(supabase, tournee.id),
-        getMissionEnCoursHref(supabase, tournee.id),
-      ])
-    : [[] as MissionTourneeVue[], null];
+  // Sans tournée il n'y a rien à tarifer : la métropole et une table vide
+  // suffisent, le calcul ne rencontrera aucun acte.
+  const [missions, contexte, contexteTarifaire] =
+    tournee && user
+      ? await Promise.all([
+          getMissionsTourneeVue(supabase, tournee.id),
+          getMissionEnCoursHref(supabase, tournee.id),
+          getContexteTarifaire(supabase, user.id),
+        ])
+      : [
+          [] as MissionTourneeVue[],
+          null,
+          { zone: "metropole", valeurs: new Map() } satisfies ContexteTarifaire,
+        ];
 
   const counts = compterMissions(missions);
   const missionsFiltrees = filtrerMissions(missions, filtre);
@@ -43,7 +53,7 @@ export default async function MaTourneePage({
     <main className="min-h-screen bg-[#F6F7F5]" aria-label="Ma tournée">
       {tournee ? (
         <>
-          <EnTeteTournee missions={missions} tournee={tournee} />
+          <EnTeteTournee missions={missions} tournee={tournee} contexteTarifaire={contexteTarifaire} />
           <OngletsFiltresTournee filtre={filtre} counts={counts} />
 
           <div className="mx-auto max-w-2xl px-4 pt-4 pb-8">

@@ -302,6 +302,27 @@ export type Database = {
         }
         Relationships: []
       }
+      ngap_lettres_cles: {
+        Row: {
+          lettre_cle: string
+          libelle: string
+          valeur_dom: number
+          valeur_metropole: number
+        }
+        Insert: {
+          lettre_cle: string
+          libelle: string
+          valeur_dom: number
+          valeur_metropole: number
+        }
+        Update: {
+          lettre_cle?: string
+          libelle?: string
+          valeur_dom?: number
+          valeur_metropole?: number
+        }
+        Relationships: []
+      }
       patients: {
         Row: {
           adresse: string
@@ -375,18 +396,21 @@ export type Database = {
       }
       profiles: {
         Row: {
+          code_postal: string | null
           created_at: string
           full_name: string
           id: string
           role: string
         }
         Insert: {
+          code_postal?: string | null
           created_at?: string
           full_name: string
           id: string
           role?: string
         }
         Update: {
+          code_postal?: string | null
           created_at?: string
           full_name?: string
           id?: string

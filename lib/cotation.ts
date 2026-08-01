@@ -1,4 +1,9 @@
 import type { ActeVue, MissionTourneeVue } from "@/lib/data/ma-journee";
+import {
+  calculerTarifActe,
+  type ValeursLettresCles,
+  type ZoneTarifaire,
+} from "@/lib/zone-tarifaire";
 
 /**
  * Cotation d'une tournée : ce que les actes réalisés représentent en euros.
@@ -32,6 +37,35 @@ const PART_SECOND_ACTE = 0.5;
 const LETTRES_CLES_HORS_CUMUL = new Set(["BSA", "BSB", "BSC", "TLS", "TLL", "TLD"]);
 
 /**
+ * De quoi tarifer un acte : la zone du cabinet et la valeur des lettres-clés.
+ *
+ * Les deux voyagent ensemble parce qu'aucune ne suffit seule — une valeur sans
+ * zone ne dit pas laquelle des deux colonnes lire.
+ */
+export interface ContexteTarifaire {
+  zone: ZoneTarifaire;
+  valeurs: ValeursLettresCles;
+}
+
+/**
+ * Tarif d'un acte dans la zone du cabinet.
+ *
+ * Se rabat sur le montant figé du catalogue si la lettre-clé est absente de la
+ * table des valeurs — le cas tant que la migration n'est pas appliquée. Les
+ * montants restent alors ceux de la métropole, ce qui vaut mieux qu'une
+ * journée soudainement chiffrée à zéro.
+ */
+function tarifDe(acte: ActeVue, contexte: ContexteTarifaire): number | null {
+  const calcule = calculerTarifActe(
+    acte.lettreCle,
+    acte.coefficient,
+    contexte.zone,
+    contexte.valeurs
+  );
+  return calcule ?? acte.cotation;
+}
+
+/**
  * Montant d'un passage, règle du deuxième acte à 50 % appliquée.
  *
  * Article 11B des dispositions générales : au cours d'une même séance, l'acte
@@ -45,21 +79,24 @@ const LETTRES_CLES_HORS_CUMUL = new Set(["BSA", "BSB", "BSC", "TLS", "TLL", "TLD
  * relevée chez les IDEL. Les actes sans code ne comptent pas : rien ne permet
  * de les chiffrer.
  */
-export function calculerMontantPassage(actes: ActeVue[]): number {
-  const cotes = actes.filter(
-    (acte): acte is ActeVue & { cotation: number } => acte.cotation !== null
-  );
+export function calculerMontantPassage(
+  actes: ActeVue[],
+  contexte: ContexteTarifaire
+): number {
+  const tarifes = actes
+    .map((acte) => ({ acte, tarif: tarifDe(acte, contexte) }))
+    .filter((ligne): ligne is { acte: ActeVue; tarif: number } => ligne.tarif !== null);
 
-  const horsCumul = cotes.filter((acte) => estHorsCumul(acte));
-  const soumisAuCumul = cotes.filter((acte) => !estHorsCumul(acte));
+  const horsCumul = tarifes.filter((ligne) => estHorsCumul(ligne.acte));
+  const soumisAuCumul = tarifes.filter((ligne) => !estHorsCumul(ligne.acte));
 
-  const montantHorsCumul = horsCumul.reduce((somme, acte) => somme + acte.cotation, 0);
+  const montantHorsCumul = horsCumul.reduce((somme, ligne) => somme + ligne.tarif, 0);
 
   const montantSoumis = [...soumisAuCumul]
     .sort(comparerParCoefficient)
-    .reduce((somme, acte, rang) => {
-      if (rang === 0) return somme + acte.cotation;
-      if (rang === 1) return somme + acte.cotation * PART_SECOND_ACTE;
+    .reduce((somme, ligne, rang) => {
+      if (rang === 0) return somme + ligne.tarif;
+      if (rang === 1) return somme + ligne.tarif * PART_SECOND_ACTE;
       return somme;
     }, 0);
 
@@ -73,11 +110,11 @@ export function calculerMontantPassage(actes: ActeVue[]): number {
  * catalogue ; son absence ne relègue un acte que par défaut de mieux.
  */
 function comparerParCoefficient(
-  a: ActeVue & { cotation: number },
-  b: ActeVue & { cotation: number }
+  a: { acte: ActeVue; tarif: number },
+  b: { acte: ActeVue; tarif: number }
 ): number {
-  const ecart = (b.coefficient ?? 0) - (a.coefficient ?? 0);
-  return ecart !== 0 ? ecart : b.cotation - a.cotation;
+  const ecart = (b.acte.coefficient ?? 0) - (a.acte.coefficient ?? 0);
+  return ecart !== 0 ? ecart : b.tarif - a.tarif;
 }
 
 function estHorsCumul(acte: ActeVue): boolean {
@@ -90,10 +127,13 @@ function estHorsCumul(acte: ActeVue): boolean {
  * Une absence ne compte pas : le soin n'a pas été réalisé. L'indemnité de
  * déplacement qui peut lui rester due dépend des règles du lot suivant.
  */
-export function calculerMontantTournee(missions: MissionTourneeVue[]): number {
+export function calculerMontantTournee(
+  missions: MissionTourneeVue[],
+  contexte: ContexteTarifaire
+): number {
   const montant = missions
     .filter((mission) => mission.statut !== "absent")
-    .reduce((somme, mission) => somme + calculerMontantPassage(mission.actes), 0);
+    .reduce((somme, mission) => somme + calculerMontantPassage(mission.actes, contexte), 0);
 
   return arrondirCentimes(montant);
 }
