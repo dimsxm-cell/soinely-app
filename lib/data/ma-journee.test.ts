@@ -559,8 +559,16 @@ describe("getMissionsTourneeVue", () => {
         patients: patient,
         missions_cliniques: null,
         actes_mission: [
-          { libelle: "Insuline", ordre: 1, ngap_codes: { code: "AMI 1" } },
-          { libelle: "Toilette", ordre: 0, ngap_codes: { code: "AIS 3" } },
+          {
+            libelle: "Insuline",
+            ordre: 1,
+            ngap_codes: { code: "AMI 1", cotation: 3.15, lettre_cle: "AMI" },
+          },
+          {
+            libelle: "Toilette",
+            ordre: 0,
+            ngap_codes: { code: "AIS 3", cotation: 7.95, lettre_cle: "AIS" },
+          },
         ],
       },
     ]);
@@ -569,12 +577,12 @@ describe("getMissionsTourneeVue", () => {
     const missions = await getMissionsTourneeVue(fakeClient, "t1");
 
     expect(missions[0].actes).toEqual([
-      { libelle: "Toilette", code: "AIS 3" },
-      { libelle: "Insuline", code: "AMI 1" },
+      { libelle: "Toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS" },
+      { libelle: "Insuline", code: "AMI 1", cotation: 3.15, lettreCle: "AMI" },
     ]);
   });
 
-  it("rend un code nul pour un acte sans cotation", async () => {
+  it("rend un code et un tarif nuls pour un acte sans cotation", async () => {
     const fakeClient = fakeClientAvecMissions([
       {
         id: "m1",
@@ -592,7 +600,10 @@ describe("getMissionsTourneeVue", () => {
     const { getMissionsTourneeVue } = await import("./ma-journee");
     const missions = await getMissionsTourneeVue(fakeClient, "t1");
 
-    expect(missions[0].actes).toEqual([{ libelle: "Pansement", code: null }]);
+    // Sans code, l'acte reste affiché mais ne peut entrer dans aucun total.
+    expect(missions[0].actes).toEqual([
+      { libelle: "Pansement", code: null, cotation: null, lettreCle: null },
+    ]);
   });
 
   it("rend une liste d'actes vide quand la mission n'en porte aucun", async () => {

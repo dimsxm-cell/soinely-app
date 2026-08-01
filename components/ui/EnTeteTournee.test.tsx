@@ -101,6 +101,37 @@ describe("EnTeteTournee", () => {
     expect(screen.getByText("8")).toBeInTheDocument();
   });
 
+  it("affiche le montant des actes cotés de la tournée", () => {
+    // Un pansement (6,30 €) et une injection (3,15 €) au même passage : la
+    // règle du deuxième acte à 50 % donne 7,88 €, plus 7,95 € de toilette.
+    const avecActes = [
+      {
+        ...creerMission("a", "terminee", "08:00:00"),
+        actes: [
+          { libelle: "Pansement", code: "AMI 2", cotation: 6.3, lettreCle: "AMI" },
+          { libelle: "Injection", code: "AMI 1", cotation: 3.15, lettreCle: "AMI" },
+        ],
+      },
+      {
+        ...creerMission("b", "a_faire", "10:00:00"),
+        actes: [{ libelle: "Toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS" }],
+      },
+    ];
+
+    render(<EnTeteTournee missions={avecActes} tournee={tournee} />);
+
+    expect(screen.getByText("Actes cotés")).toBeInTheDocument();
+    expect(screen.getByText(/15,83/)).toBeInTheDocument();
+  });
+
+  it("tait le montant tant qu'aucun acte n'est coté, plutôt que d'annoncer zéro", () => {
+    // Un « 0,00 € » se lirait comme une journée sans valeur, alors qu'il ne
+    // dit que l'absence de codes sur des soins bien réels.
+    render(<EnTeteTournee missions={missions} tournee={tournee} />);
+
+    expect(screen.queryByText("Actes cotés")).not.toBeInTheDocument();
+  });
+
   it("n'affiche pas d'heure de fin quand tout est validé", () => {
     const toutesValidees = [
       creerMission("a", "terminee", "08:00:00"),

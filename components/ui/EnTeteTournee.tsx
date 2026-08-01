@@ -1,6 +1,7 @@
 import type { MissionTourneeVue } from "@/lib/data/ma-journee";
 import type { Tournee } from "@/lib/types/clinical";
 import { estimerHeureFin, formatDateTournee } from "@/lib/tournee-vue";
+import { calculerMontantTournee, formaterEuros } from "@/lib/cotation";
 
 export function EnTeteTournee({
   missions,
@@ -18,6 +19,7 @@ export function EnTeteTournee({
   ).length;
   const pct = total > 0 ? Math.round((valides / total) * 100) : 0;
   const heureFin = estimerHeureFin(missions);
+  const montantActes = calculerMontantTournee(missions);
   const maintenant = new Date().toLocaleTimeString("fr-FR", {
     hour: "2-digit",
     minute: "2-digit",
@@ -41,13 +43,30 @@ export function EnTeteTournee({
           </div>
         </div>
 
-        {/* Compteur validés */}
-        <div className="mt-3 flex items-baseline gap-1.5">
-          <span className="font-display text-[44px] font-bold tabular-nums leading-none text-white">
-            {valides}
-          </span>
-          <span className="text-[20px] font-semibold text-white/30">/{total}</span>
-          <span className="ml-1 text-[13px] text-white/45">passages validés</span>
+        {/* Compteur validés, et ce que la journée représente */}
+        <div className="mt-3 flex items-end justify-between gap-3">
+          <div className="flex items-baseline gap-1.5">
+            <span className="font-display text-[44px] font-bold tabular-nums leading-none text-white">
+              {valides}
+            </span>
+            <span className="text-[20px] font-semibold text-white/30">/{total}</span>
+            <span className="ml-1 text-[13px] text-white/45">passages validés</span>
+          </div>
+
+          {/* « Actes cotés » et non « facturable » : les majorations et les
+              indemnités de déplacement n'entrent pas encore dans ce total.
+              Annoncer un montant pour un autre serait trompeur sur la seule
+              page où une IDEL vient chercher un chiffre sûr. */}
+          {montantActes > 0 && (
+            <div className="shrink-0 text-right">
+              <p className="text-[9.5px] font-semibold uppercase tracking-[0.09em] text-white/30">
+                Actes cotés
+              </p>
+              <p className="mt-0.5 font-display text-[22px] font-bold leading-none tabular-nums text-white">
+                {formaterEuros(montantActes)}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Barre de progression */}
