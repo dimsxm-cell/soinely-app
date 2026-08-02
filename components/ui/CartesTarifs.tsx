@@ -63,11 +63,18 @@ const CLASSE_CARTE_POPULAIRE =
 
 interface CartesTarifsProps {
   estConnecte: boolean;
+  /** Faux tant que les identifiants de paiement ne sont pas configurés. */
+  paiementDisponible: boolean;
   planActuel: "solo" | "cabinet" | null;
   joursRestantsEssai: number;
 }
 
-export function CartesTarifs({ estConnecte, planActuel, joursRestantsEssai }: CartesTarifsProps) {
+export function CartesTarifs({
+  estConnecte,
+  planActuel,
+  joursRestantsEssai,
+  paiementDisponible,
+}: CartesTarifsProps) {
   const [annuel, setAnnuel] = useState(false);
 
   const baseToggle =
@@ -194,13 +201,24 @@ export function CartesTarifs({ estConnecte, planActuel, joursRestantsEssai }: Ca
               </ul>
               {plan.note && <p className="mb-4 text-[12px] leading-relaxed text-navy/45">{plan.note}</p>}
 
-              <form action={createCheckoutSessionAction}>
-                <input type="hidden" name="plan" value={plan.id} />
-                <input type="hidden" name="periodicite" value={annuel ? "annuel" : "mensuel"} />
-                <BoutonEffetVerre variant="primaire" filterId="glass-distortion-tarifs" type="submit">
-                  {planActuel === plan.id ? "Offre actuelle" : `Choisir ${plan.nom}`}
-                </BoutonEffetVerre>
-              </form>
+              {/* Sans les identifiants de paiement, l'action de commande
+                  renonce en silence : le bouton ne réagissait pas, sans un mot
+                  d'explication. Mieux vaut annoncer l'indisponibilité que
+                  laisser cliquer dans le vide. */}
+              {paiementDisponible ? (
+                <form action={createCheckoutSessionAction}>
+                  <input type="hidden" name="plan" value={plan.id} />
+                  <input type="hidden" name="periodicite" value={annuel ? "annuel" : "mensuel"} />
+                  <BoutonEffetVerre variant="primaire" filterId="glass-distortion-tarifs" type="submit">
+                    {planActuel === plan.id ? "Offre actuelle" : `Choisir ${plan.nom}`}
+                  </BoutonEffetVerre>
+                </form>
+              ) : (
+                <p className="rounded-[12px] bg-navy/[0.04] px-4 py-3 text-center text-[13px] leading-relaxed text-navy/55">
+                  Les abonnements ouvriront à la fin de la bêta. D&apos;ici là, votre accès reste
+                  gratuit.
+                </p>
+              )}
             </div>
           );
         })}

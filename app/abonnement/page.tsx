@@ -9,6 +9,11 @@ export default async function AbonnementPage() {
   const user = await getUtilisateurConnecte();
 
   const abonnement = user ? await getAbonnement(supabase, user.id) : null;
+  // Les identifiants de paiement ne sont lus que sur le serveur. Sans eux,
+  // l'action de commande renoncerait en silence : autant l'annoncer.
+  const paiementDisponible = Boolean(
+    process.env.STRIPE_SECRET_KEY && process.env.STRIPE_PRICE_ID_SOLO
+  );
   const joursRestantsEssai = user && !abonnement ? getJoursRestantsEssaiGratuit(user.created_at) : 0;
 
   return (
@@ -53,6 +58,7 @@ export default async function AbonnementPage() {
 
         <CartesTarifs
           estConnecte={Boolean(user)}
+          paiementDisponible={paiementDisponible}
           planActuel={abonnement?.plan ?? null}
           joursRestantsEssai={joursRestantsEssai}
         />
