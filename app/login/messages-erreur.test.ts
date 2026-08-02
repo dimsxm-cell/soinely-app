@@ -42,3 +42,31 @@ describe("traduireErreurAuth", () => {
     );
   });
 });
+
+describe("traduireErreurAuth — erreurs sans message exploitable", () => {
+  it("rend une phrase compréhensible devant un objet vide", () => {
+    // Cas rencontré en production : un envoi SMTP refusé remonte une erreur
+    // dont le message est un objet. Rendu tel quel, il s'affichait « {} ».
+    expect(traduireErreurAuth({} as unknown as string)).toMatch(/L'envoi a échoué/);
+  });
+
+  it("rend une phrase compréhensible devant un message vide", () => {
+    expect(traduireErreurAuth("")).toMatch(/L'envoi a échoué/);
+    expect(traduireErreurAuth("   ")).toMatch(/L'envoi a échoué/);
+  });
+
+  it("rend une phrase compréhensible devant null ou undefined", () => {
+    expect(traduireErreurAuth(null as unknown as string)).toMatch(/L'envoi a échoué/);
+    expect(traduireErreurAuth(undefined as unknown as string)).toMatch(/L'envoi a échoué/);
+  });
+
+  it("n'affiche jamais la représentation brute d'un objet", () => {
+    // Le point qui compte : quoi qu'on lui donne, le texte rendu doit être
+    // lisible par une IDEL.
+    for (const valeur of [{}, [], 42, null, undefined, { message: "x" }]) {
+      const rendu = traduireErreurAuth(valeur as unknown as string);
+      expect(rendu).not.toContain("{");
+      expect(rendu).not.toContain("object");
+    }
+  });
+});

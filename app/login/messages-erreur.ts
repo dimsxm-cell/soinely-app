@@ -42,7 +42,24 @@ const MESSAGES_FR: { motif: RegExp; message: string }[] = [
   },
 ];
 
-export function traduireErreurAuth(messageAnglais: string): string {
+/**
+ * Ce que voit l'utilisatrice quand l'erreur n'a pas de message exploitable.
+ *
+ * Cas rencontré en production : un envoi d'email refusé par le serveur SMTP
+ * remonte une erreur dont le message est un objet vide. Rendu tel quel, il
+ * s'affichait « {} » à l'écran — indéchiffrable, et pire que rien puisqu'il
+ * laissait croire à un bogue d'affichage plutôt qu'à un envoi manqué.
+ */
+const MESSAGE_PAR_DEFAUT =
+  "L'envoi a échoué. Réessayez dans quelques minutes ; si cela persiste, signalez-le.";
+
+export function traduireErreurAuth(messageAnglais: unknown): string {
+  // Le type annoncé par Supabase est `string`, la réalité pas toujours : une
+  // panne de messagerie rend un objet. Ne pas s'y fier ne coûte rien.
+  if (typeof messageAnglais !== "string" || messageAnglais.trim() === "") {
+    return MESSAGE_PAR_DEFAUT;
+  }
+
   const connu = MESSAGES_FR.find((m) => m.motif.test(messageAnglais));
   // Message inconnu : on le laisse passer plutôt que de le remplacer par un
   // texte vague. Mieux vaut une phrase en anglais qu'un « une erreur est
