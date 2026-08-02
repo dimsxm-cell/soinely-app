@@ -1,10 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
+import { DUREE_ESSAI_GRATUIT_JOURS } from "@/lib/data/abonnement";
 
+// La durée vient du code qui l'applique : annoncer ici un délai que
+// l'application ne tiendrait pas se paierait en testeurs perdus le jour où ils
+// se heurtent à la page d'abonnement.
 const TESTEURS = [
   {
-    titre: "100% gratuit",
-    desc: "Accès complet à toutes les fonctionnalités pendant la bêta, sans frais.",
+    titre: `Gratuit ${DUREE_ESSAI_GRATUIT_JOURS} jours`,
+    desc: "Accès complet à toutes les fonctionnalités, sans carte bancaire.",
     d: "M20 6 9 17l-5-5",
   },
   {
@@ -72,7 +76,7 @@ export function ListeAttente() {
               </svg>
             </Link>
             <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.75)" }}>
-              100% gratuit · Sans engagement
+              {`Gratuit ${DUREE_ESSAI_GRATUIT_JOURS} jours · Sans carte bancaire`}
             </div>
           </div>
 
