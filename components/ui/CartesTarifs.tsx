@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { DUREE_ESSAI_GRATUIT_JOURS } from "@/lib/data/abonnement";
 import { createCheckoutSessionAction } from "@/lib/data/abonnement-actions";
 import { BoutonEffetVerre } from "./BoutonEffetVerre";
 
@@ -109,7 +110,7 @@ export function CartesTarifs({ estConnecte, planActuel, joursRestantsEssai }: Ca
           <div className="mb-1.5 flex items-baseline gap-1.5">
             <span className="font-display text-[52px] font-extrabold leading-none tracking-tight">0 €</span>
           </div>
-          <p className="mb-5 text-[12.5px] text-[#9a92b3]">Gratuit 15 jours, aucune carte requise</p>
+          <p className="mb-5 text-[12.5px] text-[#9a92b3]">{`Gratuit ${DUREE_ESSAI_GRATUIT_JOURS} jours, aucune carte requise`}</p>
           <div className="mb-5 h-px w-full bg-gradient-to-r from-transparent via-brand-violet/20 to-transparent" />
           <ul className="mb-6 flex flex-1 flex-col gap-3">
             <li className="flex items-start gap-2.5 text-sm leading-tight text-[#3d3956]">
@@ -122,7 +123,7 @@ export function CartesTarifs({ estConnecte, planActuel, joursRestantsEssai }: Ca
                   <path d="M20 6 9 17l-5-5" />
                 </svg>
               </span>
-              Accès complet à l&apos;application pendant 15 jours
+              {`Accès complet à l'application pendant ${DUREE_ESSAI_GRATUIT_JOURS} jours`}
             </li>
           </ul>
 

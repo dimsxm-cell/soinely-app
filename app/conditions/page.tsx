@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PageLegale, type SectionLegale } from "@/components/legal/PageLegale";
+import { DUREE_ESSAI_GRATUIT_JOURS } from "@/lib/data/abonnement";
 
 export const metadata: Metadata = {
   title: "Conditions générales d'utilisation — Soinely",
@@ -63,7 +64,7 @@ const SECTIONS: SectionLegale[] = [
       {
         type: "liste",
         items: [
-          "Tout nouveau compte bénéficie d'un essai gratuit de 15 jours donnant accès à l'ensemble des fonctionnalités, sans carte bancaire.",
+          `Tout nouveau compte bénéficie d'un essai gratuit de ${DUREE_ESSAI_GRATUIT_JOURS} jours donnant accès à l'ensemble des fonctionnalités, sans carte bancaire.`,
           "À l'issue de l'essai, la poursuite de l'utilisation requiert un abonnement payant.",
           "Offre Solo : 19 € par mois et par infirmier. Offre Cabinet : 39 € par mois et par infirmier.",
           "Le paiement annuel bénéficie d'une remise de 20 % et est facturé en une fois pour douze mois.",

@@ -1,39 +1,54 @@
 import { describe, expect, it, vi } from "vitest";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+// Les cas se calculent depuis la durée plutôt que de la coder en dur : ces
+// tests doivent vérifier la règle, pas la valeur du moment. Passer l'essai de
+// quinze jours à un an ne doit pas les faire échouer.
+function ilYA(jours: number): string {
+  return new Date(Date.now() - jours * 86_400_000).toISOString();
+}
+
 describe("estDansEssaiGratuit", () => {
-  it("retourne true si le compte a été créé il y a moins de 15 jours", async () => {
-    const { estDansEssaiGratuit } = await import("./abonnement");
+  it("retourne true pendant l'essai", async () => {
+    const { estDansEssaiGratuit, DUREE_ESSAI_GRATUIT_JOURS } = await import("./abonnement");
 
-    const ilYA5Jours = new Date(Date.now() - 5 * 86_400_000).toISOString();
-
-    expect(estDansEssaiGratuit(ilYA5Jours)).toBe(true);
+    expect(estDansEssaiGratuit(ilYA(DUREE_ESSAI_GRATUIT_JOURS - 1))).toBe(true);
   });
 
-  it("retourne false si le compte a été créé il y a plus de 15 jours", async () => {
+  it("retourne true le jour même de l'inscription", async () => {
     const { estDansEssaiGratuit } = await import("./abonnement");
 
-    const ilYA20Jours = new Date(Date.now() - 20 * 86_400_000).toISOString();
+    expect(estDansEssaiGratuit(ilYA(0))).toBe(true);
+  });
 
-    expect(estDansEssaiGratuit(ilYA20Jours)).toBe(false);
+  it("retourne false une fois l'essai écoulé", async () => {
+    const { estDansEssaiGratuit, DUREE_ESSAI_GRATUIT_JOURS } = await import("./abonnement");
+
+    expect(estDansEssaiGratuit(ilYA(DUREE_ESSAI_GRATUIT_JOURS + 5))).toBe(false);
+  });
+
+  it("couvre une inscription de la veille des quinze anciens jours", async () => {
+    // La bêta promet un accès gratuit : un compte créé il y a trois semaines
+    // ne doit plus se heurter à la page d'abonnement.
+    const { estDansEssaiGratuit } = await import("./abonnement");
+
+    expect(estDansEssaiGratuit(ilYA(21))).toBe(true);
   });
 });
 
 describe("getJoursRestantsEssaiGratuit", () => {
   it("calcule les jours restants avant la fin de l'essai gratuit", async () => {
-    const { getJoursRestantsEssaiGratuit } = await import("./abonnement");
+    const { getJoursRestantsEssaiGratuit, DUREE_ESSAI_GRATUIT_JOURS } = await import("./abonnement");
 
-    const ilYA5Jours = new Date(Date.now() - 5 * 86_400_000).toISOString();
-
-    expect(getJoursRestantsEssaiGratuit(ilYA5Jours)).toBe(10);
+    expect(getJoursRestantsEssaiGratuit(ilYA(5))).toBe(DUREE_ESSAI_GRATUIT_JOURS - 5);
   });
 
   it("ne descend jamais en dessous de 0", async () => {
-    const { getJoursRestantsEssaiGratuit } = await import("./abonnement");
+    // Un compte largement au-delà de l'essai rend zéro, jamais un négatif qui
+    // s'afficherait tel quel dans « Essai jusqu'au… ».
+    const { getJoursRestantsEssaiGratuit, DUREE_ESSAI_GRATUIT_JOURS } = await import("./abonnement");
 
-    const ilYA30Jours = new Date(Date.now() - 30 * 86_400_000).toISOString();
-
-    expect(getJoursRestantsEssaiGratuit(ilYA30Jours)).toBe(0);
+    expect(getJoursRestantsEssaiGratuit(ilYA(DUREE_ESSAI_GRATUIT_JOURS * 2))).toBe(0);
   });
 });
 

@@ -70,9 +70,15 @@ describe("proxy", () => {
     expect(response.status).toBe(200);
   });
 
-  it("redirige vers /abonnement si aucun abonnement et le compte a plus de 15 jours", async () => {
-    const ilYA20Jours = new Date(Date.now() - 20 * 86_400_000).toISOString();
-    getUserMock.mockResolvedValue({ data: { user: { id: "u1", created_at: ilYA20Jours } } });
+  it("redirige vers /abonnement si aucun abonnement et l'essai est écoulé", async () => {
+    // Le délai se déduit de la durée en vigueur : allonger l'essai pendant la
+    // bêta ne doit pas faire échouer ce test, qui porte sur la garde et non
+    // sur la valeur du moment.
+    const { DUREE_ESSAI_GRATUIT_JOURS } = await import("@/lib/data/abonnement");
+    const essaiEcoule = new Date(
+      Date.now() - (DUREE_ESSAI_GRATUIT_JOURS + 5) * 86_400_000
+    ).toISOString();
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1", created_at: essaiEcoule } } });
     eqSelectMock.mockResolvedValue({ data: null, error: null });
 
     const { proxy } = await import("./proxy");
@@ -84,7 +90,7 @@ describe("proxy", () => {
     expect(response.headers.get("location")).toContain("/abonnement");
   });
 
-  it("redirige vers /abonnement même dans les 15 jours si l'abonnement existe avec un statut impayé", async () => {
+  it("redirige vers /abonnement même pendant l'essai si l'abonnement est impayé", async () => {
     const ilYA5Jours = new Date(Date.now() - 5 * 86_400_000).toISOString();
     getUserMock.mockResolvedValue({ data: { user: { id: "u1", created_at: ilYA5Jours } } });
     eqSelectMock.mockResolvedValue({ data: { statut: "impaye" }, error: null });
