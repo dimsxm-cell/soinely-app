@@ -27,12 +27,12 @@ describe("estDansEssaiGratuit", () => {
     expect(estDansEssaiGratuit(ilYA(DUREE_ESSAI_GRATUIT_JOURS + 5))).toBe(false);
   });
 
-  it("couvre une inscription de la veille des quinze anciens jours", async () => {
-    // La bêta promet un accès gratuit : un compte créé il y a trois semaines
-    // ne doit plus se heurter à la page d'abonnement.
-    const { estDansEssaiGratuit } = await import("./abonnement");
+  it("retourne false le jour où l'essai expire", async () => {
+    // Frontière exacte : au terme du délai, l'accès bascule. C'est ce jour-là
+    // que le testeur voit la page d'abonnement.
+    const { estDansEssaiGratuit, DUREE_ESSAI_GRATUIT_JOURS } = await import("./abonnement");
 
-    expect(estDansEssaiGratuit(ilYA(21))).toBe(true);
+    expect(estDansEssaiGratuit(ilYA(DUREE_ESSAI_GRATUIT_JOURS))).toBe(false);
   });
 });
 

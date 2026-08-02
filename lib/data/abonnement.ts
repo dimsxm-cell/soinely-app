@@ -4,19 +4,15 @@ import type { Abonnement, PlanAbonnement, StatutAbonnement } from "@/lib/types/a
 import { journaliserEchec } from "@/lib/journal";
 
 /**
- * Durée de l'essai gratuit, en jours.
+ * Durée de l'essai gratuit, en jours. Quinze jours, testeurs de la bêta
+ * compris.
  *
- * Un an pendant la bêta privée. La page d'accueil promet « accès complet à
- * toutes les fonctionnalités pendant la bêta, sans frais » : à quinze jours,
- * chaque testeur se heurtait à la page d'abonnement deux semaines après son
- * inscription, ce que rien ne lui avait annoncé.
- *
- * L'essai se comptant depuis la création du compte, changer ce nombre vaut
- * pour tous les comptes existants, sans reprise de données.
- *
- * À ramener à 15 le jour où les paiements s'ouvrent.
+ * L'essai se compte depuis la création du compte : changer ce nombre vaut pour
+ * tous les comptes existants, sans reprise de données. Les textes qui
+ * l'annoncent — cartes de tarifs, conditions générales — en dérivent, ils ne
+ * peuvent donc pas le contredire.
  */
-export const DUREE_ESSAI_GRATUIT_JOURS = 365;
+export const DUREE_ESSAI_GRATUIT_JOURS = 15;
 
 export function getJoursRestantsEssaiGratuit(dateCreationCompte: string): number {
   const joursEcoules = (Date.now() - new Date(dateCreationCompte).getTime()) / 86_400_000;
