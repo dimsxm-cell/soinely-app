@@ -584,3 +584,93 @@ describe("position du patient", () => {
     );
   });
 });
+
+describe("createSoinPrescritAction — chaque refus se dit", () => {
+  function soin(champs: Record<string, string> = {}): FormData {
+    const formData = new FormData();
+    formData.set("patientId", "p1");
+    formData.set("typeSoin", "Injection");
+    formData.set("frequenceType", "quotidien");
+    formData.set("heures", "06:20");
+    formData.set("dateDebut", "2026-08-03");
+    for (const [cle, valeur] of Object.entries(champs)) formData.set(cle, valeur);
+    return formData;
+  }
+
+  it("prescrit le soin quand tout est renseigné", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
+    singleInsertMock.mockResolvedValue({ data: { id: "s1" }, error: null });
+
+    const { createSoinPrescritAction } = await import("./patients-actions");
+
+    expect((await createSoinPrescritAction(soin())).succes).toBe(true);
+  });
+
+  it("nomme le champ manquant plutôt que d'abandonner en silence", async () => {
+    const { createSoinPrescritAction } = await import("./patients-actions");
+
+    // C'est le cas qu'a rencontré la fondatrice : le bouton ne produisait
+    // rien, et rien n'indiquait lequel des six champs faisait défaut.
+    expect((await createSoinPrescritAction(soin({ typeSoin: "" }))).erreur).toMatch(
+      /type de soin/i
+    );
+    expect((await createSoinPrescritAction(soin({ dateDebut: "" }))).erreur).toMatch(
+      /date de début/i
+    );
+    expect((await createSoinPrescritAction(soin({ heures: "" }))).erreur).toMatch(/heure/i);
+  });
+
+  it("montre l'heure fautive au lieu de refuser toute la saisie", async () => {
+    const { createSoinPrescritAction } = await import("./patients-actions");
+
+    // « 6:20 » et « 06h20 » sont des écritures naturelles : les nommer vaut
+    // mieux que de rejeter le formulaire sans explication.
+    const resultat = await createSoinPrescritAction(soin({ heures: "6:20" }));
+
+    expect(resultat.succes).toBe(false);
+    expect(resultat.erreur).toContain("6:20");
+    expect(resultat.erreur).toMatch(/HH:MM/);
+  });
+
+  it("accepte plusieurs passages dans la journée", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
+    singleInsertMock.mockResolvedValue({ data: { id: "s1" }, error: null });
+
+    const { createSoinPrescritAction } = await import("./patients-actions");
+
+    expect((await createSoinPrescritAction(soin({ heures: "07:00, 19:00" }))).succes).toBe(true);
+  });
+
+  it("refuse une date de fin antérieure au début", async () => {
+    const { createSoinPrescritAction } = await import("./patients-actions");
+
+    const resultat = await createSoinPrescritAction(
+      soin({ dateDebut: "2026-08-10", dateFin: "2026-08-01" })
+    );
+
+    expect(resultat.erreur).toMatch(/précède/);
+  });
+
+  it("réclame un jour coché pour une récurrence hebdomadaire", async () => {
+    const { createSoinPrescritAction } = await import("./patients-actions");
+
+    const resultat = await createSoinPrescritAction(soin({ frequenceType: "jours_semaine" }));
+
+    expect(resultat.erreur).toMatch(/jour de la semaine/i);
+  });
+
+  it("remonte l'erreur de la base plutôt que de la taire", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
+    singleInsertMock.mockResolvedValue({ data: null, error: { message: "permission denied" } });
+
+    const { createSoinPrescritAction } = await import("./patients-actions");
+
+    const resultat = await createSoinPrescritAction(soin());
+
+    // C'est ce message qui a permis de trouver le défaut de droits sur
+    // profiles en quelques secondes.
+    expect(resultat.succes).toBe(false);
+    expect(resultat.erreur).toContain("permission denied");
+  });
+});

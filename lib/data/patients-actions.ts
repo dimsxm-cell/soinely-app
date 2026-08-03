@@ -128,9 +128,22 @@ export async function updatePatientAction(formData: FormData): Promise<void> {
   revalidatePath(`/patients/${patientId}`);
 }
 
-export async function createSoinPrescritAction(formData: FormData): Promise<void> {
+export interface ResultatSoin {
+  succes: boolean;
+  erreur?: string;
+}
+
+/**
+ * Prescrit un soin à un patient.
+ *
+ * Chaque refus se dit. Cette action abandonnait auparavant en silence dès
+ * qu'un champ manquait : le bouton ne produisait rien, et rien n'indiquait
+ * lequel. C'est le parcours le plus critique de l'application — sans soin
+ * prescrit, aucune tournée n'existe.
+ */
+export async function createSoinPrescritAction(formData: FormData): Promise<ResultatSoin> {
   const patientId = String(formData.get("patientId") ?? "");
-  const typeSoin = String(formData.get("typeSoin") ?? "");
+  const typeSoin = String(formData.get("typeSoin") ?? "").trim();
   const frequenceType = String(formData.get("frequenceType") ?? "") as FrequenceSoin;
   const heuresBrut = String(formData.get("heures") ?? "")
     .split(",")
@@ -141,20 +154,42 @@ export async function createSoinPrescritAction(formData: FormData): Promise<void
   // Cotation facultative : un soin peut exister sans code NGAP.
   const ngapCodeId = champTexteOuNull(formData, "ngapCodeId");
 
-  const heuresValides = heuresBrut.length > 0 && heuresBrut.every((h) => /^([01]\d|2[0-3]):[0-5]\d$/.test(h));
+  if (!patientId) return { succes: false, erreur: "Patient introuvable." };
+  if (!typeSoin) return { succes: false, erreur: "Indiquez le type de soin." };
+  if (!frequenceType) return { succes: false, erreur: "Choisissez une récurrence." };
+  if (!dateDebut) return { succes: false, erreur: "Indiquez une date de début." };
 
-  if (!patientId || !typeSoin || !frequenceType || !dateDebut || !heuresValides) return;
-  if (dateFin && dateFin < dateDebut) return;
+  if (heuresBrut.length === 0) {
+    return { succes: false, erreur: "Indiquez au moins une heure de passage." };
+  }
+
+  // Le format attendu est HH:MM sur deux chiffres. « 6:20 » ou « 06h20 » sont
+  // des saisies naturelles qu'il vaut mieux nommer que refuser sans un mot.
+  const heureFautive = heuresBrut.find((h) => !/^([01]\d|2[0-3]):[0-5]\d$/.test(h));
+  if (heureFautive) {
+    return {
+      succes: false,
+      erreur: `Heure mal écrite : « ${heureFautive} ». Attendu HH:MM, par exemple 06:20.`,
+    };
+  }
+
+  if (dateFin && dateFin < dateDebut) {
+    return { succes: false, erreur: "La date de fin précède la date de début." };
+  }
 
   let joursSemaine: number[] | null = null;
   let intervalleJours: number | null = null;
 
   if (frequenceType === "jours_semaine") {
     joursSemaine = formData.getAll("joursSemaine").map(Number);
-    if (joursSemaine.length === 0) return;
+    if (joursSemaine.length === 0) {
+      return { succes: false, erreur: "Cochez au moins un jour de la semaine." };
+    }
   } else if (frequenceType === "tous_les_x_jours") {
     const valeur = Number(formData.get("intervalleJours"));
-    if (!valeur || valeur < 1) return;
+    if (!valeur || valeur < 1) {
+      return { succes: false, erreur: "Indiquez un intervalle d'au moins un jour." };
+    }
     intervalleJours = valeur;
   }
 
@@ -163,7 +198,7 @@ export async function createSoinPrescritAction(formData: FormData): Promise<void
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return;
+  if (!user) return { succes: false, erreur: "Vous devez être connectée." };
 
   const { error } = await supabase
     .from("soins_prescrits")
@@ -182,10 +217,14 @@ export async function createSoinPrescritAction(formData: FormData): Promise<void
     .select("id")
     .single();
 
-  if (error) journaliserEchec("createSoinPrescritAction", error);
-  if (error) return;
+  if (error) {
+    journaliserEchec("createSoinPrescritAction", error);
+    return { succes: false, erreur: `L'enregistrement a échoué : ${error.message}` };
+  }
 
   revalidatePath(`/patients/${patientId}`);
+  revalidatePath(`/patients/${patientId}/prescriptions`);
+  return { succes: true };
 }
 
 export async function arreterSoinPrescritAction(formData: FormData): Promise<void> {

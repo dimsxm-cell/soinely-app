@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getPatient, getSoinsPrescrits } from "@/lib/data/patients";
-import { createSoinPrescritAction, arreterSoinPrescritAction, coterSoinPrescritAction, updatePatientAction } from "@/lib/data/patients-actions";
+import { arreterSoinPrescritAction, coterSoinPrescritAction, updatePatientAction } from "@/lib/data/patients-actions";
+import { FormulaireSoinPrescrit } from "@/components/ui/FormulaireSoinPrescrit";
 import { getCodesNgap } from "@/lib/data/ngap";
 import { formaterNomPropre } from "@/lib/format";
 import type { SoinPrescrit } from "@/lib/types/clinical";
@@ -207,82 +208,7 @@ export default async function PatientPage({ params }: { params: Promise<{ id: st
           </>
         )}
 
-        <form
-          action={createSoinPrescritAction}
-          className="mt-5 flex flex-col gap-3 border-t border-navy/10 pt-4"
-        >
-          <input type="hidden" name="patientId" value={patient.id} />
-          <label className="flex flex-col gap-1 text-sm text-navy">
-            Type de soin
-            <input name="typeSoin" required className="rounded-card border border-navy/20 p-2" />
-          </label>
-          <label className="flex flex-col gap-1 text-sm text-navy">
-            Cotation NGAP (facultatif)
-            <select
-              name="ngapCodeId"
-              defaultValue=""
-              className="rounded-card border border-navy/20 p-2"
-            >
-              <option value="">Aucune</option>
-              {codesNgap.map((code) => (
-                <option key={code.id} value={code.id}>
-                  {code.code} — {code.libelle}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="flex flex-col gap-1 text-sm text-navy">
-            Récurrence
-            <select name="frequenceType" required className="rounded-card border border-navy/20 p-2">
-              <option value="quotidien">Quotidien</option>
-              <option value="jours_semaine">Jours de semaine précis</option>
-              <option value="tous_les_x_jours">Tous les X jours</option>
-              <option value="ponctuel">Ponctuel</option>
-            </select>
-          </label>
-          <fieldset className="flex flex-wrap gap-3 text-sm text-navy">
-            <legend className="text-xs text-navy/60">
-              Jours (si &laquo;&nbsp;Jours de semaine précis&nbsp;&raquo;)
-            </legend>
-            {JOUR_LABEL.map((label, index) => (
-              <label key={label} className="flex items-center gap-1">
-                <input type="checkbox" name="joursSemaine" value={index} />
-                {label}
-              </label>
-            ))}
-          </fieldset>
-          <label className="flex flex-col gap-1 text-sm text-navy">
-            Intervalle en jours (si &laquo;&nbsp;Tous les X jours&nbsp;&raquo;)
-            <input type="number" name="intervalleJours" min={1} className="rounded-card border border-navy/20 p-2" />
-          </label>
-          <label className="flex flex-col gap-1 text-sm text-navy">
-            Heure(s) du soin (ex. 08:00, ou 07:00, 19:00 pour plusieurs)
-            <input
-              name="heures"
-              type="text"
-              required
-              placeholder="08:00"
-              className="rounded-card border border-navy/20 p-2"
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm text-navy">
-            Date de début
-            <input
-              type="date"
-              name="dateDebut"
-              required
-              defaultValue={new Date().toISOString().slice(0, 10)}
-              className="rounded-card border border-navy/20 p-2"
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm text-navy">
-            Date de fin (optionnelle)
-            <input type="date" name="dateFin" className="rounded-card border border-navy/20 p-2" />
-          </label>
-          <Button type="submit" variant="primary" className="self-start">
-            Ajouter le soin
-          </Button>
-        </form>
+        <FormulaireSoinPrescrit patientId={patient.id} codesNgap={codesNgap} />
         </section>
 
         <section className="rounded-card border border-navy/10 bg-white p-6">
