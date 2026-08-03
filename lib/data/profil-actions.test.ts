@@ -4,7 +4,8 @@ const getUserMock = vi.fn();
 const updateUserMock = vi.fn();
 const uploadMock = vi.fn();
 const storageFromMock = vi.fn(() => ({ upload: uploadMock }));
-const eqMock = vi.fn();
+const selectApresUpdateMock = vi.fn();
+const eqMock = vi.fn(() => ({ select: selectApresUpdateMock }));
 const updateMock = vi.fn(() => ({ eq: eqMock }));
 const fromMock = vi.fn(() => ({ update: updateMock }));
 
@@ -99,7 +100,7 @@ describe("uploadAvatarAction", () => {
 describe("enregistrerCabinetAction", () => {
   it("enregistre un code postal valide et rafraîchit la tournée", async () => {
     getUserMock.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
-    eqMock.mockResolvedValue({ error: null });
+    selectApresUpdateMock.mockResolvedValue({ data: [{ id: "u1" }], error: null });
 
     const { enregistrerCabinetAction } = await import("./profil-actions");
     const { revalidatePath } = await import("next/cache");
@@ -117,7 +118,7 @@ describe("enregistrerCabinetAction", () => {
 
   it("efface le code postal quand le champ est vidé", async () => {
     getUserMock.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
-    eqMock.mockResolvedValue({ error: null });
+    selectApresUpdateMock.mockResolvedValue({ data: [{ id: "u1" }], error: null });
 
     const { enregistrerCabinetAction } = await import("./profil-actions");
 
@@ -158,7 +159,7 @@ describe("enregistrerCabinetAction", () => {
 describe("adresse du cabinet", () => {
   it("géocode l'adresse et enregistre sa position", async () => {
     getUserMock.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
-    eqMock.mockResolvedValue({ error: null });
+    selectApresUpdateMock.mockResolvedValue({ data: [{ id: "u1" }], error: null });
     geocoderMock.mockResolvedValueOnce({ latitude: 16.2415, longitude: -61.5343 });
 
     const { enregistrerCabinetAction } = await import("./profil-actions");
@@ -178,7 +179,7 @@ describe("adresse du cabinet", () => {
 
   it("efface la position quand l'adresse n'est plus localisable", async () => {
     getUserMock.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
-    eqMock.mockResolvedValue({ error: null });
+    selectApresUpdateMock.mockResolvedValue({ data: [{ id: "u1" }], error: null });
     geocoderMock.mockResolvedValueOnce(null);
 
     const { enregistrerCabinetAction } = await import("./profil-actions");
@@ -197,7 +198,7 @@ describe("adresse du cabinet", () => {
 
   it("n'interroge pas le géocodeur pour une adresse vidée", async () => {
     getUserMock.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
-    eqMock.mockResolvedValue({ error: null });
+    selectApresUpdateMock.mockResolvedValue({ data: [{ id: "u1" }], error: null });
     geocoderMock.mockClear();
 
     const { enregistrerCabinetAction } = await import("./profil-actions");
@@ -211,5 +212,70 @@ describe("adresse du cabinet", () => {
     expect(updateMock).toHaveBeenCalledWith(
       expect.objectContaining({ adresse_cabinet: null, cabinet_latitude: null })
     );
+  });
+});
+
+describe("enregistrerCabinetAction — ce que l'écran doit dire", () => {
+  it("refuse un code postal incomplet en le disant", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
+
+    const { enregistrerCabinetAction } = await import("./profil-actions");
+
+    const formData = new FormData();
+    formData.set("codePostal", "9711");
+    formData.set("adresseCabinet", "15 rue Schoelcher");
+    const resultat = await enregistrerCabinetAction(formData);
+
+    // Auparavant l'action abandonnait tout en silence, adresse comprise : les
+    // champs revenaient vides sans que rien n'explique pourquoi.
+    expect(resultat.succes).toBe(false);
+    expect(resultat.erreur).toMatch(/cinq chiffres/);
+  });
+
+  it("tolère les espaces d'une saisie au doigt", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
+    selectApresUpdateMock.mockResolvedValue({ data: [{ id: "u1" }], error: null });
+
+    const { enregistrerCabinetAction } = await import("./profil-actions");
+
+    const formData = new FormData();
+    formData.set("codePostal", "97 110");
+    const resultat = await enregistrerCabinetAction(formData);
+
+    expect(resultat.succes).toBe(true);
+    expect(updateMock).toHaveBeenCalledWith(expect.objectContaining({ code_postal: "97110" }));
+  });
+
+  it("signale un profil introuvable plutôt qu'un faux succès", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
+    // Un update qui ne trouve aucune ligne ne lève pas d'erreur : sans cette
+    // vérification, l'écran annoncerait un enregistrement qui n'a pas eu lieu.
+    selectApresUpdateMock.mockResolvedValue({ data: [], error: null });
+
+    const { enregistrerCabinetAction } = await import("./profil-actions");
+
+    const formData = new FormData();
+    formData.set("codePostal", "97110");
+    const resultat = await enregistrerCabinetAction(formData);
+
+    expect(resultat.succes).toBe(false);
+    expect(resultat.erreur).toMatch(/profil est introuvable/);
+  });
+
+  it("prévient quand l'adresse est enregistrée mais non localisée", async () => {
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
+    selectApresUpdateMock.mockResolvedValue({ data: [{ id: "u1" }], error: null });
+    geocoderMock.mockResolvedValueOnce(null);
+
+    const { enregistrerCabinetAction } = await import("./profil-actions");
+
+    const formData = new FormData();
+    formData.set("codePostal", "97110");
+    formData.set("adresseCabinet", "adresse illisible");
+    const resultat = await enregistrerCabinetAction(formData);
+
+    // Succès partiel : la fiche est à jour, mais les kilomètres ne suivront pas.
+    expect(resultat.succes).toBe(true);
+    expect(resultat.erreur).toMatch(/non localisée/);
   });
 });

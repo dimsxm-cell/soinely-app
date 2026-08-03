@@ -47,14 +47,24 @@ export async function uploadAvatarAction(formData: FormData): Promise<void> {
  * de près de 5 % sans que rien ne le signale. L'adresse est l'origine des
  * trajets, donc des indemnités kilométriques.
  */
-export async function enregistrerCabinetAction(formData: FormData): Promise<void> {
-  const saisi = String(formData.get("codePostal") ?? "").trim();
+export interface ResultatCabinet {
+  succes: boolean;
+  erreur?: string;
+}
+
+export async function enregistrerCabinetAction(
+  formData: FormData
+): Promise<ResultatCabinet> {
+  // Les espaces d'une saisie au doigt ne doivent pas faire échouer un code
+  // postal par ailleurs correct.
+  const saisi = String(formData.get("codePostal") ?? "").replace(/\s/g, "");
 
   // Cinq chiffres, ou rien. Une saisie partielle rangerait le cabinet en
-  // métropole par défaut, ce qui est plus discret qu'un refus mais fausserait
-  // tous les montants — mieux vaut ne rien enregistrer.
+  // métropole par défaut, ce qui fausserait tous les montants sans le dire.
   const codePostal = /^\d{5}$/.test(saisi) ? saisi : null;
-  if (saisi !== "" && codePostal === null) return;
+  if (saisi !== "" && codePostal === null) {
+    return { succes: false, erreur: "Le code postal doit comporter cinq chiffres." };
+  }
 
   const adresseSaisie = String(formData.get("adresseCabinet") ?? "").trim();
   const adresseCabinet = adresseSaisie === "" ? null : adresseSaisie;
@@ -65,14 +75,17 @@ export async function enregistrerCabinetAction(formData: FormData): Promise<void
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return;
+  if (!user) return { succes: false, erreur: "Vous devez être connectée." };
 
   // L'adresse est géocodée à la saisie, et non à chaque calcul de tournée :
   // celle d'un cabinet ne bouge pas. Si elle n'est pas située, la position est
   // effacée plutôt que laissée à l'ancienne, qui pointerait ailleurs.
   const position = adresseCabinet ? await geocoderAdresse(adresseCabinet) : null;
 
-  const { error } = await supabase
+  // `select` après l'écriture : un update qui ne trouve aucune ligne ne lève
+  // pas d'erreur. Sans ce retour, un profil absent passerait pour un
+  // enregistrement réussi, et le champ reviendrait vide sans explication.
+  const { data, error } = await supabase
     .from("profiles")
     .update({
       code_postal: codePostal,
@@ -80,15 +93,32 @@ export async function enregistrerCabinetAction(formData: FormData): Promise<void
       cabinet_latitude: position?.latitude ?? null,
       cabinet_longitude: position?.longitude ?? null,
     })
-    .eq("id", user.id);
+    .eq("id", user.id)
+    .select("id");
 
   if (error) {
     journaliserEchec("enregistrerCabinetAction", error);
-    return;
+    return { succes: false, erreur: `L'enregistrement a échoué : ${error.message}` };
+  }
+
+  if (!data || data.length === 0) {
+    return {
+      succes: false,
+      erreur: "Votre profil est introuvable. Signalez-le, il doit être recréé.",
+    };
   }
 
   revalidatePath("/compte");
   // La tournée affiche les montants : ils changent avec la zone et l'origine
   // des trajets.
   revalidatePath("/ma-tournee");
+
+  if (adresseCabinet && !position) {
+    return {
+      succes: true,
+      erreur: "Adresse enregistrée, mais non localisée : vos kilomètres ne seront pas comptés.",
+    };
+  }
+
+  return { succes: true };
 }
