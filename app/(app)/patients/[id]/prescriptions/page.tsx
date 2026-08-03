@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getPatient, getSoinsPrescrits } from "@/lib/data/patients";
+import { getOrdonnances } from "@/lib/data/ordonnances";
+import { Ordonnances } from "@/components/ui/Ordonnances";
 import { formatDateFr } from "@/lib/format";
 import type { SoinPrescrit } from "@/lib/types/clinical";
 import { EnTeteFichePatient } from "@/components/ui/EnTeteFichePatient";
@@ -52,7 +54,11 @@ function CarteSoin({ soin, actif }: { soin: SoinPrescrit; actif: boolean }) {
 export default async function FichePrescriptionsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
-  const [patient, soins] = await Promise.all([getPatient(supabase, id), getSoinsPrescrits(supabase, id)]);
+  const [patient, soins, ordonnances] = await Promise.all([
+    getPatient(supabase, id),
+    getSoinsPrescrits(supabase, id),
+    getOrdonnances(supabase, id),
+  ]);
 
   if (!patient) notFound();
 
@@ -83,6 +89,8 @@ export default async function FichePrescriptionsPage({ params }: { params: Promi
             <p className="mt-3 text-[14.5px] text-navy/55">Aucun soin actif pour ce patient.</p>
           )}
         </section>
+
+        <Ordonnances patientId={patient.id} ordonnances={ordonnances} />
 
         {arretes.length > 0 && (
           <section>

@@ -335,6 +335,36 @@ export type Database = {
         }
         Relationships: []
       }
+      ordonnances: {
+        Row: {
+          id: string
+          patient_id: string
+          idel_id: string
+          fichier_path: string
+          date_prescription: string | null
+          note: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          patient_id: string
+          idel_id: string
+          fichier_path: string
+          date_prescription?: string | null
+          note?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          patient_id?: string
+          idel_id?: string
+          fichier_path?: string
+          date_prescription?: string | null
+          note?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
       patients: {
         Row: {
           adresse: string
