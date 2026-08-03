@@ -118,7 +118,20 @@ export async function updateConsignesAction(formData: FormData): Promise<void> {
   revalidatePath(`/ma-journee/${missionId}`);
 }
 
-export async function updateTransmissionAction(formData: FormData): Promise<void> {
+export interface ResultatEcriture {
+  succes: boolean;
+  erreur?: string;
+}
+
+/**
+ * Enregistre la transmission d'une visite.
+ *
+ * Le seul texte de l'application que rien ne permet de retrouver s'il se
+ * perd : une observation clinique écrite au chevet du patient ne se réécrit
+ * pas de mémoire trois semaines plus tard. L'échec doit donc se voir à
+ * l'instant, tant que le texte est encore à l'écran.
+ */
+export async function updateTransmissionAction(formData: FormData): Promise<ResultatEcriture> {
   const missionId = String(formData.get("missionId"));
   const transmission = String(formData.get("transmission"));
 
@@ -130,16 +143,27 @@ export async function updateTransmissionAction(formData: FormData): Promise<void
     .eq("id", missionId)
     .maybeSingle();
 
-  if (!mission) return;
+  if (!mission) return { succes: false, erreur: "Passage introuvable." };
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("missions_du_jour")
     .update({ transmission })
-    .eq("id", missionId);
+    .eq("id", missionId)
+    .select("id");
 
-  if (error) journaliserEchec("updateTransmissionAction", error);
+  if (error) {
+    journaliserEchec("updateTransmissionAction", error);
+    return { succes: false, erreur: `Enregistrement impossible : ${error.message}. Gardez votre texte.` };
+  }
+
+  // Une écriture qui ne touche aucune ligne ne lève pas d'erreur : sans ce
+  // contrôle, un refus de la sécurité passerait pour un enregistrement.
+  if (!data || data.length === 0) {
+    return { succes: false, erreur: "Rien n'a été enregistré. Gardez votre texte et signalez-le." };
+  }
 
   revalidatePath(`/ma-journee/${missionId}`);
+  return { succes: true };
 }
 
 export async function updateRappelAction(formData: FormData): Promise<void> {

@@ -7,6 +7,7 @@ const selectMock = vi.fn(() => ({ eq: () => ({ maybeSingle: eqSelectMock }) }));
 // n'enchaînent qu'un seul `.eq()` continuent d'utiliser eqUpdateMock seul,
 // via mockResolvedValue, exactement comme avant.
 const eqUpdateMock2 = vi.fn();
+const selectApresUpdateMock = vi.fn().mockResolvedValue({ data: [{ id: "m1" }], error: null });
 const eqUpdateMock = vi.fn();
 const updateMock = vi.fn(() => ({ eq: eqUpdateMock }));
 const fromMock = vi.fn(() => ({ select: selectMock, update: updateMock }));
@@ -285,7 +286,7 @@ describe("updateConsignesAction", () => {
 describe("updateTransmissionAction", () => {
   it("met à jour la transmission de la mission et invalide le cache", async () => {
     eqSelectMock.mockResolvedValue({ data: { id: "m1" }, error: null });
-    eqUpdateMock.mockResolvedValue({ error: null });
+    eqUpdateMock.mockReturnValue({ select: selectApresUpdateMock });
 
     const { updateTransmissionAction } = await import("./ma-journee-actions");
     const { revalidatePath } = await import("next/cache");
@@ -590,5 +591,59 @@ describe("updateDistanceAction", () => {
     await updateDistanceAction(formData);
 
     expect(updateMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("updateTransmissionAction — ne jamais perdre le texte en silence", () => {
+  it("prévient quand l'écriture échoue, en invitant à garder le texte", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    eqSelectMock.mockResolvedValue({ data: { id: "m1" }, error: null });
+    eqUpdateMock.mockReturnValue({
+      select: vi.fn().mockResolvedValue({ data: null, error: { message: "permission denied" } }),
+    });
+
+    const { updateTransmissionAction } = await import("./ma-journee-actions");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("transmission", "Plaie propre, pas d'écoulement.");
+    const resultat = await updateTransmissionAction(formData);
+
+    // Une observation clinique ne se réécrit pas de mémoire : l'échec doit se
+    // voir tant que le texte est encore à l'écran.
+    expect(resultat.succes).toBe(false);
+    expect(resultat.erreur).toContain("permission denied");
+    expect(resultat.erreur).toMatch(/Gardez votre texte/);
+  });
+
+  it("signale une écriture qui n'a touché aucune ligne", async () => {
+    eqSelectMock.mockResolvedValue({ data: { id: "m1" }, error: null });
+    eqUpdateMock.mockReturnValue({
+      select: vi.fn().mockResolvedValue({ data: [], error: null }),
+    });
+
+    const { updateTransmissionAction } = await import("./ma-journee-actions");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("transmission", "Observation.");
+    const resultat = await updateTransmissionAction(formData);
+
+    // Un refus de la sécurité ne lève pas d'erreur : sans ce contrôle, il
+    // passerait pour un enregistrement réussi.
+    expect(resultat.succes).toBe(false);
+    expect(resultat.erreur).toMatch(/Rien n'a été enregistré/);
+  });
+
+  it("signale un passage introuvable", async () => {
+    eqSelectMock.mockResolvedValue({ data: null, error: null });
+
+    const { updateTransmissionAction } = await import("./ma-journee-actions");
+
+    const formData = new FormData();
+    formData.set("missionId", "inconnue");
+    formData.set("transmission", "Observation.");
+
+    expect((await updateTransmissionAction(formData)).erreur).toMatch(/introuvable/);
   });
 });

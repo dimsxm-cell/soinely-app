@@ -12,10 +12,10 @@ import {
   updateMissionStatutAction,
   updateRappelAction,
   updateDistanceAction,
-  updateTransmissionAction,
   uploadPhotoAction,
 } from "@/lib/data/ma-journee-actions";
 import { Button } from "@/components/ui/Button";
+import { ChampTransmission } from "@/components/ui/ChampTransmission";
 import { ChampFichier } from "@/components/ui/ChampFichier";
 import { Chronometre } from "@/components/ui/Chronometre";
 import { IconeSoin } from "@/components/ui/IconeSoin";
@@ -377,19 +377,7 @@ export default async function ArriveePatientPage({
             <p className="text-[11px] font-semibold uppercase tracking-[0.07em] text-navy/45">
               Transmission de cette visite
             </p>
-            <form action={updateTransmissionAction} className="mt-2 flex flex-col gap-3">
-              <input type="hidden" name="missionId" value={mission.id} />
-              <textarea
-                name="transmission"
-                defaultValue={mission.transmission ?? ""}
-                rows={3}
-                placeholder="Écrire ce qui s'est passé pendant la visite..."
-                className="rounded-[12px] border border-navy/10 bg-[#F6F7F5] p-3 text-[15px] text-navy placeholder:text-navy/40"
-              />
-              <Button type="submit" variant="tertiary" className="self-start !min-h-0 !px-0 !py-0">
-                Enregistrer
-              </Button>
-            </form>
+            <ChampTransmission missionId={mission.id} transmission={mission.transmission} />
           </div>
         )}
 
