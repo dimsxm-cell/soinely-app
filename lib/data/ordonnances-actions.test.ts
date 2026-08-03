@@ -152,3 +152,46 @@ describe("ajouterOrdonnanceAction", () => {
     expect(resultat.succes).toBe(true);
   });
 });
+
+describe("les deux champs de dépôt", () => {
+  it("accepte un fichier venu du bouton « Choisir un fichier »", async () => {
+    const { ajouterOrdonnanceAction } = await import("./ordonnances-actions");
+
+    // Le champ de l'appareil photo reste vide quand on joint un PDF déjà
+    // enregistré : c'est l'autre qui porte le fichier.
+    const formData = new FormData();
+    formData.set("patientId", "p1");
+    formData.set("fichierJoint", photo("application/pdf", 2000, "ordo.pdf"));
+
+    const resultat = await ajouterOrdonnanceAction(formData);
+
+    expect(resultat.succes).toBe(true);
+    expect(uploadMock).toHaveBeenCalled();
+  });
+
+  it("retient la photo quand les deux champs sont remplis", async () => {
+    const { ajouterOrdonnanceAction } = await import("./ordonnances-actions");
+
+    const formData = new FormData();
+    formData.set("patientId", "p1");
+    formData.set("fichier", photo("image/jpeg", 3000, "photo.jpg"));
+    formData.set("fichierJoint", photo("application/pdf", 2000, "ordo.pdf"));
+
+    await ajouterOrdonnanceAction(formData);
+
+    // Le geste le plus récent l'emporte : on vient de prendre la photo.
+    expect(String(uploadMock.mock.calls[0][0])).toMatch(/\.jpg$/);
+  });
+
+  it("réclame un fichier quand les deux champs sont vides", async () => {
+    const { ajouterOrdonnanceAction } = await import("./ordonnances-actions");
+
+    const formData = new FormData();
+    formData.set("patientId", "p1");
+
+    const resultat = await ajouterOrdonnanceAction(formData);
+
+    expect(resultat.succes).toBe(false);
+    expect(resultat.erreur).toMatch(/Choisissez une photo/);
+  });
+});

@@ -29,7 +29,12 @@ export async function ajouterOrdonnanceAction(
   formData: FormData
 ): Promise<ResultatOrdonnance> {
   const patientId = String(formData.get("patientId") ?? "");
-  const fichier = formData.get("fichier");
+  // Deux champs, deux gestes : l'appareil photo ou un fichier déjà là. Seul
+  // l'un des deux porte un fichier, on retient celui qui est rempli.
+  const depuisAppareil = formData.get("fichier");
+  const depuisFichiers = formData.get("fichierJoint");
+  const fichier =
+    depuisAppareil instanceof File && depuisAppareil.size > 0 ? depuisAppareil : depuisFichiers;
 
   if (!patientId) return { succes: false, erreur: "Patient introuvable." };
   if (!(fichier instanceof File) || fichier.size === 0) {
