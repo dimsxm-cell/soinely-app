@@ -22,6 +22,13 @@ const CTA_CLASS =
 
 const CONFETTI_COLORS = ["#7c3aed", "#a855f7", "#ec4899", "#5856d6", "#22c55e", "#f59e0b"];
 
+/**
+ * « Se connecter avec Apple » n'apparaît que si le fournisseur est activé
+ * dans Supabase. Il exige un compte Apple Developer payant : tant qu'il
+ * n'existe pas, le bouton renverrait « Unsupported provider ».
+ */
+const APPLE_ACTIF = process.env.NEXT_PUBLIC_AUTH_APPLE === "1";
+
 export default function LoginPage() {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>("login");
@@ -368,16 +375,24 @@ export default function LoginPage() {
               <div className="h-px flex-1 bg-[#e0dced]" />
             </div>
             <div className="mt-3.5 flex gap-2.5">
-              <button
-                type="button"
-                onClick={() => handleOAuth("apple")}
-                className="btn-glace-clair flex flex-1 items-center justify-center gap-2 rounded-[12px] border border-[#e0e0e0] bg-white py-3 text-[14.5px] font-semibold text-[#1d1d1f]"
-              >
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="#1d1d1f" aria-hidden="true">
-                  <path d="M16.365 1.43c0 1.14-.493 2.27-1.177 3.08-.744.9-1.99 1.57-2.987 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.572-2.27 1.206-2.98.804-.94 2.142-1.64 3.248-1.68.03.13.05.28.05.43zm4.565 15.71c-.03.07-.463 1.58-1.518 3.12-.945 1.34-1.94 2.71-3.43 2.71-1.517 0-1.9-.88-3.63-.88-1.698 0-2.302.91-3.67.91-1.377 0-2.332-1.26-3.428-2.8-1.287-1.82-2.323-4.63-2.323-7.28 0-4.28 2.797-6.55 5.552-6.55 1.448 0 2.675.95 3.6.95.865 0 2.222-1.01 3.902-1.01.613 0 2.886.06 4.374 2.19-.13.09-2.383 1.37-2.383 4.19 0 3.26 2.854 4.42 2.955 4.45z" />
-                </svg>
-                Apple
-              </button>
+              {/* Apple n'apparaît que si le fournisseur est activé côté
+                  Supabase. Sans cela, le bouton renvoyait « Unsupported
+                  provider » : une IDEL en conclut que l'application est en
+                  panne, et n'essaie pas la suite. Activer Apple Sign In exige
+                  un compte Apple Developer payant ; le jour où il le sera, il
+                  suffira de poser NEXT_PUBLIC_AUTH_APPLE=1. */}
+              {APPLE_ACTIF && (
+                <button
+                  type="button"
+                  onClick={() => handleOAuth("apple")}
+                  className="btn-glace-clair flex flex-1 items-center justify-center gap-2 rounded-[12px] border border-[#e0e0e0] bg-white py-3 text-[14.5px] font-semibold text-[#1d1d1f]"
+                >
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="#1d1d1f" aria-hidden="true">
+                    <path d="M16.365 1.43c0 1.14-.493 2.27-1.177 3.08-.744.9-1.99 1.57-2.987 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.572-2.27 1.206-2.98.804-.94 2.142-1.64 3.248-1.68.03.13.05.28.05.43zm4.565 15.71c-.03.07-.463 1.58-1.518 3.12-.945 1.34-1.94 2.71-3.43 2.71-1.517 0-1.9-.88-3.63-.88-1.698 0-2.302.91-3.67.91-1.377 0-2.332-1.26-3.428-2.8-1.287-1.82-2.323-4.63-2.323-7.28 0-4.28 2.797-6.55 5.552-6.55 1.448 0 2.675.95 3.6.95.865 0 2.222-1.01 3.902-1.01.613 0 2.886.06 4.374 2.19-.13.09-2.383 1.37-2.383 4.19 0 3.26 2.854 4.42 2.955 4.45z" />
+                  </svg>
+                  Apple
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => handleOAuth("google")}
