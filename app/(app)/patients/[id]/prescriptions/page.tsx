@@ -133,7 +133,7 @@ export default async function FichePrescriptionsPage({ params }: { params: Promi
 
         {/* Protocoles en cours */}
         <section>
-          <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.08em] text-navy/45">
+          <p className="mb-3 text-[11.5px] font-semibold uppercase tracking-[0.07em] text-navy/45">
             Protocoles en cours ({actifs.length})
           </p>
           {actifs.length > 0 ? (
@@ -153,7 +153,7 @@ export default async function FichePrescriptionsPage({ params }: { params: Promi
         {/* Consignes liées aux soins */}
         {(patient.noteSoin || patient.consignes || patient.allergies) && (
           <section className="rounded-[20px] bg-white p-5 shadow-[0_1px_3px_rgba(15,23,42,0.06)]">
-            <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.08em] text-navy/45">
+            <p className="mb-3 text-[11.5px] font-semibold uppercase tracking-[0.07em] text-navy/45">
               Consignes
             </p>
             <div className="flex flex-col gap-2.5 text-[14px] leading-relaxed text-navy/75">
@@ -181,7 +181,7 @@ export default async function FichePrescriptionsPage({ params }: { params: Promi
 
         {/* Historique des passages */}
         <section>
-          <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.08em] text-navy/45">
+          <p className="mb-3 text-[11.5px] font-semibold uppercase tracking-[0.07em] text-navy/45">
             Historique des passages ({visites.length})
           </p>
           {visites.length > 0 ? (
@@ -244,7 +244,7 @@ export default async function FichePrescriptionsPage({ params }: { params: Promi
         {/* Transmissions */}
         {transmissions.length > 0 && (
           <section>
-            <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.08em] text-navy/45">
+            <p className="mb-3 text-[11.5px] font-semibold uppercase tracking-[0.07em] text-navy/45">
               Transmissions ({transmissions.length})
             </p>
             <div className="flex flex-col gap-3">
@@ -321,7 +321,7 @@ export default async function FichePrescriptionsPage({ params }: { params: Promi
         {/* Soins arrêtés */}
         {arretes.length > 0 && (
           <section>
-            <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.08em] text-navy/35">
+            <p className="mb-3 text-[11.5px] font-semibold uppercase tracking-[0.07em] text-navy/35">
               Soins arrêtés ({arretes.length})
             </p>
             <div className="flex flex-col gap-3">
@@ -341,7 +341,7 @@ export default async function FichePrescriptionsPage({ params }: { params: Promi
       <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] z-10 px-4 pb-3">
         <Link
           href={`/patients/${patient.id}`}
-          className="btn-glace flex w-full items-center justify-center rounded-[16px] py-4 text-[15px] font-bold tracking-[-0.2px] text-white"
+          className="btn-glace flex w-full items-center justify-center rounded-[16px] py-4 text-[15.5px] font-bold tracking-[-0.2px] text-white"
           style={{
             background: "linear-gradient(135deg, #7C3AED 0%, #9333EA 100%)",
           }}

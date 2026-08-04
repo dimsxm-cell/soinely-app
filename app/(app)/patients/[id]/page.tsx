@@ -55,8 +55,8 @@ function SectionTitre({ icone, titre, sous }: { icone: React.ReactNode; titre: s
     <div className="mb-4 flex items-center gap-2.5">
       {icone}
       <div>
-        <p className="font-sf-display text-[15px] font-bold leading-[1.3] tracking-[-0.35px] text-navy">{titre}</p>
-        {sous && <p className="text-[11.5px] leading-[1.45] text-[#8D8798]">{sous}</p>}
+        <p className="text-[14px] font-bold text-navy">{titre}</p>
+        {sous && <p className="text-[12px] text-navy/50">{sous}</p>}
       </div>
     </div>
   );
@@ -248,7 +248,7 @@ export default async function PatientPage({ params }: { params: Promise<{ id: st
       <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] z-10 px-4 pb-3">
         <Link
           href={`/patients/${patient.id}`}
-          className="btn-glace flex w-full items-center justify-center rounded-[16px] py-4 text-[15px] font-bold tracking-[-0.2px] text-white"
+          className="btn-glace flex w-full items-center justify-center rounded-[16px] py-4 text-[15.5px] font-bold tracking-[-0.2px] text-white"
           style={{
             background: "linear-gradient(135deg, #7C3AED 0%, #9333EA 100%)",
           }}

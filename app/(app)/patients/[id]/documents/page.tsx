@@ -141,7 +141,7 @@ export default async function DocumentsPatientPage({ params }: { params: Promise
         {/* Ordonnances scannées */}
         {ordonnances.length > 0 && (
           <section>
-            <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.08em] text-navy/45">
+            <p className="mb-3 text-[11.5px] font-semibold uppercase tracking-[0.07em] text-navy/45">
               Ordonnances ({ordonnances.length})
             </p>
             <ul className="flex flex-col gap-3">
@@ -194,7 +194,7 @@ export default async function DocumentsPatientPage({ params }: { params: Promise
 
         {/* Documents imprimables */}
         <section>
-          <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.08em] text-navy/45">
+          <p className="mb-3 text-[11.5px] font-semibold uppercase tracking-[0.07em] text-navy/45">
             Documents à imprimer
           </p>
           <ul className="flex flex-col gap-3">
@@ -254,7 +254,7 @@ export default async function DocumentsPatientPage({ params }: { params: Promise
       <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] z-10 px-4 pb-3">
         <Link
           href={`/patients/${patient.id}/prescriptions`}
-          className="btn-glace flex w-full items-center justify-center rounded-[16px] py-4 text-[15px] font-bold tracking-[-0.2px] text-white"
+          className="btn-glace flex w-full items-center justify-center rounded-[16px] py-4 text-[15.5px] font-bold tracking-[-0.2px] text-white"
           style={{
             background: "linear-gradient(135deg, #7C3AED 0%, #9333EA 100%)",
           }}
