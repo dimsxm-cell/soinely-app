@@ -249,10 +249,10 @@ export function Hero() {
                           }}
                         >
                           <Image
-                            src="/marketing/ely-avatar.png"
+                            src="/marketing/ely-nouveau-portrait.webp"
                             alt="ELY"
-                            width={18}
-                            height={18}
+                            width={379}
+                            height={231}
                             className="ely-wave h-[18px] w-[18px] object-contain"
                           />
                         </span>
@@ -339,7 +339,7 @@ export function Hero() {
                   ].map((tab) => (
                     <div key={tab.l} className="flex flex-col items-center gap-[3px]">
                       {tab.active ? (
-                        <Image src="/marketing/ely-avatar.png" alt="ELY" width={22} height={22} className="h-[22px] w-[22px] object-contain" />
+                        <Image src="/marketing/ely-nouveau-portrait.webp" alt="ELY" width={379} height={231} className="h-[22px] w-[22px] object-contain" />
                       ) : (
                         <span className="h-[14px] w-[14px] rounded-[5px] border-2 border-[#1e1b3c]/20" />
                       )}
@@ -369,9 +369,16 @@ export function Hero() {
           >
             <div className="mb-[9px] flex items-center justify-between">
               <div className="flex items-center gap-[9px]">
-                <div className="flex h-[34px] w-[34px] items-center justify-center overflow-hidden rounded-full"
+                <div className="flex h-[54px] w-[54px] shrink-0 items-center justify-center overflow-hidden rounded-full"
                   style={{ background: "radial-gradient(circle at 50% 35%,#efe7fb,#fff)" }}>
-                  <Image src="/marketing/ely-mascot-1.webp" alt="ELY" width={34} height={34} className="h-[30px] w-[30px] object-contain" />
+                  <Image
+                    src="/marketing/ely-nouveau-portrait.webp"
+                    alt="ELY"
+                    width={379}
+                    height={231}
+                    className="object-contain"
+                    style={{ width: 46, height: "auto" }}
+                  />
                 </div>
                 <span style={{ fontSize: 16, fontWeight: 800, color: "#6d28d9" }}>ELY</span>
               </div>

@@ -42,14 +42,14 @@ export function ListeAttente() {
               propre ligne au-dessus du texte : l'encart défile déjà, sa
               hauteur n'y est pas contrainte. Un peu plus petite qu'ailleurs
               pour ne pas repousser l'inscription hors de l'écran. */}
-          <div className="mx-auto h-[124px] w-[108px] sm:mx-0 sm:h-[150px] sm:w-[130px]">
+          <div className="mx-auto h-[124px] w-[80px] sm:mx-0 sm:h-[150px] sm:w-[96px]">
             {/* object-contain (et non cover) : le personnage est détouré, il
                 doit tenir entier dans le cadre plutôt que d'être rogné. */}
             <Image
-              src="/marketing/ely-mascot-2.webp"
+              src="/marketing/ely-nouveau-professionnel.webp"
               alt="Mascotte ELY"
-              width={936}
-              height={1400}
+              width={379}
+              height={890}
               className="h-full w-full object-contain drop-shadow-[0_8px_18px_rgba(0,0,0,.25)]"
             />
           </div>
