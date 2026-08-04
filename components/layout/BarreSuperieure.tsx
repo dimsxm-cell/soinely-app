@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { LogoSoinely } from "@/components/ui/LogoSoinely";
 
 function IconeRecherche() {
@@ -23,7 +26,17 @@ interface BarreSuperieureProps {
   avatarUrl?: string | null;
 }
 
+/** Fiche patient (Identité/Soins/Documents) : son propre en-tête violet
+ *  porte déjà le retour et « Mon compte », la barre blanche globale
+ *  ferait doublon. La liste /patients et /patients/nouveau la gardent. */
+function estFichePatient(pathname: string): boolean {
+  return /^\/patients\/(?!nouveau($|\/))[^/]+/.test(pathname);
+}
+
 export function BarreSuperieure({ avatarUrl }: BarreSuperieureProps) {
+  const pathname = usePathname();
+  if (estFichePatient(pathname)) return null;
+
   return (
     <header className="sticky top-0 z-10 border-b border-navy/10 bg-[#F6F7F5]/95 backdrop-blur print:hidden">
       <div className="mx-auto flex max-w-2xl items-center justify-between px-6 py-3">

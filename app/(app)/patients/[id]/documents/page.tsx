@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUtilisateurConnecte } from "@/lib/supabase/server";
 import { getPatient, getSoinsPrescrits } from "@/lib/data/patients";
 import { getOrdonnances } from "@/lib/data/ordonnances";
 import { getVisitesPatient } from "@/lib/data/dossier-patient";
+import { getAvatarUrl } from "@/lib/data/profil";
 import { EnTetePatientMobile } from "@/components/ui/EnTetePatientMobile";
 import { OngletsPatient } from "@/components/ui/OngletsPatient";
 import Link from "next/link";
@@ -109,19 +110,22 @@ const DOCS_IMPRIMABLES = [
 export default async function DocumentsPatientPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
-  const [patient, soins, ordonnances, visites] = await Promise.all([
+  const [patient, soins, ordonnances, visites, user] = await Promise.all([
     getPatient(supabase, id),
     getSoinsPrescrits(supabase, id),
     getOrdonnances(supabase, id),
     getVisitesPatient(supabase, id),
+    getUtilisateurConnecte(),
   ]);
+  const avatarPath = user?.user_metadata?.avatar_path as string | undefined;
+  const avatarUrl = avatarPath ? await getAvatarUrl(supabase, avatarPath) : null;
 
   if (!patient) notFound();
 
   return (
     <main className="min-h-screen bg-[#F6F7F5] text-navy">
       {/* ── Header iOS violet ── */}
-      <EnTetePatientMobile patient={patient} soins={soins} visites={visites} />
+      <EnTetePatientMobile patient={patient} soins={soins} visites={visites} avatarUrl={avatarUrl} />
 
       {/* ── Onglets de navigation ── */}
       <div

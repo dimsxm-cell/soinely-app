@@ -97,6 +97,8 @@ interface EnTetePatientMobileProps {
   soins: SoinPrescrit[];
   /** Visites du patient, utilisées pour le nombre total de passages et l'anneau de progression hebdomadaire. */
   visites?: VisitePatient[];
+  /** Avatar de l'utilisateur connecté (infirmier), pour l'accès à « Mon compte ». */
+  avatarUrl?: string | null;
 }
 
 /**
@@ -104,7 +106,7 @@ interface EnTetePatientMobileProps {
  * Fond dégradé violet foncé, avatar initiales cerclé d'un anneau de progression,
  * badges allergie et AMI, trois statistiques calculées depuis les soins prescrits.
  */
-export function EnTetePatientMobile({ patient, soins, visites = [] }: EnTetePatientMobileProps) {
+export function EnTetePatientMobile({ patient, soins, visites = [], avatarUrl }: EnTetePatientMobileProps) {
   const nomFormate = formaterNomPropre(patient.nomComplet);
   const initiales = extraireInitiales(patient.nomComplet);
   const age = calculerAge(patient.dateNaissance);
@@ -198,28 +200,36 @@ export function EnTetePatientMobile({ patient, soins, visites = [] }: EnTetePati
               </svg>
             </a>
 
-            {/* Bouton menu */}
-            <button
-              type="button"
-              aria-label="Plus d'options"
-              className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-white/20"
+            {/* Mon compte */}
+            <Link
+              href="/compte"
+              aria-label="Mon compte"
+              className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full transition-colors hover:bg-white/20"
               style={{
                 background: "rgba(255,255,255,0.12)",
                 backdropFilter: "blur(12px)",
                 border: "1px solid rgba(255,255,255,0.18)",
               }}
             >
-              <svg
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                aria-hidden="true"
-                className="h-4 w-4 text-white"
-              >
-                <circle cx="12" cy="5" r="1.5" />
-                <circle cx="12" cy="12" r="1.5" />
-                <circle cx="12" cy="19" r="1.5" />
-              </svg>
-            </button>
+              {avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element -- URL signée à courte durée de vie, incompatible avec le cache de next/image
+                <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
+              ) : (
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                  className="h-4 w-4 text-white"
+                >
+                  <circle cx="12" cy="8" r="3.5" />
+                  <path d="M4.5 19.5c0-3.6 3.36-6 7.5-6s7.5 2.4 7.5 6" />
+                </svg>
+              )}
+            </Link>
           </div>
         </div>
 

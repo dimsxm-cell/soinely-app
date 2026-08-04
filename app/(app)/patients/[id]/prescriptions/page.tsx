@@ -1,14 +1,20 @@
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUtilisateurConnecte } from "@/lib/supabase/server";
 import { getPatient, getSoinsPrescrits } from "@/lib/data/patients";
 import { getOrdonnances } from "@/lib/data/ordonnances";
 import { getVisitesPatient, type VisitePatient } from "@/lib/data/dossier-patient";
+import { getAvatarUrl } from "@/lib/data/profil";
+import { updatePatientAction } from "@/lib/data/patients-actions";
 import { Ordonnances } from "@/components/ui/Ordonnances";
 import { formatDateFr } from "@/lib/format";
 import type { SoinPrescrit, StatutMission } from "@/lib/types/clinical";
 import { IconeSoin } from "@/components/ui/IconeSoin";
 import { EnTetePatientMobile } from "@/components/ui/EnTetePatientMobile";
 import { OngletsPatient } from "@/components/ui/OngletsPatient";
+import { Button } from "@/components/ui/Button";
+import { FormulaireAvecRetour } from "@/components/ui/FormulaireAvecRetour";
+import { ChampAvecDictee } from "@/components/ui/ChampAvecDictee";
+import { ChampForfaitBsi } from "@/components/ui/ChampForfaitBsi";
 import Link from "next/link";
 
 const JOUR_LABEL = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
@@ -92,12 +98,15 @@ function CarteSoin({ soin, actif }: { soin: SoinPrescrit; actif: boolean }) {
 export default async function FichePrescriptionsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
-  const [patient, soins, ordonnances, visites] = await Promise.all([
+  const [patient, soins, ordonnances, visites, user] = await Promise.all([
     getPatient(supabase, id),
     getSoinsPrescrits(supabase, id),
     getOrdonnances(supabase, id),
     getVisitesPatient(supabase, id),
+    getUtilisateurConnecte(),
   ]);
+  const avatarPath = user?.user_metadata?.avatar_path as string | undefined;
+  const avatarUrl = avatarPath ? await getAvatarUrl(supabase, avatarPath) : null;
 
   if (!patient) notFound();
 
@@ -114,7 +123,7 @@ export default async function FichePrescriptionsPage({ params }: { params: Promi
   return (
     <main className="min-h-screen bg-[#F6F7F5] text-navy">
       {/* ── Header iOS violet ── */}
-      <EnTetePatientMobile patient={patient} soins={soins} visites={visites} />
+      <EnTetePatientMobile patient={patient} soins={soins} visites={visites} avatarUrl={avatarUrl} />
 
       {/* ── Onglets de navigation ── */}
       <div
@@ -150,34 +159,45 @@ export default async function FichePrescriptionsPage({ params }: { params: Promi
           )}
         </section>
 
-        {/* Consignes liées aux soins */}
-        {(patient.noteSoin || patient.consignes || patient.allergies) && (
-          <section className="rounded-[20px] bg-white p-5 shadow-[0_1px_3px_rgba(15,23,42,0.06)]">
-            <p className="mb-3 text-[11.5px] font-semibold uppercase tracking-[0.07em] text-navy/45">
-              Consignes
-            </p>
-            <div className="flex flex-col gap-2.5 text-[14px] leading-relaxed text-navy/75">
-              {patient.allergies && (
-                <p>
-                  <span className="font-semibold text-danger">⚠ Allergies : </span>
-                  {patient.allergies}
-                </p>
-              )}
-              {patient.noteSoin && (
-                <p>
-                  <span className="font-semibold text-navy">Soin : </span>
-                  {patient.noteSoin}
-                </p>
-              )}
-              {patient.consignes && (
-                <p>
-                  <span className="font-semibold text-navy">Consignes : </span>
-                  {patient.consignes}
-                </p>
-              )}
-            </div>
-          </section>
-        )}
+        {/* Soins & Consignes */}
+        <section className="rounded-[20px] bg-white p-5 shadow-[0_1px_3px_rgba(15,23,42,0.06)]">
+          <p className="mb-3 text-[11.5px] font-semibold uppercase tracking-[0.07em] text-navy/45">
+            Soins & Consignes
+          </p>
+          <FormulaireAvecRetour action={updatePatientAction} messageSucces="Soins enregistrés." className="flex flex-col gap-3">
+            <input type="hidden" name="nomComplet" value={patient.nomComplet} />
+            <input type="hidden" name="adresse" value={patient.adresse} />
+            <input type="hidden" name="telephone" value={patient.telephone} />
+            <input type="hidden" name="patientId" value={patient.id} />
+            <ChampAvecDictee
+              name="noteSoin"
+              label="Soin"
+              defaultValue={patient.noteSoin}
+              multiligne
+              rows={2}
+              placeholder="Ex. : pansement quotidien, injection le matin"
+            />
+            <ChampAvecDictee
+              name="antecedents"
+              label="Antécédents médicaux"
+              defaultValue={patient.antecedents}
+              multiligne
+              rows={2}
+            />
+            <ChampAvecDictee name="allergies" label="Allergies" defaultValue={patient.allergies} multiligne rows={2} />
+            <ChampAvecDictee
+              name="consignes"
+              label="Consignes spécifiques"
+              defaultValue={patient.consignes}
+              multiligne
+              rows={2}
+            />
+            <ChampForfaitBsi defaultValue={patient.forfaitBsi} />
+            <Button type="submit" variant="secondary" className="self-start">
+              Enregistrer
+            </Button>
+          </FormulaireAvecRetour>
+        </section>
 
         {/* Historique des passages */}
         <section>
