@@ -12,27 +12,9 @@ import { ChampAvecDictee } from "@/components/ui/ChampAvecDictee";
 import { ChampsIdentite } from "@/components/ui/ChampsIdentite";
 import { ChampForfaitBsi } from "@/components/ui/ChampForfaitBsi";
 import { ChampTelephone } from "@/components/ui/ChampTelephone";
-import { LienRetour } from "@/components/ui/LienRetour";
+import { EnTetePatientMobile } from "@/components/ui/EnTetePatientMobile";
+import { OngletsPatient } from "@/components/ui/OngletsPatient";
 import Link from "next/link";
-
-const DOCUMENTS_IMPRIMABLES = [
-  { href: "identite", label: "Identité du patient", description: "Résumé de la fiche patient, prêt à imprimer." },
-  {
-    href: "consentement",
-    label: "Consentement éclairé",
-    description: "Personne de confiance et consentement aux soins.",
-  },
-  {
-    href: "fin-de-prise-en-charge",
-    label: "Fin de prise en charge",
-    description: "Bilan et transmission à la fin d'un suivi.",
-  },
-  {
-    href: "renoncement",
-    label: "Attestation de renoncement",
-    description: "En cas d'arrêt des soins à la demande du patient.",
-  },
-];
 
 const JOUR_LABEL = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
 
@@ -41,6 +23,42 @@ function decrireRecurrence(soin: SoinPrescrit): string {
   if (soin.frequenceType === "quotidien") return "Tous les jours";
   if (soin.frequenceType === "tous_les_x_jours") return `Tous les ${soin.intervalleJours} jours`;
   return (soin.joursSemaine ?? []).map((jour) => JOUR_LABEL[jour]).join(", ");
+}
+
+/** Icône pour chaque section de la fiche identité */
+function SectionIcon({ path, color = "#7C3AED" }: { path: string; color?: string }) {
+  return (
+    <span
+      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px]"
+      style={{ background: `${color}18` }}
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        className="h-4 w-4"
+      >
+        <path d={path} />
+      </svg>
+    </span>
+  );
+}
+
+/** En-tête d'une section de formulaire */
+function SectionTitre({ icone, titre, sous }: { icone: React.ReactNode; titre: string; sous?: string }) {
+  return (
+    <div className="mb-4 flex items-center gap-2.5">
+      {icone}
+      <div>
+        <p className="text-[14px] font-bold text-navy">{titre}</p>
+        {sous && <p className="text-[12px] text-navy/50">{sous}</p>}
+      </div>
+    </div>
+  );
 }
 
 export default async function PatientPage({ params }: { params: Promise<{ id: string }> }) {
@@ -58,183 +76,181 @@ export default async function PatientPage({ params }: { params: Promise<{ id: st
 
   return (
     <main className="min-h-screen bg-[#F6F7F5] text-navy">
-      <div className="mx-auto flex max-w-2xl flex-col gap-6 px-6 py-10 sm:py-14">
-        <div>
-          <LienRetour href="/patients" label="Patients" />
-          <h1 className="mt-4 text-center font-display text-[28px] font-medium leading-tight sm:text-[32px]">
-            {formaterNomPropre(patient.nomComplet)}
-          </h1>
-        </div>
+      {/* ── Header iOS violet ── */}
+      <EnTetePatientMobile patient={patient} soins={soins} />
 
-        <section className="rounded-card border border-navy/10 bg-white p-6">
-        <p className="text-xs font-medium uppercase text-navy/60">Fiche patient</p>
-        <FormulaireAvecRetour action={updatePatientAction} messageSucces="Fiche enregistrée." className="mt-3 flex flex-col gap-3">
-          <input type="hidden" name="patientId" value={patient.id} />
-          <ChampAvecDictee
-            name="nomComplet"
-            label="Nom et prénom"
-            defaultValue={formaterNomPropre(patient.nomComplet)}
-            required
-          />
-          <ChampsIdentite
-            defaultNumeroSecu={patient.numeroSecu}
-            defaultDateNaissance={patient.dateNaissance}
-            defaultSexe={patient.sexe}
-          />
-          <ChampAvecDictee name="adresse" label="Adresse" defaultValue={patient.adresse} required />
-          <ChampTelephone name="telephone" label="Téléphone" defaultValue={patient.telephone} required />
-          <ChampAvecDictee name="medecinNom" label="Médecin traitant" defaultValue={patient.medecinNom} />
-          <ChampTelephone
-            name="medecinTelephone"
-            label="Téléphone du médecin traitant"
-            defaultValue={patient.medecinTelephone}
-          />
-          <ChampAvecDictee
-            name="personneConfianceNom"
-            label="Personne de confiance"
-            defaultValue={patient.personneConfianceNom}
-          />
-          <ChampTelephone
-            name="personneConfianceTelephone"
-            label="Téléphone de la personne de confiance"
-            defaultValue={patient.personneConfianceTelephone}
-          />
-          <ChampAvecDictee
-            name="noteSoin"
-            label="Soin"
-            defaultValue={patient.noteSoin}
-            multiligne
-            rows={2}
-            placeholder="Ex. : pansement quotidien, injection le matin"
-          />
-          <ChampAvecDictee
-            name="antecedents"
-            label="Antécédents médicaux"
-            defaultValue={patient.antecedents}
-            multiligne
-            rows={2}
-          />
-          <ChampAvecDictee name="allergies" label="Allergies" defaultValue={patient.allergies} multiligne rows={2} />
-          <ChampAvecDictee
-            name="consignes"
-            label="Consignes spécifiques"
-            defaultValue={patient.consignes}
-            multiligne
-            rows={2}
-          />
-          <ChampForfaitBsi defaultValue={patient.forfaitBsi} />
-          <Button type="submit" variant="tertiary" className="self-start">
-            Enregistrer
-          </Button>
-        </FormulaireAvecRetour>
-      </section>
+      {/* ── Onglets de navigation ── */}
+      <div
+        className="sticky top-0 z-20 px-4 py-3"
+        style={{
+          background: "linear-gradient(160deg, #2D1557 0%, #3B1D72 100%)",
+        }}
+      >
+        <OngletsPatient patientId={patient.id} />
+      </div>
 
-      <section className="rounded-card border border-navy/10 bg-white p-6">
-        <p className="text-xs font-medium uppercase text-navy/60">Soins prescrits</p>
-        <p className="mt-1 text-xs text-navy/50">
-          Une cotation modifiée s&apos;applique aux tournées générées à partir du
-          lendemain.
-        </p>
+      {/* ── Contenu : Identité ── */}
+      <div className="mx-auto flex max-w-xl flex-col gap-4 px-4 py-5 pb-32">
 
-        {soinsActifs.length > 0 ? (
-          <ul className="mt-3 flex flex-col gap-3">
-            {soinsActifs.map((soin) => (
-              <li
-                key={soin.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-card border border-navy/10 p-3"
-              >
-                <div>
-                  <p className="text-navy">
-                    {soin.ngapCode ? `${soin.ngapCode} — ` : ""}
-                    {soin.typeSoin}
-                  </p>
-                  <p className="text-sm text-navy/60">
-                    {decrireRecurrence(soin)} · {soin.heures.join(", ")}
-                  </p>
-                </div>
-                <div className="flex min-w-0 flex-wrap items-center gap-2">
-                  {codesNgap.length > 0 && (
-                    // Un catalogue vide signale un échec de lecture : le sélecteur ne peut
-                    // alors pas afficher la cotation en cours, donc il ne doit pas pouvoir
-                    // l'effacer.
-                    <form action={coterSoinPrescritAction} className="flex items-center gap-2">
-                      <input type="hidden" name="soinId" value={soin.id} />
-                      <input type="hidden" name="patientId" value={patient.id} />
-                      <label className="sr-only" htmlFor={`cotation-${soin.id}`}>
-                        Cotation NGAP de « {soin.typeSoin} »
-                      </label>
-                      <select
-                        id={`cotation-${soin.id}`}
-                        name="ngapCodeId"
-                        defaultValue={soin.ngapCodeId ?? ""}
-                        className="max-w-full min-w-0 rounded-card border border-navy/20 p-2 text-sm"
-                      >
-                        <option value="">Aucune</option>
-                        {codesNgap.map((code) => (
-                          <option key={code.id} value={code.id}>
-                            {code.code} — {code.libelle}
-                          </option>
-                        ))}
-                      </select>
-                      <Button type="submit" variant="tertiary">
-                        Enregistrer
-                      </Button>
-                    </form>
-                  )}
-                  <form action={arreterSoinPrescritAction}>
-                    <input type="hidden" name="soinId" value={soin.id} />
-                    <input type="hidden" name="patientId" value={patient.id} />
-                    <Button type="submit" variant="secondary">
-                      Arrêter
-                    </Button>
-                  </form>
-                </div>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="mt-2 text-navy/60">Aucun soin actif.</p>
-        )}
+        {/* Section Identité */}
+        <section className="rounded-[20px] bg-white p-5 shadow-[0_1px_3px_rgba(15,23,42,0.06)]">
+          <SectionTitre
+            icone={<SectionIcon path="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" />}
+            titre="Identité"
+            sous="Informations administratives"
+          />
+          <FormulaireAvecRetour action={updatePatientAction} messageSucces="Fiche enregistrée." className="flex flex-col gap-3">
+            <input type="hidden" name="patientId" value={patient.id} />
+            <ChampAvecDictee
+              name="nomComplet"
+              label="Nom et prénom"
+              defaultValue={formaterNomPropre(patient.nomComplet)}
+              required
+            />
+            <ChampsIdentite
+              defaultNumeroSecu={patient.numeroSecu}
+              defaultDateNaissance={patient.dateNaissance}
+              defaultSexe={patient.sexe}
+            />
+          </FormulaireAvecRetour>
+        </section>
 
-        {soinsArretes.length > 0 && (
-          <>
-            <p className="mt-4 text-xs font-medium uppercase text-navy/40">Soins arrêtés</p>
-            <ul className="mt-2 flex flex-col gap-2">
-              {soinsArretes.map((soin) => (
-                <li key={soin.id} className="text-sm text-navy/40">
-                  {soin.typeSoin} — {decrireRecurrence(soin)}
+        {/* Section Coordonnées */}
+        <section className="rounded-[20px] bg-white p-5 shadow-[0_1px_3px_rgba(15,23,42,0.06)]">
+          <SectionTitre
+            icone={<SectionIcon path="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z M12 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" color="#0EA5E9" />}
+            titre="Coordonnées"
+            sous="Adresse et téléphone"
+          />
+          <FormulaireAvecRetour action={updatePatientAction} messageSucces="Coordonnées enregistrées." className="flex flex-col gap-3">
+            <input type="hidden" name="nomComplet" value={patient.nomComplet} />
+            <input type="hidden" name="patientId" value={patient.id} />
+            <ChampAvecDictee name="adresse" label="Adresse" defaultValue={patient.adresse} required />
+            <ChampTelephone name="telephone" label="Téléphone" defaultValue={patient.telephone} required />
+            <Button type="submit" variant="secondary" className="self-start">
+              Enregistrer
+            </Button>
+          </FormulaireAvecRetour>
+        </section>
+
+        {/* Section Entourage médical */}
+        <section className="rounded-[20px] bg-white p-5 shadow-[0_1px_3px_rgba(15,23,42,0.06)]">
+          <SectionTitre
+            icone={<SectionIcon path="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M9 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z M22 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75" color="#10B981" />}
+            titre="Entourage médical"
+            sous="Médecin traitant et personne de confiance"
+          />
+          <FormulaireAvecRetour action={updatePatientAction} messageSucces="Entourage enregistré." className="flex flex-col gap-3">
+            <input type="hidden" name="nomComplet" value={patient.nomComplet} />
+            <input type="hidden" name="adresse" value={patient.adresse} />
+            <input type="hidden" name="telephone" value={patient.telephone} />
+            <input type="hidden" name="patientId" value={patient.id} />
+            <ChampAvecDictee name="medecinNom" label="Médecin traitant" defaultValue={patient.medecinNom} />
+            <ChampTelephone name="medecinTelephone" label="Téléphone du médecin" defaultValue={patient.medecinTelephone} />
+            <ChampAvecDictee name="personneConfianceNom" label="Personne de confiance" defaultValue={patient.personneConfianceNom} />
+            <ChampTelephone
+              name="personneConfianceTelephone"
+              label="Téléphone de la personne de confiance"
+              defaultValue={patient.personneConfianceTelephone}
+            />
+            <Button type="submit" variant="secondary" className="self-start">
+              Enregistrer
+            </Button>
+          </FormulaireAvecRetour>
+        </section>
+
+        {/* Section Soins & Consignes */}
+        <section className="rounded-[20px] bg-white p-5 shadow-[0_1px_3px_rgba(15,23,42,0.06)]">
+          <SectionTitre
+            icone={<SectionIcon path="M8 2v4 M16 2v4 M3 10h18 M8 14h.01 M12 14h.01 M16 14h.01 M8 18h.01 M12 18h.01 M16 18h.01 M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z" color="#F59E0B" />}
+            titre="Soins & Consignes"
+            sous="Notes de soin, antécédents, allergies"
+          />
+          <FormulaireAvecRetour action={updatePatientAction} messageSucces="Soins enregistrés." className="flex flex-col gap-3">
+            <input type="hidden" name="nomComplet" value={patient.nomComplet} />
+            <input type="hidden" name="adresse" value={patient.adresse} />
+            <input type="hidden" name="telephone" value={patient.telephone} />
+            <input type="hidden" name="patientId" value={patient.id} />
+            <ChampAvecDictee
+              name="noteSoin"
+              label="Soin"
+              defaultValue={patient.noteSoin}
+              multiligne
+              rows={2}
+              placeholder="Ex. : pansement quotidien, injection le matin"
+            />
+            <ChampAvecDictee
+              name="antecedents"
+              label="Antécédents médicaux"
+              defaultValue={patient.antecedents}
+              multiligne
+              rows={2}
+            />
+            <ChampAvecDictee name="allergies" label="Allergies" defaultValue={patient.allergies} multiligne rows={2} />
+            <ChampAvecDictee
+              name="consignes"
+              label="Consignes spécifiques"
+              defaultValue={patient.consignes}
+              multiligne
+              rows={2}
+            />
+            <ChampForfaitBsi defaultValue={patient.forfaitBsi} />
+            <Button type="submit" variant="secondary" className="self-start">
+              Enregistrer
+            </Button>
+          </FormulaireAvecRetour>
+        </section>
+
+        {/* Soins prescrits actifs — résumé rapide avec lien vers onglet Soins */}
+        {soinsActifs.length > 0 && (
+          <section className="rounded-[20px] bg-white p-5 shadow-[0_1px_3px_rgba(15,23,42,0.06)]">
+            <div className="mb-4 flex items-center justify-between">
+              <SectionTitre
+                icone={<SectionIcon path="M9 12l2 2 4-4 M7.835 4.697a3.42 3.42 0 0 0 1.946-.806 3.42 3.42 0 0 1 4.438 0 3.42 3.42 0 0 0 1.946.806 3.42 3.42 0 0 1 3.138 3.138 3.42 3.42 0 0 0 .806 1.946 3.42 3.42 0 0 1 0 4.438 3.42 3.42 0 0 0-.806 1.946 3.42 3.42 0 0 1-3.138 3.138 3.42 3.42 0 0 0-1.946.806 3.42 3.42 0 0 1-4.438 0 3.42 3.42 0 0 0-1.946-.806 3.42 3.42 0 0 1-3.138-3.138 3.42 3.42 0 0 0-.806-1.946 3.42 3.42 0 0 1 0-4.438 3.42 3.42 0 0 0 .806-1.946 3.42 3.42 0 0 1 3.138-3.138z" color="#7C3AED" />}
+                titre="Soins prescrits"
+                sous={`${soinsActifs.length} soin${soinsActifs.length > 1 ? "s" : ""} actif${soinsActifs.length > 1 ? "s" : ""}`}
+              />
+              <Link href={`/patients/${patient.id}/prescriptions`} className="text-[13px] font-semibold text-brand-violet hover:underline">
+                Voir tout →
+              </Link>
+            </div>
+            <ul className="flex flex-col gap-2">
+              {soinsActifs.slice(0, 3).map((soin) => (
+                <li key={soin.id} className="flex items-center justify-between gap-3 rounded-[12px] bg-[#F6F7F5] px-4 py-3">
+                  <div>
+                    <p className="text-[14px] font-semibold text-navy">
+                      {soin.ngapCode ? `${soin.ngapCode} — ` : ""}{soin.typeSoin}
+                    </p>
+                    <p className="text-[12.5px] text-navy/55">
+                      {decrireRecurrence(soin)} · {soin.heures.join(", ")}
+                    </p>
+                  </div>
+                  <span className="shrink-0 rounded-full bg-teal/10 px-2.5 py-1 text-[11px] font-semibold text-[#0E7E70]">
+                    Actif
+                  </span>
                 </li>
               ))}
+              {soinsActifs.length > 3 && (
+                <li className="text-center text-[13px] text-navy/50">
+                  +{soinsActifs.length - 3} autre{soinsActifs.length - 3 > 1 ? "s" : ""}…
+                </li>
+              )}
             </ul>
-          </>
+          </section>
         )}
+      </div>
 
-        <FormulaireSoinPrescrit patientId={patient.id} codesNgap={codesNgap} />
-        </section>
-
-        <section className="rounded-card border border-navy/10 bg-white p-6">
-          <p className="text-xs font-medium uppercase text-navy/60">Documents à imprimer</p>
-          <p className="mt-2 text-sm text-navy/60">
-            Pré-remplis avec les informations du patient et votre nom, prêts à imprimer et signer.
-          </p>
-          <div className="mt-4 flex flex-col gap-2.5">
-            {DOCUMENTS_IMPRIMABLES.map((document) => (
-              <Link
-                key={document.href}
-                href={`/patients/${patient.id}/documents/${document.href}`}
-                className="row-lift flex items-center justify-between gap-3 rounded-[14px] border border-navy/10 bg-[#F6F7F5] px-4 py-3"
-              >
-                <div>
-                  <p className="text-[14.5px] font-semibold text-navy">{document.label}</p>
-                  <p className="text-[12.5px] text-navy/50">{document.description}</p>
-                </div>
-                <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[18px] w-[18px] shrink-0 text-navy/30">
-                  <path d="m9 18 6-6-6-6" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </Link>
-            ))}
-          </div>
-        </section>
+      {/* Bouton Enregistrer la fiche flottant */}
+      <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] z-10 px-4 pb-3">
+        <Link
+          href={`/patients/${patient.id}`}
+          className="btn-glace flex w-full items-center justify-center rounded-[16px] py-4 text-[15.5px] font-bold tracking-[-0.2px] text-white"
+          style={{
+            background: "linear-gradient(135deg, #7C3AED 0%, #9333EA 100%)",
+          }}
+        >
+          Enregistrer la fiche
+        </Link>
       </div>
     </main>
   );

@@ -1,0 +1,282 @@
+import Link from "next/link";
+import type { PatientComplet, SoinPrescrit } from "@/lib/types/clinical";
+import { formaterNomPropre, formatDateFr } from "@/lib/format";
+
+/** Calcule l'âge depuis une date de naissance ISO (YYYY-MM-DD). */
+function calculerAge(dateNaissance: string | null): number | null {
+  if (!dateNaissance) return null;
+  const naissance = new Date(dateNaissance);
+  const maintenant = new Date();
+  let age = maintenant.getFullYear() - naissance.getFullYear();
+  const mois = maintenant.getMonth() - naissance.getMonth();
+  if (mois < 0 || (mois === 0 && maintenant.getDate() < naissance.getDate())) age--;
+  return age;
+}
+
+/** Extrait les initiales (max 2 lettres) du nom complet. */
+function extraireInitiales(nomComplet: string): string {
+  const mots = nomComplet.trim().split(/\s+/);
+  if (mots.length >= 2) return (mots[0][0] + mots[1][0]).toUpperCase();
+  return nomComplet.slice(0, 2).toUpperCase();
+}
+
+/** Extrait la ville de l'adresse (dernier élément significatif). */
+function extraireVille(adresse: string): string {
+  const parties = adresse.split(",").map((p) => p.trim());
+  // Prend la dernière partie non-vide
+  const derniere = parties.reverse().find((p) => p.length > 0) ?? "";
+  // Retire le code postal si présent au début
+  return derniere.replace(/^\d{5}\s*/, "").split(" ")[0] || derniere;
+}
+
+/**
+ * Calcule les statistiques de passages depuis les soins prescrits :
+ * - nombre de passages hebdomadaires théoriques
+ * - description de la fréquence (ex. "3×/sem")
+ * - date du dernier soin (dateDebut le plus récent)
+ */
+function calculerStats(soins: SoinPrescrit[]): {
+  passagesParSemaine: number;
+  frequenceLabel: string;
+  dernierLabel: string;
+} {
+  const actifs = soins.filter((s) => s.actif);
+
+  // Calcul du nombre de passages par semaine
+  let total = 0;
+  for (const soin of actifs) {
+    if (soin.frequenceType === "quotidien") total += 7;
+    else if (soin.frequenceType === "jours_semaine") total += (soin.joursSemaine ?? []).length;
+    else if (soin.frequenceType === "tous_les_x_jours" && soin.intervalleJours)
+      total += Math.round(7 / soin.intervalleJours);
+    else if (soin.frequenceType === "ponctuel") total += 1;
+  }
+
+  const frequenceLabel = total > 0 ? `${total}×/sem` : "—";
+
+  // Dernier passage : dateDebut la plus récente parmi les soins actifs
+  const datesDebut = actifs
+    .map((s) => s.dateDebut)
+    .filter(Boolean)
+    .sort()
+    .reverse();
+  const dernierLabel = datesDebut[0]
+    ? new Date(datesDebut[0]).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" }).replace("/", "/")
+    : "—";
+
+  return { passagesParSemaine: total, frequenceLabel, dernierLabel };
+}
+
+interface EnTetePatientMobileProps {
+  patient: PatientComplet;
+  soins: SoinPrescrit[];
+  /** Nombre total de passages (toutes tournées confondues). Pas encore calculé : affiché si fourni. */
+  totalPassages?: number;
+}
+
+/**
+ * En-tête iOS premium de la fiche patient.
+ * Fond dégradé violet foncé, avatar initiales, badges allergie et AMI,
+ * trois statistiques calculées depuis les soins prescrits.
+ */
+export function EnTetePatientMobile({ patient, soins, totalPassages }: EnTetePatientMobileProps) {
+  const nomFormate = formaterNomPropre(patient.nomComplet);
+  const initiales = extraireInitiales(patient.nomComplet);
+  const age = calculerAge(patient.dateNaissance);
+  const ville = extraireVille(patient.adresse);
+  const sexeLabel = patient.sexe === "femme" ? "Féminin" : patient.sexe === "homme" ? "Masculin" : null;
+
+  const { frequenceLabel, dernierLabel } = calculerStats(soins);
+  const passagesLabel = totalPassages != null ? String(totalPassages) : "—";
+
+  // Sous-titre : âge · sexe · ville
+  const sousTitre = [age ? `${age} ans` : null, sexeLabel, ville].filter(Boolean).join(" · ");
+
+  return (
+    <div className="patient-header-gradient relative overflow-hidden pb-0 pt-0">
+      {/* Fond dégradé violet profond */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background: "linear-gradient(160deg, #1A0A2E 0%, #2D1557 55%, #3B1D72 100%)",
+        }}
+      />
+
+      {/* Orbes de lumière ambiante */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-20 left-1/3 h-64 w-64 rounded-full"
+        style={{
+          background: "radial-gradient(circle, rgba(124,58,237,0.35) 0%, transparent 70%)",
+        }}
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-10 right-0 h-48 w-48 rounded-full"
+        style={{
+          background: "radial-gradient(circle, rgba(236,72,153,0.18) 0%, transparent 70%)",
+        }}
+      />
+
+      <div className="relative z-10 px-4 pb-5 pt-4">
+        {/* Barre supérieure : retour + actions */}
+        <div className="flex items-center justify-between">
+          <Link
+            href="/patients"
+            className="inline-flex items-center gap-1.5 rounded-[10px] px-3 py-1.5 text-[13px] font-semibold text-white/90 transition-colors hover:text-white"
+            style={{
+              background: "rgba(255,255,255,0.12)",
+              backdropFilter: "blur(12px)",
+              border: "1px solid rgba(255,255,255,0.18)",
+            }}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              className="h-3.5 w-3.5"
+            >
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+            Patients
+          </Link>
+
+          <div className="flex items-center gap-2">
+            {/* Bouton appel */}
+            <a
+              href={`tel:${patient.telephone}`}
+              aria-label={`Appeler ${nomFormate}`}
+              className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-white/20"
+              style={{
+                background: "rgba(255,255,255,0.12)",
+                backdropFilter: "blur(12px)",
+                border: "1px solid rgba(255,255,255,0.18)",
+              }}
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+                className="h-4 w-4 text-white"
+              >
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+              </svg>
+            </a>
+
+            {/* Bouton menu */}
+            <button
+              type="button"
+              aria-label="Plus d'options"
+              className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-white/20"
+              style={{
+                background: "rgba(255,255,255,0.12)",
+                backdropFilter: "blur(12px)",
+                border: "1px solid rgba(255,255,255,0.18)",
+              }}
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+                className="h-4 w-4 text-white"
+              >
+                <circle cx="12" cy="5" r="1.5" />
+                <circle cx="12" cy="12" r="1.5" />
+                <circle cx="12" cy="19" r="1.5" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Avatar + Nom */}
+        <div className="mt-5 flex flex-col items-center">
+          {/* Avatar circulaire avec initiales */}
+          <div
+            className="flex h-[68px] w-[68px] items-center justify-center rounded-full text-[22px] font-bold tracking-tight text-white shadow-[0_0_0_3px_rgba(255,255,255,0.2),0_8px_24px_rgba(0,0,0,0.3)]"
+            style={{
+              background: "linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)",
+            }}
+          >
+            {initiales}
+          </div>
+
+          <h1 className="mt-3 text-center text-[22px] font-bold leading-tight tracking-[-0.3px] text-white">
+            {nomFormate}
+          </h1>
+
+          {sousTitre && (
+            <p className="mt-1 text-center text-[13.5px] text-white/60">
+              {sousTitre}
+            </p>
+          )}
+
+          {/* Badges */}
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+            {patient.allergies && (
+              <span className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-[12px] font-semibold text-white"
+                style={{ background: "rgba(239,68,68,0.85)", border: "1px solid rgba(239,68,68,0.5)" }}>
+                <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-white" />
+                Allergie {patient.allergies.split(/[,;]/)[0].trim()}
+              </span>
+            )}
+            {patient.forfaitBsi && (
+              <span className="inline-flex items-center rounded-full px-3 py-1 text-[12px] font-semibold text-white/90"
+                style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)" }}>
+                {patient.forfaitBsi.toUpperCase()} · {frequenceLabel}
+              </span>
+            )}
+            {!patient.forfaitBsi && patient.noteSoin && (
+              <span className="inline-flex items-center rounded-full px-3 py-1 text-[12px] font-semibold text-white/90"
+                style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)" }}>
+                AMI · {frequenceLabel}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Statistiques */}
+        <div
+          className="mt-5 grid grid-cols-3 divide-x divide-white/10 rounded-[16px] px-1 py-3"
+          style={{
+            background: "rgba(255,255,255,0.08)",
+            border: "1px solid rgba(255,255,255,0.12)",
+          }}
+        >
+          <div className="flex flex-col items-center gap-0.5 px-3">
+            <span className="text-[20px] font-bold leading-none tracking-tight text-white">
+              {passagesLabel}
+            </span>
+            <span className="text-[10.5px] font-semibold uppercase tracking-wide text-white/45">
+              Passages
+            </span>
+          </div>
+          <div className="flex flex-col items-center gap-0.5 px-3">
+            <span className="text-[20px] font-bold leading-none tracking-tight text-white">
+              {frequenceLabel}
+            </span>
+            <span className="text-[10.5px] font-semibold uppercase tracking-wide text-white/45">
+              Fréquence
+            </span>
+          </div>
+          <div className="flex flex-col items-center gap-0.5 px-3">
+            <span className="text-[20px] font-bold leading-none tracking-tight text-white">
+              {dernierLabel}
+            </span>
+            <span className="text-[10.5px] font-semibold uppercase tracking-wide text-white/45">
+              Dernier
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
