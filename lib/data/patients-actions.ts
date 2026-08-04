@@ -90,13 +90,28 @@ export async function createPatientAction(
   redirect(`/patients/${patient.id}`);
 }
 
-export async function updatePatientAction(formData: FormData): Promise<void> {
+export interface ResultatEcriturePatient {
+  succes: boolean;
+  erreur?: string;
+}
+
+/**
+ * Met à jour une fiche patient.
+ *
+ * Abandonnait en silence dès qu'un champ obligatoire manquait : la fiche
+ * semblait enregistrée alors que rien n'avait changé. Même piège que celui
+ * rencontré sur l'adresse du cabinet.
+ */
+export async function updatePatientAction(formData: FormData): Promise<ResultatEcriturePatient> {
   const patientId = String(formData.get("patientId") ?? "");
   const nomComplet = String(formData.get("nomComplet") ?? "");
   const adresse = String(formData.get("adresse") ?? "");
   const telephone = String(formData.get("telephone") ?? "");
 
-  if (!nomComplet || !adresse || !telephone) return;
+  if (!patientId) return { succes: false, erreur: "Patient introuvable." };
+  if (!nomComplet) return { succes: false, erreur: "Le nom est obligatoire." };
+  if (!adresse) return { succes: false, erreur: "L'adresse est obligatoire." };
+  if (!telephone) return { succes: false, erreur: "Le téléphone est obligatoire." };
 
   const supabase = await createClient();
 
@@ -123,9 +138,14 @@ export async function updatePatientAction(formData: FormData): Promise<void> {
     })
     .eq("id", patientId);
 
-  if (error) journaliserEchec("updatePatientAction", error);
+  if (error) {
+    journaliserEchec("updatePatientAction", error);
+    return { succes: false, erreur: `Enregistrement impossible : ${error.message}` };
+  }
 
   revalidatePath(`/patients/${patientId}`);
+  revalidatePath(`/patients/${patientId}/prescriptions`);
+  return { succes: true };
 }
 
 export interface ResultatSoin {

@@ -7,10 +7,24 @@ import { geocoderAdresse } from "@/lib/geocodage";
 
 const BUCKET_AVATARS = "avatars";
 
-export async function uploadAvatarAction(formData: FormData): Promise<void> {
+export interface ResultatCabinet {
+  succes: boolean;
+  erreur?: string;
+}
+
+/**
+ * Change la photo de profil.
+ *
+ * Renonçait sans un mot : la photo choisie restait affichée dans le champ,
+ * l'ancienne restait à l'écran, et rien ne disait laquelle des deux avait
+ * gagné.
+ */
+export async function uploadAvatarAction(formData: FormData): Promise<ResultatCabinet> {
   const photo = formData.get("photo");
 
-  if (!(photo instanceof File) || photo.size === 0) return;
+  if (!(photo instanceof File) || photo.size === 0) {
+    return { succes: false, erreur: "Choisissez une photo." };
+  }
 
   const supabase = await createClient();
 
@@ -18,7 +32,7 @@ export async function uploadAvatarAction(formData: FormData): Promise<void> {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return;
+  if (!user) return { succes: false, erreur: "Vous devez être connectée." };
 
   const extension = photo.name.split(".").pop() ?? "jpg";
   const path = `${user.id}/avatar.${extension}`;
@@ -29,14 +43,18 @@ export async function uploadAvatarAction(formData: FormData): Promise<void> {
 
   if (uploadError) {
     journaliserEchec("uploadAvatarAction", uploadError);
-    return;
+    return { succes: false, erreur: "L'envoi a échoué. Vérifiez votre réseau et réessayez." };
   }
 
   const { error } = await supabase.auth.updateUser({ data: { avatar_path: path } });
 
-  if (error) journaliserEchec("uploadAvatarAction", error);
+  if (error) {
+    journaliserEchec("uploadAvatarAction", error);
+    return { succes: false, erreur: `La photo est envoyée mais n'a pas pu être rattachée : ${error.message}` };
+  }
 
   revalidatePath("/compte");
+  return { succes: true };
 }
 
 /**
@@ -47,11 +65,6 @@ export async function uploadAvatarAction(formData: FormData): Promise<void> {
  * de près de 5 % sans que rien ne le signale. L'adresse est l'origine des
  * trajets, donc des indemnités kilométriques.
  */
-export interface ResultatCabinet {
-  succes: boolean;
-  erreur?: string;
-}
-
 export async function enregistrerCabinetAction(
   formData: FormData
 ): Promise<ResultatCabinet> {

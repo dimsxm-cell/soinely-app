@@ -674,3 +674,34 @@ describe("createSoinPrescritAction — chaque refus se dit", () => {
     expect(resultat.erreur).toContain("permission denied");
   });
 });
+
+describe("updatePatientAction — la fiche ne se perd plus en silence", () => {
+  it("nomme le champ obligatoire manquant", async () => {
+    const { updatePatientAction } = await import("./patients-actions");
+
+    const formData = new FormData();
+    formData.set("patientId", "p1");
+    formData.set("nomComplet", "Mme Dupont");
+    formData.set("adresse", "");
+    formData.set("telephone", "0612345678");
+
+    // Même piège que sur l'adresse du cabinet : la fiche semblait enregistrée
+    // alors que rien n'avait changé.
+    expect((await updatePatientAction(formData)).erreur).toMatch(/adresse est obligatoire/);
+  });
+
+  it("remonte l'erreur de la base", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    eqUpdateMock.mockResolvedValue({ error: { message: "permission denied" } });
+
+    const { updatePatientAction } = await import("./patients-actions");
+
+    const formData = new FormData();
+    formData.set("patientId", "p1");
+    formData.set("nomComplet", "Mme Dupont");
+    formData.set("adresse", "12 rue des Lilas");
+    formData.set("telephone", "0612345678");
+
+    expect((await updatePatientAction(formData)).erreur).toContain("permission denied");
+  });
+});

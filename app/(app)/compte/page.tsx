@@ -12,6 +12,7 @@ import { signOutAction } from "@/app/login/actions";
 import { BasculeEcoutePermanenteEly } from "@/components/ui/BasculeEcoutePermanenteEly";
 import { Button } from "@/components/ui/Button";
 import { ChampFichier } from "@/components/ui/ChampFichier";
+import { FormulaireAvecRetour } from "@/components/ui/FormulaireAvecRetour";
 import type { PlanAbonnement, StatutAbonnement } from "@/lib/types/abonnement";
 
 const PLAN_LABEL: Record<PlanAbonnement, string> = {
@@ -85,7 +86,7 @@ export default async function ComptePage() {
                 <p className="text-sm text-navy/60">{user.email}</p>
               </div>
             </div>
-            <form action={uploadAvatarAction} className="mt-4 flex flex-wrap items-center gap-3">
+            <FormulaireAvecRetour action={uploadAvatarAction} messageSucces="Photo enregistrée." className="mt-4 flex flex-wrap items-center gap-3">
               <ChampFichier
                 name="photo"
                 accept="image/*"
@@ -95,7 +96,7 @@ export default async function ComptePage() {
               <Button type="submit" variant="tertiary" className="!min-h-0 shrink-0 !px-0 !py-0">
                 Enregistrer
               </Button>
-            </form>
+            </FormulaireAvecRetour>
           </section>
 
           <section className="rounded-[20px] border border-navy/10 bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,.04),0_18px_40px_rgba(15,23,42,.06)]">

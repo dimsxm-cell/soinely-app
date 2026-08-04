@@ -279,3 +279,31 @@ describe("enregistrerCabinetAction — ce que l'écran doit dire", () => {
     expect(resultat.erreur).toMatch(/non localisée/);
   });
 });
+
+describe("uploadAvatarAction — l'échec se voit", () => {
+  it("réclame une photo quand aucune n'est jointe", async () => {
+    const { uploadAvatarAction } = await import("./profil-actions");
+
+    const resultat = await uploadAvatarAction(new FormData());
+
+    expect(resultat.succes).toBe(false);
+    expect(resultat.erreur).toMatch(/Choisissez une photo/);
+  });
+
+  it("signale un envoi manqué", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
+    uploadMock.mockResolvedValue({ error: { message: "réseau coupé" } });
+
+    const { uploadAvatarAction } = await import("./profil-actions");
+
+    const formData = new FormData();
+    formData.set("photo", new File([new Uint8Array(500)], "moi.jpg", { type: "image/jpeg" }));
+    const resultat = await uploadAvatarAction(formData);
+
+    // Sans message, la photo choisie restait dans le champ et l'ancienne à
+    // l'écran : rien ne disait laquelle des deux avait gagné.
+    expect(resultat.succes).toBe(false);
+    expect(resultat.erreur).toMatch(/envoi a échoué/);
+  });
+})

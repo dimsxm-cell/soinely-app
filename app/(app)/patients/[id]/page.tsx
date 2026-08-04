@@ -7,6 +7,7 @@ import { getCodesNgap } from "@/lib/data/ngap";
 import { formaterNomPropre } from "@/lib/format";
 import type { SoinPrescrit } from "@/lib/types/clinical";
 import { Button } from "@/components/ui/Button";
+import { FormulaireAvecRetour } from "@/components/ui/FormulaireAvecRetour";
 import { ChampAvecDictee } from "@/components/ui/ChampAvecDictee";
 import { ChampsIdentite } from "@/components/ui/ChampsIdentite";
 import { ChampForfaitBsi } from "@/components/ui/ChampForfaitBsi";
@@ -67,7 +68,7 @@ export default async function PatientPage({ params }: { params: Promise<{ id: st
 
         <section className="rounded-card border border-navy/10 bg-white p-6">
         <p className="text-xs font-medium uppercase text-navy/60">Fiche patient</p>
-        <form action={updatePatientAction} className="mt-3 flex flex-col gap-3">
+        <FormulaireAvecRetour action={updatePatientAction} messageSucces="Fiche enregistrée." className="mt-3 flex flex-col gap-3">
           <input type="hidden" name="patientId" value={patient.id} />
           <ChampAvecDictee
             name="nomComplet"
@@ -125,7 +126,7 @@ export default async function PatientPage({ params }: { params: Promise<{ id: st
           <Button type="submit" variant="tertiary" className="self-start">
             Enregistrer
           </Button>
-        </form>
+        </FormulaireAvecRetour>
       </section>
 
       <section className="rounded-card border border-navy/10 bg-white p-6">
