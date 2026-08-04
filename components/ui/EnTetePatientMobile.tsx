@@ -266,33 +266,33 @@ export function EnTetePatientMobile({ patient, soins, visites = [] }: EnTetePati
             </h1>
 
             {sousTitre && <p className="mt-1 text-[13.5px] text-white/60">{sousTitre}</p>}
+
+            {/* Badges — alignés sous le titre et le sous-titre, pas sous l'avatar */}
+            <div className="mt-2.5 flex flex-wrap items-center gap-2">
+              {patient.allergies && (
+                <span className="inline-flex items-center gap-1 rounded-[12px] px-3 py-1 text-[12px] font-semibold text-white"
+                  style={{ background: "rgba(239,68,68,0.16)", border: "1px solid rgba(239,68,68,0.4)" }}>
+                  <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-white" />
+                  Allergie {patient.allergies.split(/[,;]/)[0].trim()}
+                </span>
+              )}
+              {patient.forfaitBsi && (
+                <span className="inline-flex items-center rounded-[12px] px-3 py-1 text-[12px] font-semibold text-white"
+                  style={{ background: "rgba(239,68,68,0.85)", border: "1px solid rgba(239,68,68,0.5)" }}>
+                  {patient.forfaitBsi.toUpperCase()} · {frequenceLabel}
+                </span>
+              )}
+              {!patient.forfaitBsi && patient.noteSoin && (
+                <span className="inline-flex items-center rounded-[12px] px-3 py-1 text-[12px] font-semibold text-white"
+                  style={{ background: "rgba(239,68,68,0.85)", border: "1px solid rgba(239,68,68,0.5)" }}>
+                  AMI · {frequenceLabel}
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Badges */}
-        <div className="mt-4 flex flex-wrap items-center gap-2">
-          {patient.allergies && (
-            <span className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-[12px] font-semibold text-white"
-              style={{ background: "rgba(239,68,68,0.85)", border: "1px solid rgba(239,68,68,0.5)" }}>
-              <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-white" />
-              Allergie {patient.allergies.split(/[,;]/)[0].trim()}
-            </span>
-          )}
-          {patient.forfaitBsi && (
-            <span className="inline-flex items-center rounded-full px-3 py-1 text-[12px] font-semibold text-white/90"
-              style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)" }}>
-              {patient.forfaitBsi.toUpperCase()} · {frequenceLabel}
-            </span>
-          )}
-          {!patient.forfaitBsi && patient.noteSoin && (
-            <span className="inline-flex items-center rounded-full px-3 py-1 text-[12px] font-semibold text-white/90"
-              style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)" }}>
-              AMI · {frequenceLabel}
-            </span>
-          )}
-        </div>
-
-        {/* Statistiques — trois cartes séparées, teintées de la couleur du badge allergie */}
+        {/* Statistiques — trois cartes séparées */}
         <div className="mt-5 grid grid-cols-3 gap-3">
           {[
             { label: "Passages", valeur: passagesLabel },
@@ -302,7 +302,7 @@ export function EnTetePatientMobile({ patient, soins, visites = [] }: EnTetePati
             <div
               key={stat.label}
               className="flex flex-col items-center gap-0.5 rounded-[16px] py-3"
-              style={{ background: "rgba(239,68,68,0.14)", border: "1px solid rgba(239,68,68,0.28)" }}
+              style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)" }}
             >
               <span className="font-display text-[20px] font-bold leading-none tracking-tight text-white">
                 {stat.valeur}
