@@ -261,29 +261,31 @@ export function EnTetePatientMobile({ patient, soins, visites = [] }: EnTetePati
           </div>
 
           <div className="min-w-0 flex-1">
-            <h1 className="font-display text-[24px] font-bold leading-tight tracking-[-0.3px] text-white">
+            <h1 className="font-sf-display text-[26px] font-bold leading-[1.1] tracking-[-0.9px] text-white">
               {nomFormate}
             </h1>
 
-            {sousTitre && <p className="mt-1 text-[13.5px] text-white/60">{sousTitre}</p>}
+            {sousTitre && (
+              <p className="mt-1 text-[11.5px] leading-[1.45] text-[#B8AFD0]">{sousTitre}</p>
+            )}
 
             {/* Badges — alignés sous le titre et le sous-titre, pas sous l'avatar */}
             <div className="mt-2.5 flex flex-wrap items-center gap-2">
               {patient.allergies && (
-                <span className="inline-flex items-center gap-1 rounded-[12px] px-3 py-1 text-[12px] font-semibold text-white"
+                <span className="inline-flex items-center gap-1 rounded-[12px] px-3 py-1 text-[11px] font-bold tracking-[-0.1px] text-white"
                   style={{ background: "rgba(239,68,68,0.16)", border: "1px solid rgba(239,68,68,0.4)" }}>
                   <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-white" />
                   Allergie {patient.allergies.split(/[,;]/)[0].trim()}
                 </span>
               )}
               {patient.forfaitBsi && (
-                <span className="inline-flex items-center rounded-[12px] px-3 py-1 text-[12px] font-semibold text-white"
+                <span className="inline-flex items-center rounded-[12px] px-3 py-1 text-[11px] font-bold tracking-[-0.1px] text-white"
                   style={{ background: "rgba(239,68,68,0.85)", border: "1px solid rgba(239,68,68,0.5)" }}>
                   {patient.forfaitBsi.toUpperCase()} · {frequenceLabel}
                 </span>
               )}
               {!patient.forfaitBsi && patient.noteSoin && (
-                <span className="inline-flex items-center rounded-[12px] px-3 py-1 text-[12px] font-semibold text-white"
+                <span className="inline-flex items-center rounded-[12px] px-3 py-1 text-[11px] font-bold tracking-[-0.1px] text-white"
                   style={{ background: "rgba(239,68,68,0.85)", border: "1px solid rgba(239,68,68,0.5)" }}>
                   AMI · {frequenceLabel}
                 </span>
@@ -304,10 +306,10 @@ export function EnTetePatientMobile({ patient, soins, visites = [] }: EnTetePati
               className="flex flex-col items-center gap-0.5 rounded-[16px] py-3"
               style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)" }}
             >
-              <span className="font-display text-[20px] font-bold leading-none tracking-tight text-white">
+              <span className="font-sf-display text-[17px] font-bold leading-none tracking-tight text-white [font-variant-numeric:tabular-nums]">
                 {stat.valeur}
               </span>
-              <span className="text-[10.5px] font-semibold uppercase tracking-wide text-white/50">
+              <span className="text-[10px] font-bold uppercase tracking-[0.08em] text-white/50">
                 {stat.label}
               </span>
             </div>

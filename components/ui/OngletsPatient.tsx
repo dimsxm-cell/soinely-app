@@ -45,10 +45,10 @@ export function OngletsPatient({ patientId }: OngletPatientProps) {
             href={href}
             role="tab"
             aria-selected={actif}
-            className={`flex-1 rounded-[10px] py-2 text-center text-[13.5px] font-semibold transition-all duration-200 ${
+            className={`flex-1 rounded-[10px] py-2 text-center text-[12.5px] transition-all duration-200 ${
               actif
-                ? "bg-white text-[#1A0A2E] shadow-[0_1px_4px_rgba(0,0,0,0.15)]"
-                : "text-white/70 hover:text-white"
+                ? "bg-white font-bold text-[#1A0A2E] shadow-[0_1px_4px_rgba(0,0,0,0.15)]"
+                : "font-semibold text-white/70 hover:text-white"
             }`}
           >
             {onglet.label}
