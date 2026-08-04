@@ -16,7 +16,7 @@ const TRANSITIONS_VALIDES: Record<StatutMission, StatutMission[]> = {
   absent: ["a_faire"],
 };
 
-export async function updateMissionStatutAction(formData: FormData): Promise<void> {
+export async function updateMissionStatutAction(formData: FormData): Promise<ResultatEcriture> {
   const missionId = String(formData.get("missionId"));
   const nouveauStatut = String(formData.get("nouveauStatut")) as StatutMission;
 
@@ -28,14 +28,18 @@ export async function updateMissionStatutAction(formData: FormData): Promise<voi
     .eq("id", missionId)
     .maybeSingle();
 
-  if (!mission) return;
+  if (!mission) return { succes: false, erreur: "Passage introuvable." };
 
   const statutActuel = mission.statut as StatutMission;
 
   // L'accès optionnel protège d'un statut inattendu venu de la base : sans lui,
   // une valeur hors des quatre connues ferait planter l'action au lieu de la
   // refuser. TypeScript garantit les clés, pas la donnée lue.
-  if (!TRANSITIONS_VALIDES[statutActuel]?.includes(nouveauStatut)) return;
+  if (!TRANSITIONS_VALIDES[statutActuel]?.includes(nouveauStatut)) {
+    // Le passage a changé d'état ailleurs — deuxième onglet, ou appui
+    // répété : le dire évite de croire que le bouton ne marche pas.
+    return { succes: false, erreur: "Ce passage a déjà changé d'état. Rafraîchissez la page." };
+  }
 
   // Revenir à « à faire » efface le motif d'absence : conservé, il décrirait
   // une absence qui n'existe plus.
@@ -54,14 +58,18 @@ export async function updateMissionStatutAction(formData: FormData): Promise<voi
     .eq("id", missionId)
     .eq("statut", statutActuel);
 
-  if (error) journaliserEchec("updateMissionStatutAction", error);
+  if (error) {
+    journaliserEchec("updateMissionStatutAction", error);
+    return { succes: false, erreur: `Le changement a échoué : ${error.message}` };
+  }
 
   revalidatePath("/ma-journee");
   revalidatePath("/ma-tournee");
   revalidatePath(`/ma-journee/${missionId}`);
+  return { succes: true };
 }
 
-export async function updateMotifAbsenceAction(formData: FormData): Promise<void> {
+export async function updateMotifAbsenceAction(formData: FormData): Promise<ResultatEcriture> {
   const missionId = String(formData.get("missionId"));
   const motif = String(formData.get("motif") ?? "").trim() || null;
 
@@ -75,7 +83,10 @@ export async function updateMotifAbsenceAction(formData: FormData): Promise<void
 
   // Un motif n'a de sens que sur une absence : ailleurs, il resterait une
   // explication orpheline qu'aucun écran n'afficherait.
-  if (!mission || mission.statut !== "absent") return;
+  if (!mission) return { succes: false, erreur: "Passage introuvable." };
+  if (mission.statut !== "absent") {
+    return { succes: false, erreur: "Ce passage n'est plus marqué absent." };
+  }
 
   // Le filtre sur le statut referme la fenêtre entre la lecture et
   // l'écriture : si une annulation d'absence est arrivée entre-temps, le
@@ -87,14 +98,18 @@ export async function updateMotifAbsenceAction(formData: FormData): Promise<void
     .eq("id", missionId)
     .eq("statut", "absent");
 
-  if (error) journaliserEchec("updateMotifAbsenceAction", error);
+  if (error) {
+    journaliserEchec("updateMotifAbsenceAction", error);
+    return { succes: false, erreur: `Enregistrement impossible : ${error.message}` };
+  }
 
   revalidatePath("/ma-journee");
   revalidatePath("/ma-tournee");
   revalidatePath(`/ma-journee/${missionId}`);
+  return { succes: true };
 }
 
-export async function updateConsignesAction(formData: FormData): Promise<void> {
+export async function updateConsignesAction(formData: FormData): Promise<ResultatEcriture> {
   const missionId = String(formData.get("missionId"));
   const consignes = String(formData.get("consignes"));
 
@@ -106,16 +121,20 @@ export async function updateConsignesAction(formData: FormData): Promise<void> {
     .eq("id", missionId)
     .maybeSingle();
 
-  if (!mission) return;
+  if (!mission) return { succes: false, erreur: "Passage introuvable." };
 
   const { error } = await supabase
     .from("patients")
     .update({ consignes })
     .eq("id", mission.patient_id);
 
-  if (error) journaliserEchec("updateConsignesAction", error);
+  if (error) {
+    journaliserEchec("updateConsignesAction", error);
+    return { succes: false, erreur: `Enregistrement impossible : ${error.message}` };
+  }
 
   revalidatePath(`/ma-journee/${missionId}`);
+  return { succes: true };
 }
 
 export interface ResultatEcriture {
@@ -166,7 +185,7 @@ export async function updateTransmissionAction(formData: FormData): Promise<Resu
   return { succes: true };
 }
 
-export async function updateRappelAction(formData: FormData): Promise<void> {
+export async function updateRappelAction(formData: FormData): Promise<ResultatEcriture> {
   const missionId = String(formData.get("missionId"));
   const rappel = String(formData.get("rappel"));
 
@@ -178,16 +197,20 @@ export async function updateRappelAction(formData: FormData): Promise<void> {
     .eq("id", missionId)
     .maybeSingle();
 
-  if (!mission) return;
+  if (!mission) return { succes: false, erreur: "Passage introuvable." };
 
   const { error } = await supabase
     .from("missions_du_jour")
     .update({ rappel })
     .eq("id", missionId);
 
-  if (error) journaliserEchec("updateRappelAction", error);
+  if (error) {
+    journaliserEchec("updateRappelAction", error);
+    return { succes: false, erreur: `Enregistrement impossible : ${error.message}` };
+  }
 
   revalidatePath(`/ma-journee/${missionId}`);
+  return { succes: true };
 }
 
 /**
@@ -201,7 +224,7 @@ export async function updateRappelAction(formData: FormData): Promise<void> {
  * Un champ vidé efface la correction et rend la main au calcul, plutôt que
  * d'enregistrer un zéro qui supprimerait les kilomètres sans le dire.
  */
-export async function updateDistanceAction(formData: FormData): Promise<void> {
+export async function updateDistanceAction(formData: FormData): Promise<ResultatEcriture> {
   const missionId = String(formData.get("missionId"));
   const saisi = String(formData.get("distanceKm") ?? "").trim();
 
@@ -209,7 +232,9 @@ export async function updateDistanceAction(formData: FormData): Promise<void> {
   const normalise = saisi.replace(",", ".");
   const distance = saisi === "" ? null : Number(normalise);
 
-  if (distance !== null && (!Number.isFinite(distance) || distance < 0)) return;
+  if (distance !== null && (!Number.isFinite(distance) || distance < 0)) {
+    return { succes: false, erreur: `Distance invalide : « ${saisi} ». Attendu un nombre de kilomètres.` };
+  }
 
   const supabase = await createClient();
 
@@ -219,18 +244,22 @@ export async function updateDistanceAction(formData: FormData): Promise<void> {
     .eq("id", missionId)
     .maybeSingle();
 
-  if (!mission) return;
+  if (!mission) return { succes: false, erreur: "Passage introuvable." };
 
   const { error } = await supabase
     .from("missions_du_jour")
     .update({ distance_km_corrigee: distance })
     .eq("id", missionId);
 
-  if (error) journaliserEchec("updateDistanceAction", error);
+  if (error) {
+    journaliserEchec("updateDistanceAction", error);
+    return { succes: false, erreur: `Enregistrement impossible : ${error.message}` };
+  }
 
   revalidatePath(`/ma-journee/${missionId}`);
   // Le total de la tournée change avec les kilomètres du passage.
   revalidatePath("/ma-tournee");
+  return { succes: true };
 }
 
 /**

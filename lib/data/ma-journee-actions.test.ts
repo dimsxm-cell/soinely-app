@@ -696,3 +696,73 @@ describe("uploadPhotoAction — l'échec se voit", () => {
     expect(resultat.erreur).toMatch(/réseau/);
   });
 });
+
+describe("les cinq dernières actions ont retrouvé la parole", () => {
+  it("dit qu'un passage a déjà changé d'état plutôt que de ne rien faire", async () => {
+    // Deuxième onglet ouvert, ou appui répété sur le pas d'une porte : le
+    // bouton semblait mort alors que la transition était simplement refusée.
+    eqSelectMock.mockResolvedValue({ data: { statut: "terminee" }, error: null });
+
+    const { updateMissionStatutAction } = await import("./ma-journee-actions");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("nouveauStatut", "en_cours");
+    const resultat = await updateMissionStatutAction(formData);
+
+    expect(resultat.succes).toBe(false);
+    expect(resultat.erreur).toMatch(/déjà changé d'état/);
+  });
+
+  it("refuse un motif sur un passage qui n'est plus absent, en le disant", async () => {
+    eqSelectMock.mockResolvedValue({ data: { statut: "a_faire" }, error: null });
+
+    const { updateMotifAbsenceAction } = await import("./ma-journee-actions");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("motif", "Hospitalisée");
+
+    expect((await updateMotifAbsenceAction(formData)).erreur).toMatch(/plus marqué absent/);
+  });
+
+  it("montre la saisie fautive d'un kilométrage", async () => {
+    const { updateDistanceAction } = await import("./ma-journee-actions");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("distanceKm", "douze");
+    const resultat = await updateDistanceAction(formData);
+
+    expect(resultat.succes).toBe(false);
+    expect(resultat.erreur).toContain("douze");
+  });
+
+  it("signale un rappel qui n'a pas pu s'enregistrer", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    eqSelectMock.mockResolvedValue({ data: { id: "m1" }, error: null });
+    eqUpdateMock.mockResolvedValue({ error: { message: "table absente" } });
+
+    const { updateRappelAction } = await import("./ma-journee-actions");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("rappel", "Vérifier la tension");
+
+    expect((await updateRappelAction(formData)).erreur).toContain("table absente");
+  });
+
+  it("signale des consignes qui n'ont pas pu s'enregistrer", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    eqSelectMock.mockResolvedValue({ data: { patient_id: "p1" }, error: null });
+    eqUpdateMock.mockResolvedValue({ error: { message: "permission denied" } });
+
+    const { updateConsignesAction } = await import("./ma-journee-actions");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("consignes", "Clés sous le paillasson");
+
+    expect((await updateConsignesAction(formData)).erreur).toContain("permission denied");
+  });
+});

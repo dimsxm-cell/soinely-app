@@ -1,3 +1,4 @@
+import { FormulaireAvecRetour } from "@/components/ui/FormulaireAvecRetour";
 import Link from "next/link";
 import { IconeSoin } from "@/components/ui/IconeSoin";
 import type { MissionTourneeVue } from "@/lib/data/ma-journee";
@@ -251,7 +252,7 @@ export function CarteMissionTournee({
                   </svg>
                   Appeler
                 </a>
-                <form action={updateMissionStatutAction} className="flex-1">
+                <FormulaireAvecRetour action={updateMissionStatutAction} messageSucces="Passage mis à jour." className="flex-1">
                   <input type="hidden" name="missionId" value={mission.id} />
                   <input type="hidden" name="nouveauStatut" value="terminee" />
                   <button
@@ -260,12 +261,12 @@ export function CarteMissionTournee({
                   >
                     ✓ Valider
                   </button>
-                </form>
+                </FormulaireAvecRetour>
               </div>
             ) : (
               /* Mission à faire : Valider le soin + Absent */
               <div className="flex gap-2">
-                <form action={updateMissionStatutAction} className="flex-1">
+                <FormulaireAvecRetour action={updateMissionStatutAction} messageSucces="Passage mis à jour." className="flex-1">
                   <input type="hidden" name="missionId" value={mission.id} />
                   <input type="hidden" name="nouveauStatut" value="en_cours" />
                   <button
@@ -274,8 +275,8 @@ export function CarteMissionTournee({
                   >
                     Valider le soin
                   </button>
-                </form>
-                <form action={updateMissionStatutAction}>
+                </FormulaireAvecRetour>
+                <FormulaireAvecRetour action={updateMissionStatutAction} messageSucces="Passage mis à jour.">
                   <input type="hidden" name="missionId" value={mission.id} />
                   <input type="hidden" name="nouveauStatut" value="absent" />
                   <button
@@ -284,7 +285,7 @@ export function CarteMissionTournee({
                   >
                     Absent
                   </button>
-                </form>
+                </FormulaireAvecRetour>
               </div>
             )}
           </div>
@@ -294,7 +295,7 @@ export function CarteMissionTournee({
             l'annulation est offerte sans être mise en avant. */}
         {terminee && (
           <div className="border-t border-navy/[0.06] px-4 py-3">
-            <form action={updateMissionStatutAction}>
+            <FormulaireAvecRetour action={updateMissionStatutAction} messageSucces="Passage mis à jour.">
               <input type="hidden" name="missionId" value={mission.id} />
               <input type="hidden" name="nouveauStatut" value="a_faire" />
               <button
@@ -303,7 +304,7 @@ export function CarteMissionTournee({
               >
                 Annuler la validation
               </button>
-            </form>
+            </FormulaireAvecRetour>
           </div>
         )}
 
@@ -321,7 +322,7 @@ export function CarteMissionTournee({
             )}
 
             {/* Deux formulaires frères : HTML interdit de les imbriquer. */}
-            <form action={updateMotifAbsenceAction} className="flex min-w-0 gap-2">
+            <FormulaireAvecRetour action={updateMotifAbsenceAction} messageSucces="Motif enregistré." className="flex min-w-0 gap-2">
               <input type="hidden" name="missionId" value={mission.id} />
               <label className="sr-only" htmlFor={`motif-${mission.id}`}>
                 Motif de l&apos;absence de {nomFormate}
@@ -341,9 +342,9 @@ export function CarteMissionTournee({
               >
                 Enregistrer
               </button>
-            </form>
+            </FormulaireAvecRetour>
 
-            <form action={updateMissionStatutAction} className="mt-2">
+            <FormulaireAvecRetour action={updateMissionStatutAction} messageSucces="Passage mis à jour." className="mt-2">
               <input type="hidden" name="missionId" value={mission.id} />
               <input type="hidden" name="nouveauStatut" value="a_faire" />
               <button
@@ -352,7 +353,7 @@ export function CarteMissionTournee({
               >
                 Annuler l&apos;absence
               </button>
-            </form>
+            </FormulaireAvecRetour>
           </div>
         )}
 

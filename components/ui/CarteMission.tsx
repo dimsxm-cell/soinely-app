@@ -1,3 +1,4 @@
+import { FormulaireAvecRetour } from "@/components/ui/FormulaireAvecRetour";
 import Link from "next/link";
 import type { MissionDuJour, StatutMission } from "@/lib/types/clinical";
 import { updateMissionStatutAction } from "@/lib/data/ma-journee-actions";
@@ -97,7 +98,7 @@ export function CarteMission({ mission, contexteHref, estDerniere }: CarteMissio
             {STATUT_LABEL[mission.statut]}
           </span>
           {prochainStatut && (
-            <form action={updateMissionStatutAction}>
+            <FormulaireAvecRetour action={updateMissionStatutAction} messageSucces="Passage mis à jour.">
               <input type="hidden" name="missionId" value={mission.id} />
               <input type="hidden" name="nouveauStatut" value={prochainStatut} />
               <button
@@ -106,7 +107,7 @@ export function CarteMission({ mission, contexteHref, estDerniere }: CarteMissio
               >
                 {LIBELLE_ACTION[mission.statut]}
               </button>
-            </form>
+            </FormulaireAvecRetour>
           )}
         </div>
       </div>

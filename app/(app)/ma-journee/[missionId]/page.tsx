@@ -14,6 +14,7 @@ import {
   updateDistanceAction,
 } from "@/lib/data/ma-journee-actions";
 import { Button } from "@/components/ui/Button";
+import { FormulaireAvecRetour } from "@/components/ui/FormulaireAvecRetour";
 import { ChampTransmission } from "@/components/ui/ChampTransmission";
 import { ChampPhotoVisite } from "@/components/ui/ChampPhotoVisite";
 import { Chronometre } from "@/components/ui/Chronometre";
@@ -112,7 +113,7 @@ export default async function ArriveePatientPage({
         <div className="flex items-center justify-between">
           <LienRetour href="/ma-journee" label="Ma journée" />
           {absente ? (
-            <form action={updateMissionStatutAction}>
+            <FormulaireAvecRetour action={updateMissionStatutAction} messageSucces="Passage mis à jour.">
               <input type="hidden" name="missionId" value={mission.id} />
               <input type="hidden" name="nouveauStatut" value="a_faire" />
               <button
@@ -121,7 +122,7 @@ export default async function ArriveePatientPage({
               >
                 Annuler l&apos;absence
               </button>
-            </form>
+            </FormulaireAvecRetour>
           ) : (
             <span className={`rounded-full px-3 py-1.5 text-[13px] font-semibold ${STATUT_BADGE_CLASSES[mission.statut]}`}>
               {STATUT_LABEL[mission.statut]}
@@ -195,8 +196,9 @@ export default async function ArriveePatientPage({
               {/* Correction du kilométrage. La NGAP demande la distance
                   réellement parcourue : l'itinéraire calculé ignore le détour
                   par la pharmacie comme la route barrée. */}
-              <form
+              <FormulaireAvecRetour
                 action={updateDistanceAction}
+                messageSucces="Distance enregistrée."
                 className="mt-3 flex flex-wrap items-center gap-2 border-t border-navy/[0.06] pt-3"
               >
                 <input type="hidden" name="missionId" value={mission.id} />
@@ -223,7 +225,7 @@ export default async function ArriveePatientPage({
                     {formaterEuros(detailFacturation.majorations.kilometres)} d&apos;indemnités
                   </span>
                 )}
-              </form>
+              </FormulaireAvecRetour>
             </div>
           )}
         </div>
@@ -259,7 +261,7 @@ export default async function ArriveePatientPage({
             <span className="text-[11.5px] font-semibold text-brand-violet">SMS</span>
           </a>
           {peutMarquerAbsent ? (
-            <form action={updateMissionStatutAction}>
+            <FormulaireAvecRetour action={updateMissionStatutAction} messageSucces="Passage mis à jour.">
               <input type="hidden" name="missionId" value={mission.id} />
               <input type="hidden" name="nouveauStatut" value="absent" />
               <button
@@ -273,7 +275,7 @@ export default async function ArriveePatientPage({
                 </svg>
                 <span className="text-[11.5px] font-semibold text-danger">Absence</span>
               </button>
-            </form>
+            </FormulaireAvecRetour>
           ) : (
             <span className="flex flex-col items-center gap-1.5 rounded-2xl border border-navy/[0.06] bg-white py-3 text-center opacity-40 shadow-[0_1px_2px_rgba(15,23,42,.04)]">
               <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[21px] w-[21px] text-navy/40">
@@ -357,7 +359,7 @@ export default async function ArriveePatientPage({
 
         <div className="rounded-2xl border border-navy/[0.06] bg-white p-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.07em] text-navy/45">Consignes</p>
-          <form action={updateConsignesAction} className="mt-2 flex flex-col gap-3">
+          <FormulaireAvecRetour action={updateConsignesAction} messageSucces="Consignes enregistrées." className="mt-2 flex flex-col gap-3">
             <input type="hidden" name="missionId" value={mission.id} />
             <textarea
               name="consignes"
@@ -368,7 +370,7 @@ export default async function ArriveePatientPage({
             <Button type="submit" variant="tertiary" className="self-start !min-h-0 !px-0 !py-0">
               Enregistrer
             </Button>
-          </form>
+          </FormulaireAvecRetour>
         </div>
 
         {peutEcrireTransmission && (
@@ -385,7 +387,7 @@ export default async function ArriveePatientPage({
             <p className="text-[11px] font-semibold uppercase tracking-[0.07em] text-navy/45">
               Rappel pour la prochaine visite
             </p>
-            <form action={updateRappelAction} className="mt-2 flex flex-col gap-3">
+            <FormulaireAvecRetour action={updateRappelAction} messageSucces="Rappel enregistré." className="mt-2 flex flex-col gap-3">
               <input type="hidden" name="missionId" value={mission.id} />
               <textarea
                 name="rappel"
@@ -396,7 +398,7 @@ export default async function ArriveePatientPage({
               <Button type="submit" variant="tertiary" className="self-start !min-h-0 !px-0 !py-0">
                 Enregistrer
               </Button>
-            </form>
+            </FormulaireAvecRetour>
           </div>
         )}
 
@@ -421,7 +423,7 @@ export default async function ArriveePatientPage({
         </div>
 
         {prochainStatut ? (
-          <form action={updateMissionStatutAction}>
+          <FormulaireAvecRetour action={updateMissionStatutAction} messageSucces="Passage mis à jour.">
             <input type="hidden" name="missionId" value={mission.id} />
             <input type="hidden" name="nouveauStatut" value={prochainStatut} />
             <button
@@ -430,7 +432,7 @@ export default async function ArriveePatientPage({
             >
               {LIBELLE_ACTION[mission.statut]}
             </button>
-          </form>
+          </FormulaireAvecRetour>
         ) : (
           <div className="rounded-2xl border border-navy/[0.06] bg-white p-4">
             {mission.prochaineMission ? (
