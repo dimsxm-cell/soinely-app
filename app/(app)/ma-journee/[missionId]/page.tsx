@@ -16,7 +16,6 @@ import {
 import { Button } from "@/components/ui/Button";
 import { ChampTransmission } from "@/components/ui/ChampTransmission";
 import { ChampPhotoVisite } from "@/components/ui/ChampPhotoVisite";
-import { ChampFichier } from "@/components/ui/ChampFichier";
 import { Chronometre } from "@/components/ui/Chronometre";
 import { IconeSoin } from "@/components/ui/IconeSoin";
 import { LienRetour } from "@/components/ui/LienRetour";
