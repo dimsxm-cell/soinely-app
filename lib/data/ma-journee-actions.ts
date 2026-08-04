@@ -233,11 +233,26 @@ export async function updateDistanceAction(formData: FormData): Promise<void> {
   revalidatePath("/ma-tournee");
 }
 
-export async function uploadPhotoAction(formData: FormData): Promise<void> {
+/**
+ * Joint une photo de suivi à une visite.
+ *
+ * Une plaie photographiée au domicile ne se rephotographie pas le lendemain :
+ * l'état du jour est perdu si l'envoi échoue sans le dire. Chaque refus se
+ * nomme donc, tant que l'IDEL est encore devant le patient.
+ */
+export async function uploadPhotoAction(formData: FormData): Promise<ResultatEcriture> {
   const missionId = String(formData.get("missionId"));
   const photo = formData.get("photo");
 
-  if (!(photo instanceof File) || photo.size === 0) return;
+  if (!(photo instanceof File) || photo.size === 0) {
+    return { succes: false, erreur: "Choisissez une photo." };
+  }
+
+  // Le bucket refuse au-delà de dix mégaoctets : le dire ici évite un envoi
+  // long qui échouera de toute façon, sur un réseau de tournée.
+  if (photo.size > 10 * 1024 * 1024) {
+    return { succes: false, erreur: "Photo trop lourde : 10 Mo au maximum." };
+  }
 
   const supabase = await createClient();
 
@@ -245,7 +260,7 @@ export async function uploadPhotoAction(formData: FormData): Promise<void> {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return;
+  if (!user) return { succes: false, erreur: "Vous devez être connectée." };
 
   const { data: mission } = await supabase
     .from("missions_du_jour")
@@ -253,7 +268,7 @@ export async function uploadPhotoAction(formData: FormData): Promise<void> {
     .eq("id", missionId)
     .maybeSingle();
 
-  if (!mission) return;
+  if (!mission) return { succes: false, erreur: "Passage introuvable." };
 
   const extension = photo.name.split(".").pop() ?? "jpg";
   const path = `${user.id}/${missionId}.${extension}`;
@@ -264,7 +279,7 @@ export async function uploadPhotoAction(formData: FormData): Promise<void> {
 
   if (uploadError) {
     journaliserEchec("uploadPhotoAction", uploadError);
-    return;
+    return { succes: false, erreur: "L'envoi a échoué. Vérifiez votre réseau et réessayez." };
   }
 
   const { error } = await supabase
@@ -272,7 +287,11 @@ export async function uploadPhotoAction(formData: FormData): Promise<void> {
     .update({ photo_path: path })
     .eq("id", missionId);
 
-  if (error) journaliserEchec("uploadPhotoAction", error);
+  if (error) {
+    journaliserEchec("uploadPhotoAction", error);
+    return { succes: false, erreur: `La photo est envoyée mais n'a pas pu être rattachée : ${error.message}` };
+  }
 
   revalidatePath(`/ma-journee/${missionId}`);
+  return { succes: true };
 }

@@ -12,10 +12,10 @@ import {
   updateMissionStatutAction,
   updateRappelAction,
   updateDistanceAction,
-  uploadPhotoAction,
 } from "@/lib/data/ma-journee-actions";
 import { Button } from "@/components/ui/Button";
 import { ChampTransmission } from "@/components/ui/ChampTransmission";
+import { ChampPhotoVisite } from "@/components/ui/ChampPhotoVisite";
 import { ChampFichier } from "@/components/ui/ChampFichier";
 import { Chronometre } from "@/components/ui/Chronometre";
 import { IconeSoin } from "@/components/ui/IconeSoin";
@@ -410,19 +410,7 @@ export default async function ArriveePatientPage({
               // eslint-disable-next-line @next/next/no-img-element -- URL signée à courte durée de vie, incompatible avec le cache de next/image
               <img src={photoUrl} alt="Photo envoyée pour cette visite" className="mt-2 max-w-full rounded-xl" />
             )}
-            <form action={uploadPhotoAction} className="mt-2 flex flex-col gap-3">
-              <input type="hidden" name="missionId" value={mission.id} />
-              <ChampFichier
-                name="photo"
-                accept="image/*"
-                capture="environment"
-                ariaLabel="Photo de cette visite"
-                libelle="Prendre une photo"
-              />
-              <Button type="submit" variant="tertiary" className="self-start !min-h-0 !px-0 !py-0">
-                Envoyer
-              </Button>
-            </form>
+            <ChampPhotoVisite missionId={mission.id} />
           </div>
         )}
 

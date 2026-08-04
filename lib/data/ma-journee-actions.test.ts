@@ -647,3 +647,52 @@ describe("updateTransmissionAction — ne jamais perdre le texte en silence", ()
     expect((await updateTransmissionAction(formData)).erreur).toMatch(/introuvable/);
   });
 });
+
+describe("uploadPhotoAction — l'échec se voit", () => {
+  function photo(octets = 1000, type = "image/jpeg"): File {
+    return new File([new Uint8Array(octets)], "plaie.jpg", { type });
+  }
+
+  it("refuse une photo trop lourde avant de tenter l'envoi", async () => {
+    const { uploadPhotoAction } = await import("./ma-journee-actions");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("photo", photo(11 * 1024 * 1024));
+    const resultat = await uploadPhotoAction(formData);
+
+    // Le dire tout de suite évite un envoi long qui échouera de toute façon,
+    // sur un réseau de tournée.
+    expect(resultat.succes).toBe(false);
+    expect(resultat.erreur).toMatch(/trop lourde/);
+    expect(uploadMock).not.toHaveBeenCalled();
+  });
+
+  it("réclame une photo quand aucune n'est jointe", async () => {
+    const { uploadPhotoAction } = await import("./ma-journee-actions");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+
+    expect((await uploadPhotoAction(formData)).erreur).toMatch(/Choisissez une photo/);
+  });
+
+  it("signale un envoi manqué plutôt que de le taire", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    getUserMock.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
+    eqSelectMock.mockResolvedValue({ data: { id: "m1" }, error: null });
+    uploadMock.mockResolvedValue({ error: { message: "réseau coupé" } });
+
+    const { uploadPhotoAction } = await import("./ma-journee-actions");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("photo", photo());
+    const resultat = await uploadPhotoAction(formData);
+
+    // Une plaie photographiée au domicile ne se rephotographie pas le
+    // lendemain : l'IDEL doit le savoir tant qu'elle est devant le patient.
+    expect(resultat.succes).toBe(false);
+    expect(resultat.erreur).toMatch(/réseau/);
+  });
+});
