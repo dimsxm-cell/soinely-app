@@ -11,7 +11,6 @@ import type { SoinPrescrit, StatutMission } from "@/lib/types/clinical";
 import { IconeSoin } from "@/components/ui/IconeSoin";
 import { EnTetePatientMobile } from "@/components/ui/EnTetePatientMobile";
 import { OngletsPatient } from "@/components/ui/OngletsPatient";
-import { Button } from "@/components/ui/Button";
 import { FormulaireAvecRetour } from "@/components/ui/FormulaireAvecRetour";
 import { ChampAvecDictee } from "@/components/ui/ChampAvecDictee";
 import { ChampForfaitBsi } from "@/components/ui/ChampForfaitBsi";
@@ -164,7 +163,12 @@ export default async function FichePrescriptionsPage({ params }: { params: Promi
           <p className="mb-3 text-[11.5px] font-semibold uppercase tracking-[0.07em] text-navy/45">
             Soins & Consignes
           </p>
-          <FormulaireAvecRetour action={updatePatientAction} messageSucces="Soins enregistrés." className="flex flex-col gap-3">
+          <FormulaireAvecRetour
+            id="form-soins-consignes"
+            action={updatePatientAction}
+            messageSucces="Soins enregistrés."
+            className="flex flex-col gap-3"
+          >
             <input type="hidden" name="nomComplet" value={patient.nomComplet} />
             <input type="hidden" name="adresse" value={patient.adresse} />
             <input type="hidden" name="telephone" value={patient.telephone} />
@@ -193,9 +197,6 @@ export default async function FichePrescriptionsPage({ params }: { params: Promi
               rows={2}
             />
             <ChampForfaitBsi defaultValue={patient.forfaitBsi} />
-            <Button type="submit" variant="secondary" className="self-start">
-              Enregistrer
-            </Button>
           </FormulaireAvecRetour>
         </section>
 
@@ -352,22 +353,20 @@ export default async function FichePrescriptionsPage({ params }: { params: Promi
           </section>
         )}
 
-        <p className="text-center text-[12.5px] text-navy/40">
-          Les soins s&apos;ajoutent et s&apos;arrêtent depuis la fiche Identité du patient.
-        </p>
       </div>
 
-      {/* Bouton Enregistrer flottant */}
+      {/* Bouton Enregistrer flottant — soumet le formulaire Soins & Consignes ci-dessus */}
       <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] z-10 px-4 pb-3">
-        <Link
-          href={`/patients/${patient.id}`}
+        <button
+          type="submit"
+          form="form-soins-consignes"
           className="btn-glace flex w-full items-center justify-center rounded-[16px] py-4 text-[15.5px] font-bold tracking-[-0.2px] text-white"
           style={{
             background: "linear-gradient(135deg, #7C3AED 0%, #9333EA 100%)",
           }}
         >
           Enregistrer la fiche
-        </Link>
+        </button>
       </div>
     </main>
   );

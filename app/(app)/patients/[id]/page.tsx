@@ -7,14 +7,12 @@ import { arreterSoinPrescritAction, coterSoinPrescritAction, updatePatientAction
 import { FormulaireSoinPrescrit } from "@/components/ui/FormulaireSoinPrescrit";
 import { getCodesNgap } from "@/lib/data/ngap";
 import { formaterNomPropre } from "@/lib/format";
-import { Button } from "@/components/ui/Button";
 import { FormulaireAvecRetour } from "@/components/ui/FormulaireAvecRetour";
 import { ChampAvecDictee } from "@/components/ui/ChampAvecDictee";
 import { ChampsIdentite } from "@/components/ui/ChampsIdentite";
 import { ChampTelephone } from "@/components/ui/ChampTelephone";
 import { EnTetePatientMobile } from "@/components/ui/EnTetePatientMobile";
 import { OngletsPatient } from "@/components/ui/OngletsPatient";
-import Link from "next/link";
 
 /** Icône pour chaque section de la fiche identité */
 function SectionIcon({ path, color = "#7C3AED" }: { path: string; color?: string }) {
@@ -86,88 +84,85 @@ export default async function PatientPage({ params }: { params: Promise<{ id: st
       </div>
 
       {/* ── Contenu : Identité ── */}
-      <div className="mx-auto flex max-w-xl flex-col gap-4 px-4 py-5 pb-32">
+      {/* Un seul formulaire pour toute la fiche : un geste, un bouton, un enregistrement. */}
+      <FormulaireAvecRetour action={updatePatientAction} messageSucces="Fiche enregistrée." className="contents">
+        <input type="hidden" name="patientId" value={patient.id} />
+        {/* Champs gérés depuis l'onglet Soins : on les repasse tels quels pour ne pas les écraser. */}
+        <input type="hidden" name="allergies" value={patient.allergies ?? ""} />
+        <input type="hidden" name="consignes" value={patient.consignes ?? ""} />
+        <input type="hidden" name="noteSoin" value={patient.noteSoin ?? ""} />
+        <input type="hidden" name="antecedents" value={patient.antecedents ?? ""} />
+        <input type="hidden" name="forfaitBsi" value={patient.forfaitBsi ?? ""} />
 
-        {/* Section Identité */}
-        <section className="rounded-[20px] bg-white p-5 shadow-[0_1px_3px_rgba(15,23,42,0.06)]">
-          <SectionTitre
-            icone={<SectionIcon path="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" />}
-            titre="Identité"
-            sous="Informations administratives"
-          />
-          <FormulaireAvecRetour action={updatePatientAction} messageSucces="Fiche enregistrée." className="flex flex-col gap-3">
-            <input type="hidden" name="patientId" value={patient.id} />
-            <ChampAvecDictee
-              name="nomComplet"
-              label="Nom et prénom"
-              defaultValue={formaterNomPropre(patient.nomComplet)}
-              required
+        <div className="mx-auto flex max-w-xl flex-col gap-4 px-4 py-5 pb-32">
+          {/* Section Identité */}
+          <section className="rounded-[20px] bg-white p-5 shadow-[0_1px_3px_rgba(15,23,42,0.06)]">
+            <SectionTitre
+              icone={<SectionIcon path="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" />}
+              titre="Identité"
+              sous="Informations administratives"
             />
-            <ChampsIdentite
-              defaultNumeroSecu={patient.numeroSecu}
-              defaultDateNaissance={patient.dateNaissance}
-              defaultSexe={patient.sexe}
+            <div className="flex flex-col gap-3">
+              <ChampAvecDictee
+                name="nomComplet"
+                label="Nom et prénom"
+                defaultValue={formaterNomPropre(patient.nomComplet)}
+                required
+              />
+              <ChampsIdentite
+                defaultNumeroSecu={patient.numeroSecu}
+                defaultDateNaissance={patient.dateNaissance}
+                defaultSexe={patient.sexe}
+              />
+            </div>
+          </section>
+
+          {/* Section Coordonnées */}
+          <section className="rounded-[20px] bg-white p-5 shadow-[0_1px_3px_rgba(15,23,42,0.06)]">
+            <SectionTitre
+              icone={<SectionIcon path="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z M12 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" color="#0EA5E9" />}
+              titre="Coordonnées"
+              sous="Adresse et téléphone"
             />
-          </FormulaireAvecRetour>
-        </section>
+            <div className="flex flex-col gap-3">
+              <ChampAvecDictee name="adresse" label="Adresse" defaultValue={patient.adresse} required />
+              <ChampTelephone name="telephone" label="Téléphone" defaultValue={patient.telephone} required />
+            </div>
+          </section>
 
-        {/* Section Coordonnées */}
-        <section className="rounded-[20px] bg-white p-5 shadow-[0_1px_3px_rgba(15,23,42,0.06)]">
-          <SectionTitre
-            icone={<SectionIcon path="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z M12 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" color="#0EA5E9" />}
-            titre="Coordonnées"
-            sous="Adresse et téléphone"
-          />
-          <FormulaireAvecRetour action={updatePatientAction} messageSucces="Coordonnées enregistrées." className="flex flex-col gap-3">
-            <input type="hidden" name="nomComplet" value={patient.nomComplet} />
-            <input type="hidden" name="patientId" value={patient.id} />
-            <ChampAvecDictee name="adresse" label="Adresse" defaultValue={patient.adresse} required />
-            <ChampTelephone name="telephone" label="Téléphone" defaultValue={patient.telephone} required />
-            <Button type="submit" variant="secondary" className="self-start">
-              Enregistrer
-            </Button>
-          </FormulaireAvecRetour>
-        </section>
-
-        {/* Section Entourage médical */}
-        <section className="rounded-[20px] bg-white p-5 shadow-[0_1px_3px_rgba(15,23,42,0.06)]">
-          <SectionTitre
-            icone={<SectionIcon path="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M9 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z M22 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75" color="#10B981" />}
-            titre="Entourage médical"
-            sous="Médecin traitant et personne de confiance"
-          />
-          <FormulaireAvecRetour action={updatePatientAction} messageSucces="Entourage enregistré." className="flex flex-col gap-3">
-            <input type="hidden" name="nomComplet" value={patient.nomComplet} />
-            <input type="hidden" name="adresse" value={patient.adresse} />
-            <input type="hidden" name="telephone" value={patient.telephone} />
-            <input type="hidden" name="patientId" value={patient.id} />
-            <ChampAvecDictee name="medecinNom" label="Médecin traitant" defaultValue={patient.medecinNom} />
-            <ChampTelephone name="medecinTelephone" label="Téléphone du médecin" defaultValue={patient.medecinTelephone} />
-            <ChampAvecDictee name="personneConfianceNom" label="Personne de confiance" defaultValue={patient.personneConfianceNom} />
-            <ChampTelephone
-              name="personneConfianceTelephone"
-              label="Téléphone de la personne de confiance"
-              defaultValue={patient.personneConfianceTelephone}
+          {/* Section Entourage médical */}
+          <section className="rounded-[20px] bg-white p-5 shadow-[0_1px_3px_rgba(15,23,42,0.06)]">
+            <SectionTitre
+              icone={<SectionIcon path="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M9 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z M22 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75" color="#10B981" />}
+              titre="Entourage médical"
+              sous="Médecin traitant et personne de confiance"
             />
-            <Button type="submit" variant="secondary" className="self-start">
-              Enregistrer
-            </Button>
-          </FormulaireAvecRetour>
-        </section>
-      </div>
+            <div className="flex flex-col gap-3">
+              <ChampAvecDictee name="medecinNom" label="Médecin traitant" defaultValue={patient.medecinNom} />
+              <ChampTelephone name="medecinTelephone" label="Téléphone du médecin" defaultValue={patient.medecinTelephone} />
+              <ChampAvecDictee name="personneConfianceNom" label="Personne de confiance" defaultValue={patient.personneConfianceNom} />
+              <ChampTelephone
+                name="personneConfianceTelephone"
+                label="Téléphone de la personne de confiance"
+                defaultValue={patient.personneConfianceTelephone}
+              />
+            </div>
+          </section>
+        </div>
 
-      {/* Bouton Enregistrer la fiche flottant */}
-      <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] z-10 px-4 pb-3">
-        <Link
-          href={`/patients/${patient.id}`}
-          className="btn-glace flex w-full items-center justify-center rounded-[16px] py-4 text-[15.5px] font-bold tracking-[-0.2px] text-white"
-          style={{
-            background: "linear-gradient(135deg, #7C3AED 0%, #9333EA 100%)",
-          }}
-        >
-          Enregistrer la fiche
-        </Link>
-      </div>
+        {/* Bouton Enregistrer la fiche flottant — seul et unique bouton d'enregistrement de l'onglet */}
+        <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] z-10 px-4 pb-3">
+          <button
+            type="submit"
+            className="btn-glace flex w-full items-center justify-center rounded-[16px] py-4 text-[15.5px] font-bold tracking-[-0.2px] text-white"
+            style={{
+              background: "linear-gradient(135deg, #7C3AED 0%, #9333EA 100%)",
+            }}
+          >
+            Enregistrer la fiche
+          </button>
+        </div>
+      </FormulaireAvecRetour>
     </main>
   );
 }

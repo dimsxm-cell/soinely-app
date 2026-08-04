@@ -18,11 +18,14 @@ export function FormulaireAvecRetour({
   action,
   messageSucces,
   className,
+  id,
   children,
 }: {
   action: (formData: FormData) => Promise<ResultatEcriture>;
   messageSucces: string;
   className?: string;
+  /** Permet à un bouton hors du formulaire de le soumettre via l'attribut HTML `form`. */
+  id?: string;
   children: ReactNode;
 }) {
   const [resultat, envoyer] = useActionState<ResultatEcriture | null, FormData>(
@@ -31,7 +34,7 @@ export function FormulaireAvecRetour({
   );
 
   return (
-    <form action={envoyer} className={className}>
+    <form id={id} action={envoyer} className={className}>
       {children}
       {resultat?.succes && <p className="text-[13px] text-success">{messageSucces}</p>}
       {resultat?.erreur && <p className="text-[13px] text-danger">{resultat.erreur}</p>}

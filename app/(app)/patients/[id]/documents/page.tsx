@@ -140,7 +140,7 @@ export default async function DocumentsPatientPage({ params }: { params: Promise
       </div>
 
       {/* ── Contenu : Documents ── */}
-      <div className="mx-auto flex max-w-xl flex-col gap-4 px-4 py-5 pb-32">
+      <div className="mx-auto flex max-w-xl flex-col gap-4 px-4 py-5">
 
         {/* Ordonnances scannées */}
         {ordonnances.length > 0 && (
@@ -251,19 +251,6 @@ export default async function DocumentsPatientPage({ params }: { params: Promise
             <path d="M12 5v14M5 12h14" />
           </svg>
           Scanner un document
-        </Link>
-      </div>
-
-      {/* Bouton Enregistrer flottant */}
-      <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] z-10 px-4 pb-3">
-        <Link
-          href={`/patients/${patient.id}/prescriptions`}
-          className="btn-glace flex w-full items-center justify-center rounded-[16px] py-4 text-[15.5px] font-bold tracking-[-0.2px] text-white"
-          style={{
-            background: "linear-gradient(135deg, #7C3AED 0%, #9333EA 100%)",
-          }}
-        >
-          Enregistrer la fiche
         </Link>
       </div>
     </main>
