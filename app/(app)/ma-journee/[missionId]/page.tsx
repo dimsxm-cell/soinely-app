@@ -20,7 +20,6 @@ import { ChampPhotoVisite } from "@/components/ui/ChampPhotoVisite";
 import { Chronometre } from "@/components/ui/Chronometre";
 import { IconeSoin } from "@/components/ui/IconeSoin";
 import { LienRetour } from "@/components/ui/LienRetour";
-import { TuilesDossierPatient } from "@/components/ui/TuilesDossierPatient";
 import type { StatutMission } from "@/lib/types/clinical";
 
 const STATUT_LABEL: Record<StatutMission, string> = {
@@ -419,7 +418,15 @@ export default async function ArriveePatientPage({
           <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.07em] text-navy/45">
             Dossier du patient
           </p>
-          <TuilesDossierPatient patientId={mission.patient.id} />
+          <Link
+            href={`/patients/${mission.patient.id}`}
+            className="row-lift flex items-center justify-between rounded-2xl border border-navy/[0.06] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,.04)]"
+          >
+            <span className="text-[15px] font-semibold text-navy">Voir la fiche du patient</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[19px] w-[19px] shrink-0 text-navy/25">
+              <path d="m9 18 6-6-6-6" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </Link>
         </div>
 
         {prochainStatut ? (

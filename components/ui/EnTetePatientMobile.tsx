@@ -1,6 +1,13 @@
 import Link from "next/link";
 import type { PatientComplet, SoinPrescrit } from "@/lib/types/clinical";
-import { formaterNomPropre, formatDateFr } from "@/lib/format";
+import type { VisitePatient } from "@/lib/data/dossier-patient";
+import { formaterNomPropre } from "@/lib/format";
+
+const AVATAR_SIZE = 76;
+const RING_SIZE = 92;
+const RING_STROKE = 3;
+const RING_RADIUS = (RING_SIZE - RING_STROKE) / 2;
+const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 
 /** Calcule l'âge depuis une date de naissance ISO (YYYY-MM-DD). */
 function calculerAge(dateNaissance: string | null): number | null {
@@ -67,27 +74,46 @@ function calculerStats(soins: SoinPrescrit[]): {
   return { passagesParSemaine: total, frequenceLabel, dernierLabel };
 }
 
+/** Proportion (0 à 1) des passages prescrits cette semaine déjà réalisés, sur 7 jours glissants. */
+function calculerProgressionSemaine(visites: VisitePatient[], passagesParSemaine: number): number {
+  if (passagesParSemaine <= 0) return 0;
+
+  const aujourdHui = new Date();
+  aujourdHui.setHours(0, 0, 0, 0);
+  const ilYA6Jours = new Date(aujourdHui);
+  ilYA6Jours.setDate(aujourdHui.getDate() - 6);
+
+  const faits = visites.filter((v) => {
+    if (v.statut !== "terminee" || !v.date) return false;
+    const date = new Date(v.date);
+    return date >= ilYA6Jours && date <= aujourdHui;
+  }).length;
+
+  return Math.min(1, faits / passagesParSemaine);
+}
+
 interface EnTetePatientMobileProps {
   patient: PatientComplet;
   soins: SoinPrescrit[];
-  /** Nombre total de passages (toutes tournées confondues). Pas encore calculé : affiché si fourni. */
-  totalPassages?: number;
+  /** Visites du patient, utilisées pour le nombre total de passages et l'anneau de progression hebdomadaire. */
+  visites?: VisitePatient[];
 }
 
 /**
  * En-tête iOS premium de la fiche patient.
- * Fond dégradé violet foncé, avatar initiales, badges allergie et AMI,
- * trois statistiques calculées depuis les soins prescrits.
+ * Fond dégradé violet foncé, avatar initiales cerclé d'un anneau de progression,
+ * badges allergie et AMI, trois statistiques calculées depuis les soins prescrits.
  */
-export function EnTetePatientMobile({ patient, soins, totalPassages }: EnTetePatientMobileProps) {
+export function EnTetePatientMobile({ patient, soins, visites = [] }: EnTetePatientMobileProps) {
   const nomFormate = formaterNomPropre(patient.nomComplet);
   const initiales = extraireInitiales(patient.nomComplet);
   const age = calculerAge(patient.dateNaissance);
   const ville = extraireVille(patient.adresse);
   const sexeLabel = patient.sexe === "femme" ? "Féminin" : patient.sexe === "homme" ? "Masculin" : null;
 
-  const { frequenceLabel, dernierLabel } = calculerStats(soins);
-  const passagesLabel = totalPassages != null ? String(totalPassages) : "—";
+  const { passagesParSemaine, frequenceLabel, dernierLabel } = calculerStats(soins);
+  const passagesLabel = visites.length > 0 ? String(visites.length) : "—";
+  const progressionSemaine = calculerProgressionSemaine(visites, passagesParSemaine);
 
   // Sous-titre : âge · sexe · ville
   const sousTitre = [age ? `${age} ans` : null, sexeLabel, ville].filter(Boolean).join(" · ");
@@ -119,7 +145,7 @@ export function EnTetePatientMobile({ patient, soins, totalPassages }: EnTetePat
         }}
       />
 
-      <div className="relative z-10 px-4 pb-5 pt-4">
+      <div className="relative z-10 mx-auto max-w-xl px-4 pb-5 pt-4">
         {/* Barre supérieure : retour + actions */}
         <div className="flex items-center justify-between">
           <Link
@@ -198,83 +224,94 @@ export function EnTetePatientMobile({ patient, soins, totalPassages }: EnTetePat
         </div>
 
         {/* Avatar + Nom */}
-        <div className="mt-5 flex flex-col items-center">
-          {/* Avatar circulaire avec initiales */}
-          <div
-            className="flex h-[68px] w-[68px] items-center justify-center rounded-full text-[22px] font-bold tracking-tight text-white shadow-[0_0_0_3px_rgba(255,255,255,0.2),0_8px_24px_rgba(0,0,0,0.3)]"
-            style={{
-              background: "linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)",
-            }}
-          >
-            {initiales}
+        <div className="mt-5 flex items-center gap-4">
+          {/* Avatar circulaire avec anneau de progression hebdomadaire */}
+          <div className="relative shrink-0" style={{ width: RING_SIZE, height: RING_SIZE }}>
+            <svg width={RING_SIZE} height={RING_SIZE} className="absolute inset-0 -rotate-90" aria-hidden="true">
+              <circle
+                cx={RING_SIZE / 2}
+                cy={RING_SIZE / 2}
+                r={RING_RADIUS}
+                fill="none"
+                stroke="rgba(255,255,255,0.15)"
+                strokeWidth={RING_STROKE}
+              />
+              <circle
+                cx={RING_SIZE / 2}
+                cy={RING_SIZE / 2}
+                r={RING_RADIUS}
+                fill="none"
+                stroke="#C4B5FD"
+                strokeWidth={RING_STROKE}
+                strokeLinecap="round"
+                strokeDasharray={RING_CIRCUMFERENCE}
+                strokeDashoffset={RING_CIRCUMFERENCE * (1 - progressionSemaine)}
+              />
+            </svg>
+            <div
+              className="absolute inset-0 m-auto flex items-center justify-center rounded-full text-[22px] font-bold tracking-tight text-white shadow-[0_0_0_3px_rgba(255,255,255,0.2),0_8px_24px_rgba(0,0,0,0.3)]"
+              style={{
+                width: AVATAR_SIZE,
+                height: AVATAR_SIZE,
+                background: "linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)",
+              }}
+            >
+              {initiales}
+            </div>
           </div>
 
-          <h1 className="mt-3 text-center text-[22px] font-bold leading-tight tracking-[-0.3px] text-white">
-            {nomFormate}
-          </h1>
+          <div className="min-w-0 flex-1">
+            <h1 className="font-display text-[24px] font-bold leading-tight tracking-[-0.3px] text-white">
+              {nomFormate}
+            </h1>
 
-          {sousTitre && (
-            <p className="mt-1 text-center text-[13.5px] text-white/60">
-              {sousTitre}
-            </p>
-          )}
-
-          {/* Badges */}
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
-            {patient.allergies && (
-              <span className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-[12px] font-semibold text-white"
-                style={{ background: "rgba(239,68,68,0.85)", border: "1px solid rgba(239,68,68,0.5)" }}>
-                <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-white" />
-                Allergie {patient.allergies.split(/[,;]/)[0].trim()}
-              </span>
-            )}
-            {patient.forfaitBsi && (
-              <span className="inline-flex items-center rounded-full px-3 py-1 text-[12px] font-semibold text-white/90"
-                style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)" }}>
-                {patient.forfaitBsi.toUpperCase()} · {frequenceLabel}
-              </span>
-            )}
-            {!patient.forfaitBsi && patient.noteSoin && (
-              <span className="inline-flex items-center rounded-full px-3 py-1 text-[12px] font-semibold text-white/90"
-                style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)" }}>
-                AMI · {frequenceLabel}
-              </span>
-            )}
+            {sousTitre && <p className="mt-1 text-[13.5px] text-white/60">{sousTitre}</p>}
           </div>
         </div>
 
-        {/* Statistiques */}
-        <div
-          className="mt-5 grid grid-cols-3 divide-x divide-white/10 rounded-[16px] px-1 py-3"
-          style={{
-            background: "rgba(255,255,255,0.08)",
-            border: "1px solid rgba(255,255,255,0.12)",
-          }}
-        >
-          <div className="flex flex-col items-center gap-0.5 px-3">
-            <span className="text-[20px] font-bold leading-none tracking-tight text-white">
-              {passagesLabel}
+        {/* Badges */}
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          {patient.allergies && (
+            <span className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-[12px] font-semibold text-white"
+              style={{ background: "rgba(239,68,68,0.85)", border: "1px solid rgba(239,68,68,0.5)" }}>
+              <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-white" />
+              Allergie {patient.allergies.split(/[,;]/)[0].trim()}
             </span>
-            <span className="text-[10.5px] font-semibold uppercase tracking-wide text-white/45">
-              Passages
+          )}
+          {patient.forfaitBsi && (
+            <span className="inline-flex items-center rounded-full px-3 py-1 text-[12px] font-semibold text-white/90"
+              style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)" }}>
+              {patient.forfaitBsi.toUpperCase()} · {frequenceLabel}
             </span>
-          </div>
-          <div className="flex flex-col items-center gap-0.5 px-3">
-            <span className="text-[20px] font-bold leading-none tracking-tight text-white">
-              {frequenceLabel}
+          )}
+          {!patient.forfaitBsi && patient.noteSoin && (
+            <span className="inline-flex items-center rounded-full px-3 py-1 text-[12px] font-semibold text-white/90"
+              style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)" }}>
+              AMI · {frequenceLabel}
             </span>
-            <span className="text-[10.5px] font-semibold uppercase tracking-wide text-white/45">
-              Fréquence
-            </span>
-          </div>
-          <div className="flex flex-col items-center gap-0.5 px-3">
-            <span className="text-[20px] font-bold leading-none tracking-tight text-white">
-              {dernierLabel}
-            </span>
-            <span className="text-[10.5px] font-semibold uppercase tracking-wide text-white/45">
-              Dernier
-            </span>
-          </div>
+          )}
+        </div>
+
+        {/* Statistiques — trois cartes séparées, teintées de la couleur du badge allergie */}
+        <div className="mt-5 grid grid-cols-3 gap-3">
+          {[
+            { label: "Passages", valeur: passagesLabel },
+            { label: "Fréquence", valeur: frequenceLabel },
+            { label: "Dernier", valeur: dernierLabel },
+          ].map((stat) => (
+            <div
+              key={stat.label}
+              className="flex flex-col items-center gap-0.5 rounded-[16px] py-3"
+              style={{ background: "rgba(239,68,68,0.14)", border: "1px solid rgba(239,68,68,0.28)" }}
+            >
+              <span className="font-display text-[20px] font-bold leading-none tracking-tight text-white">
+                {stat.valeur}
+              </span>
+              <span className="text-[10.5px] font-semibold uppercase tracking-wide text-white/50">
+                {stat.label}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </div>

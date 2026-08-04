@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getPatient, getSoinsPrescrits } from "@/lib/data/patients";
 import { getOrdonnances } from "@/lib/data/ordonnances";
+import { getVisitesPatient } from "@/lib/data/dossier-patient";
 import { EnTetePatientMobile } from "@/components/ui/EnTetePatientMobile";
 import { OngletsPatient } from "@/components/ui/OngletsPatient";
 import Link from "next/link";
@@ -108,10 +109,11 @@ const DOCS_IMPRIMABLES = [
 export default async function DocumentsPatientPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
-  const [patient, soins, ordonnances] = await Promise.all([
+  const [patient, soins, ordonnances, visites] = await Promise.all([
     getPatient(supabase, id),
     getSoinsPrescrits(supabase, id),
     getOrdonnances(supabase, id),
+    getVisitesPatient(supabase, id),
   ]);
 
   if (!patient) notFound();
@@ -119,7 +121,7 @@ export default async function DocumentsPatientPage({ params }: { params: Promise
   return (
     <main className="min-h-screen bg-[#F6F7F5] text-navy">
       {/* ── Header iOS violet ── */}
-      <EnTetePatientMobile patient={patient} soins={soins} />
+      <EnTetePatientMobile patient={patient} soins={soins} visites={visites} />
 
       {/* ── Onglets de navigation ── */}
       <div
@@ -128,7 +130,9 @@ export default async function DocumentsPatientPage({ params }: { params: Promise
           background: "linear-gradient(160deg, #2D1557 0%, #3B1D72 100%)",
         }}
       >
-        <OngletsPatient patientId={patient.id} />
+        <div className="mx-auto max-w-xl">
+          <OngletsPatient patientId={patient.id} />
+        </div>
       </div>
 
       {/* ── Contenu : Documents ── */}

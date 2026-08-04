@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getPatient, getSoinsPrescrits } from "@/lib/data/patients";
+import { getVisitesPatient } from "@/lib/data/dossier-patient";
 import { arreterSoinPrescritAction, coterSoinPrescritAction, updatePatientAction } from "@/lib/data/patients-actions";
 import { FormulaireSoinPrescrit } from "@/components/ui/FormulaireSoinPrescrit";
 import { getCodesNgap } from "@/lib/data/ngap";
@@ -64,10 +65,11 @@ function SectionTitre({ icone, titre, sous }: { icone: React.ReactNode; titre: s
 export default async function PatientPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
-  const [patient, soins, codesNgap] = await Promise.all([
+  const [patient, soins, codesNgap, visites] = await Promise.all([
     getPatient(supabase, id),
     getSoinsPrescrits(supabase, id),
     getCodesNgap(supabase),
+    getVisitesPatient(supabase, id),
   ]);
 
   if (!patient) notFound();
@@ -77,7 +79,7 @@ export default async function PatientPage({ params }: { params: Promise<{ id: st
   return (
     <main className="min-h-screen bg-[#F6F7F5] text-navy">
       {/* ── Header iOS violet ── */}
-      <EnTetePatientMobile patient={patient} soins={soins} />
+      <EnTetePatientMobile patient={patient} soins={soins} visites={visites} />
 
       {/* ── Onglets de navigation ── */}
       <div
@@ -86,7 +88,9 @@ export default async function PatientPage({ params }: { params: Promise<{ id: st
           background: "linear-gradient(160deg, #2D1557 0%, #3B1D72 100%)",
         }}
       >
-        <OngletsPatient patientId={patient.id} />
+        <div className="mx-auto max-w-xl">
+          <OngletsPatient patientId={patient.id} />
+        </div>
       </div>
 
       {/* ── Contenu : Identité ── */}
