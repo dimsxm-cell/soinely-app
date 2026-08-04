@@ -38,35 +38,38 @@ export function BarreSuperieure({ avatarUrl }: BarreSuperieureProps) {
   if (estFichePatient(pathname)) return null;
 
   return (
-    <header className="sticky top-0 z-10 border-b border-navy/10 bg-[#F6F7F5]/95 backdrop-blur print:hidden">
-      <div className="mx-auto flex max-w-2xl items-center justify-between px-6 py-3">
-        <Link href="/ma-journee" className="flex items-center gap-2 text-base font-bold tracking-tight text-navy">
+    <header className="print:hidden">
+      <div className="mx-auto grid max-w-2xl grid-cols-3 items-center px-6 py-3">
+        <Link
+          href="/recherche"
+          aria-label="Rechercher"
+          className="flex h-9 w-9 items-center justify-center justify-self-start rounded-full text-navy/60 transition-colors hover:bg-navy/5 hover:text-navy"
+        >
+          <IconeRecherche />
+        </Link>
+
+        <Link
+          href="/ma-journee"
+          className="flex items-center gap-2 justify-self-center text-base font-bold tracking-tight text-navy"
+        >
           <LogoSoinely variante="carre" className="h-7 w-7" />
           Soinely
         </Link>
-        <div className="flex items-center gap-1.5">
-          <Link
-            href="/recherche"
-            aria-label="Rechercher"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-navy/60 transition-colors hover:bg-navy/5 hover:text-navy"
-          >
-            <IconeRecherche />
-          </Link>
-          <Link href="/compte" aria-label="Mon compte" className="flex h-9 w-9 items-center justify-center">
-            {avatarUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element -- URL signée à courte durée de vie, incompatible avec le cache de next/image
-              <img
-                src={avatarUrl}
-                alt=""
-                className="h-9 w-9 rounded-full object-cover ring-2 ring-brand-violet/70"
-              />
-            ) : (
-              <span className="flex h-9 w-9 items-center justify-center rounded-full text-brand-violet ring-2 ring-brand-violet/40 transition-colors hover:bg-brand-violet/10">
-                <IconeProfil />
-              </span>
-            )}
-          </Link>
-        </div>
+
+        <Link href="/compte" aria-label="Mon compte" className="flex h-9 w-9 items-center justify-center justify-self-end">
+          {avatarUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element -- URL signée à courte durée de vie, incompatible avec le cache de next/image
+            <img
+              src={avatarUrl}
+              alt=""
+              className="h-9 w-9 rounded-full object-cover ring-2 ring-brand-violet/70"
+            />
+          ) : (
+            <span className="flex h-9 w-9 items-center justify-center rounded-full text-brand-violet ring-2 ring-brand-violet/40 transition-colors hover:bg-brand-violet/10">
+              <IconeProfil />
+            </span>
+          )}
+        </Link>
       </div>
     </header>
   );
