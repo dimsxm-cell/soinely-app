@@ -458,10 +458,10 @@ export default async function ArriveePatientPage({
             ) : (
               <div className="flex items-center gap-4">
                 <Image
-                  src="/marketing/ely-accompagnement-portrait.png"
+                  src="/marketing/ely-nouveau-portrait.webp"
                   alt=""
-                  width={200}
-                  height={200}
+                  width={379}
+                  height={231}
                   className="h-16 w-16 shrink-0 object-contain"
                 />
                 <p className="text-navy/60">Aucun autre patient à voir aujourd&apos;hui.</p>

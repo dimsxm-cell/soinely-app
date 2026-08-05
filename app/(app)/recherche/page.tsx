@@ -38,10 +38,10 @@ export default async function RecherchePage({
         {query.trim() && results.length === 0 && (
           <div className="flex items-center gap-4">
             <Image
-              src="/marketing/ely-consultation-portrait.png"
+              src="/marketing/ely-nouveau-portrait.webp"
               alt=""
-              width={200}
-              height={200}
+              width={379}
+              height={231}
               className="h-16 w-16 shrink-0 object-contain"
             />
             <p className="text-navy/70">Aucun résultat pour « {query} ».</p>

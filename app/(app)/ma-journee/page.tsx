@@ -57,10 +57,10 @@ export default async function MaJourneePage({
               visage porte quelque chose, et le buste tient dans la hauteur
               d'une ligne sans écraser la salutation. */}
           <Image
-            src="/marketing/ely-professionnel-portrait.png"
+            src="/marketing/ely-nouveau-portrait.webp"
             alt="ELY"
-            width={200}
-            height={200}
+            width={379}
+            height={231}
             className="h-[52px] w-[52px] shrink-0 object-contain"
             priority
           />
@@ -94,10 +94,10 @@ export default async function MaJourneePage({
         ) : (
           <div className="mt-8 flex items-center gap-4">
             <Image
-              src="/marketing/ely-accompagnement-portrait.png"
+              src="/marketing/ely-nouveau-portrait.webp"
               alt=""
-              width={200}
-              height={200}
+              width={379}
+              height={231}
               className="h-16 w-16 shrink-0 object-contain"
             />
             <p className="text-navy/60">Aucune tournée enregistrée pour aujourd&apos;hui.</p>
