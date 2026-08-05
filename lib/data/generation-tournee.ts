@@ -3,7 +3,7 @@ import type { FrequenceSoin } from "@/lib/types/clinical";
 import type { Database } from "@/lib/types/database.types";
 import type { Coordonnees } from "@/lib/geocodage";
 import { echouer, journaliserEchec } from "@/lib/journal";
-import { calculerDistanceRoutiereKm } from "@/lib/distance";
+import { calculerDistanceRoutiereKm, estimerDistanceRoutiereKm } from "@/lib/distance";
 
 export interface SoinRecurrence {
   frequenceType: FrequenceSoin;
@@ -141,6 +141,14 @@ export interface VisiteAPositionner {
  * d'origine : aucune distance n'est calculable pour elles, et les mêler aux
  * visites géocodées ferait échouer tout le calcul pour une seule adresse
  * mal renseignée.
+ *
+ * Le classement s'appuie sur une estimation locale (Haversine × coefficient
+ * de sinuosité) et non sur le routeur OpenRouteService : pour n visites, la
+ * boucle gloutonne ferait jusqu'à n(n+1)/2 appels réseau par réorganisation,
+ * de quoi épuiser en quelques clics le quota partagé avec le calcul des
+ * indemnités kilométriques facturées. L'algorithme ne fait que classer les
+ * visites par proximité relative — il n'a pas besoin d'une distance
+ * routière exacte pour cela.
  */
 export async function calculerOrdreVisites(
   origine: Coordonnees,
@@ -156,10 +164,8 @@ export async function calculerOrdreVisites(
   let point: Coordonnees = origine;
 
   while (candidates.length > 0) {
-    const distances = await Promise.all(
-      candidates.map((v) =>
-        calculerDistanceRoutiereKm(point, { latitude: v.latitude, longitude: v.longitude })
-      )
+    const distances = candidates.map((v) =>
+      estimerDistanceRoutiereKm(point, { latitude: v.latitude, longitude: v.longitude })
     );
 
     let indexPlusProche = 0;

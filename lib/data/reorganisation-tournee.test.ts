@@ -5,6 +5,8 @@ const missionsSelectQueue: { data: unknown; error: unknown }[] = [];
 const profilesSelectResult: { data: unknown; error: unknown } = { data: null, error: null };
 const updateResults: { error: unknown }[] = [];
 const updateCalls: { payload: unknown; missionId: string }[] = [];
+const resetResult: { error: unknown } = { error: null };
+const resetCalls: { tourneeId: string; statutExclu: string }[] = [];
 
 // Comme le vrai client Supabase, chaque maillon de la chaîne (`eq`, `order`,
 // `limit`) se contente de renvoyer le même objet : seul un `await` (ou un
@@ -29,12 +31,29 @@ const fromMock = vi.fn((table: string) => {
   if (table === "missions_du_jour") {
     return {
       select: () => construireLecture(missionsSelectQueue.shift() ?? { data: null, error: null }),
-      update: (payload: unknown) => ({
-        eq: (_colonne: string, missionId: string) => {
-          updateCalls.push({ payload, missionId });
-          return Promise.resolve(updateResults.shift() ?? { error: null });
-        },
-      }),
+      // La remise à zéro globale (`{ ordre_visite: null }`) et la numérotation
+      // individuelle (`{ ordre_visite: <nombre> }`) empruntent deux
+      // enchaînements différents côté vrai client Supabase — `.eq(...).neq(...)`
+      // pour l'une, `.eq("id", missionId)` pour l'autre — donc `update()`
+      // branche sur la forme du payload reçu pour reproduire les deux.
+      update: (payload: { ordre_visite: number | null }) => {
+        if (payload.ordre_visite === null) {
+          return {
+            eq: (_colonne: string, tourneeId: string) => ({
+              neq: (_colonneExclue: string, statutExclu: string) => {
+                resetCalls.push({ tourneeId, statutExclu });
+                return Promise.resolve(resetResult);
+              },
+            }),
+          };
+        }
+        return {
+          eq: (_colonne: string, missionId: string) => {
+            updateCalls.push({ payload, missionId });
+            return Promise.resolve(updateResults.shift() ?? { error: null });
+          },
+        };
+      },
     };
   }
   throw new Error(`Table non attendue dans ce test : ${table}`);
@@ -58,6 +77,8 @@ beforeEach(() => {
   missionsSelectQueue.length = 0;
   updateResults.length = 0;
   updateCalls.length = 0;
+  resetCalls.length = 0;
+  resetResult.error = null;
   profilesSelectResult.data = null;
   profilesSelectResult.error = null;
   getUserMock.mockResolvedValue({ data: { user: { id: "idel1" } }, error: null });
@@ -227,6 +248,64 @@ describe("reorganiserTourneeAction", () => {
 
     expect(resultat.succes).toBe(false);
     expect(resultat.erreur).toMatch(/connectée/);
+    expect(updateCalls).toHaveLength(0);
+  });
+
+  it("remet à zéro le ordre_visite des missions non « à faire » avant de renuméroter", async () => {
+    // Une mission « terminee » a été numérotée lors d'une réorganisation
+    // précédente (ordre_visite = 1 côté base) puis terminée entre-temps.
+    // Sans remise à zéro, elle garderait ce numéro en même temps qu'une
+    // mission « à faire » fraîchement numérotée reçoit elle aussi 1.
+    missionsSelectQueue.push(
+      {
+        data: [
+          { id: "m1", patients: { latitude: 48.82, longitude: 2.3 } },
+          { id: "m2", patients: { latitude: 48.9, longitude: 2.3 } },
+        ],
+        error: null,
+      },
+      { data: null, error: null }, // en_cours
+      { data: null, error: null } // terminee
+    );
+    profilesSelectResult.data = { cabinet_latitude: 48.8, cabinet_longitude: 2.3 };
+    updateResults.push({ error: null }, { error: null });
+
+    const { reorganiserTourneeAction } = await import("./reorganisation-tournee");
+    const formData = new FormData();
+    formData.set("tourneeId", "t1");
+
+    const resultat = await reorganiserTourneeAction(formData);
+
+    expect(resultat).toEqual({ succes: true });
+    expect(resetCalls).toEqual([{ tourneeId: "t1", statutExclu: "a_faire" }]);
+    expect(updateCalls).toEqual([
+      { payload: { ordre_visite: 1 }, missionId: "m1" },
+      { payload: { ordre_visite: 2 }, missionId: "m2" },
+    ]);
+  });
+
+  it("signale l'échec quand la remise à zéro du ordre_visite échoue", async () => {
+    missionsSelectQueue.push(
+      {
+        data: [
+          { id: "m1", patients: { latitude: 48.82, longitude: 2.3 } },
+          { id: "m2", patients: { latitude: 48.9, longitude: 2.3 } },
+        ],
+        error: null,
+      },
+      { data: null, error: null },
+      { data: null, error: null }
+    );
+    profilesSelectResult.data = { cabinet_latitude: 48.8, cabinet_longitude: 2.3 };
+    resetResult.error = { message: "boom" };
+
+    const { reorganiserTourneeAction } = await import("./reorganisation-tournee");
+    const formData = new FormData();
+    formData.set("tourneeId", "t1");
+
+    const resultat = await reorganiserTourneeAction(formData);
+
+    expect(resultat.succes).toBe(false);
     expect(updateCalls).toHaveLength(0);
   });
 

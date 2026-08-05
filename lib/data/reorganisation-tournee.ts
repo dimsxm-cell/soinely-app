@@ -127,6 +127,22 @@ export async function reorganiserTourneeAction(formData: FormData): Promise<Resu
 
   const ordre = await calculerOrdreVisites(origine, visites);
 
+  // Une mission numérotée puis terminée (ou passée en cours, ou absente)
+  // entre deux réorganisations garderait sinon son ancien ordre_visite : deux
+  // missions afficheraient le même numéro, et la terminée s'intercalerait
+  // parmi les visites à venir dans le tri de /ma-journee. Invariant documenté
+  // dans lib/data/ma-journee.ts : hors "à faire", ordre_visite reste nul.
+  const { error: resetError } = await supabase
+    .from("missions_du_jour")
+    .update({ ordre_visite: null })
+    .eq("tournee_id", tourneeId)
+    .neq("statut", "a_faire");
+
+  if (resetError) {
+    journaliserEchec("reorganiserTourneeAction — remise a zero", resetError);
+    return { succes: false, erreur: "La réorganisation a échoué. Réessayez." };
+  }
+
   const resultats = await Promise.all(
     ordre.map((missionId, index) =>
       supabase.from("missions_du_jour").update({ ordre_visite: index + 1 }).eq("id", missionId)

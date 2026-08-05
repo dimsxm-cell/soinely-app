@@ -105,7 +105,11 @@ export default async function ArriveePatientPage({
   const peutEcrireTransmission = mission.statut === "en_cours" || mission.statut === "terminee";
   const enCours = mission.statut === "en_cours";
   const absente = mission.statut === "absent";
-  const itineraireHref = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mission.patient.adresse)}`;
+  const itineraireHref = hrefWaze({
+    latitude: mission.patient.latitude ?? null,
+    longitude: mission.patient.longitude ?? null,
+    adresse: mission.patient.adresse,
+  });
 
   return (
     <main className="min-h-screen bg-[#F6F7F5] text-navy">
@@ -424,19 +428,6 @@ export default async function ArriveePatientPage({
             className="row-lift flex items-center justify-between rounded-2xl border border-navy/[0.06] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,.04)]"
           >
             <span className="text-[15px] font-semibold text-navy">Voir la fiche du patient</span>
-            <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[19px] w-[19px] shrink-0 text-navy/25">
-              <path d="m9 18 6-6-6-6" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </Link>
-          <Link
-            href={hrefWaze({
-              latitude: mission.patient.latitude ?? null,
-              longitude: mission.patient.longitude ?? null,
-              adresse: mission.patient.adresse,
-            })}
-            className="row-lift mt-2.5 flex items-center justify-between rounded-2xl border border-navy/[0.06] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,.04)]"
-          >
-            <span className="text-[15px] font-semibold text-navy">Naviguer avec Waze</span>
             <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[19px] w-[19px] shrink-0 text-navy/25">
               <path d="m9 18 6-6-6-6" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
