@@ -123,6 +123,33 @@ describe("reorganiserTourneeAction", () => {
     expect(appelsProfiles).toHaveLength(0);
   });
 
+  it("part de la dernière mission terminée quand il n'y a pas de mission en cours", async () => {
+    missionsSelectQueue.push(
+      {
+        data: [
+          { id: "m1", patients: { latitude: 48.86, longitude: 2.3 } },
+          { id: "m2", patients: { latitude: 49.0, longitude: 2.3 } },
+        ],
+        error: null,
+      },
+      { data: null, error: null }, // en_cours
+      { data: { patients: { latitude: 48.85, longitude: 2.3 } }, error: null } // terminee
+    );
+    updateResults.push({ error: null }, { error: null });
+
+    const { reorganiserTourneeAction } = await import("./reorganisation-tournee");
+    const formData = new FormData();
+    formData.set("tourneeId", "t1");
+
+    await reorganiserTourneeAction(formData);
+
+    // Depuis 48.85 (dernière terminée), m1 (48.86) est plus proche que m2 (49.0).
+    expect(updateCalls[0]).toEqual({ payload: { ordre_visite: 1 }, missionId: "m1" });
+    // Le cabinet n'a pas été consulté : la dernière mission terminée a suffi.
+    const appelsProfiles = fromMock.mock.calls.filter((appel) => appel[0] === "profiles");
+    expect(appelsProfiles).toHaveLength(0);
+  });
+
   it("refuse de réorganiser moins de deux visites restantes", async () => {
     missionsSelectQueue.push({ data: [{ id: "m1", patients: null }], error: null });
 

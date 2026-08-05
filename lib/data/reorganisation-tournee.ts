@@ -26,7 +26,7 @@ async function trouverOrigine(
   tourneeId: string,
   idelId: string
 ): Promise<Coordonnees | null> {
-  const { data: enCours } = await supabase
+  const { data: enCours, error: enCoursError } = await supabase
     .from("missions_du_jour")
     .select("patients(latitude, longitude)")
     .eq("tournee_id", tourneeId)
@@ -34,12 +34,16 @@ async function trouverOrigine(
     .limit(1)
     .maybeSingle();
 
+  if (enCoursError) {
+    journaliserEchec("trouverOrigine", enCoursError);
+  }
+
   const coordsEnCours = coordsDepuisEmbed((enCours as { patients: unknown } | null)?.patients);
   if (coordsEnCours?.latitude != null && coordsEnCours.longitude != null) {
     return { latitude: coordsEnCours.latitude, longitude: coordsEnCours.longitude };
   }
 
-  const { data: derniereTerminee } = await supabase
+  const { data: derniereTerminee, error: derniereTermineeError } = await supabase
     .from("missions_du_jour")
     .select("patients(latitude, longitude)")
     .eq("tournee_id", tourneeId)
@@ -48,16 +52,24 @@ async function trouverOrigine(
     .limit(1)
     .maybeSingle();
 
+  if (derniereTermineeError) {
+    journaliserEchec("trouverOrigine", derniereTermineeError);
+  }
+
   const coordsTerminee = coordsDepuisEmbed((derniereTerminee as { patients: unknown } | null)?.patients);
   if (coordsTerminee?.latitude != null && coordsTerminee.longitude != null) {
     return { latitude: coordsTerminee.latitude, longitude: coordsTerminee.longitude };
   }
 
-  const { data: profil } = await supabase
+  const { data: profil, error: profilError } = await supabase
     .from("profiles")
     .select("cabinet_latitude, cabinet_longitude")
     .eq("id", idelId)
     .maybeSingle();
+
+  if (profilError) {
+    journaliserEchec("trouverOrigine", profilError);
+  }
 
   const p = profil as { cabinet_latitude: number | null; cabinet_longitude: number | null } | null;
   if (p?.cabinet_latitude != null && p.cabinet_longitude != null) {
