@@ -1,9 +1,9 @@
 import Image from "next/image";
 
 const IMPREVU_CHECKS = [
-  "Réorganisation instantanée",
-  "Recalcul du meilleur itinéraire",
-  "Proposition validable en 1 tap",
+  "Réorganisation en un tap",
+  "Guidage Waze en temps réel",
+  "Ordre de visite mis à jour aussitôt",
 ];
 
 const PATIENT_ORDER = ["Mme Martin → Rue Leconte", "M. Dupont → Rue Victor Hugo", "Mme Bernard → Bd du Port", "Mme Louis → Av. des Fleurs"];
@@ -27,10 +27,10 @@ export function EnTempsReel() {
                 style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-0.6px", lineHeight: 1.15, margin: "0 0 14px" }}
               >
                 Un imprévu survient…<br />
-                <span style={{ color: "#6d28d9" }}>ELY s&apos;occupe du reste.</span>
+                <span style={{ color: "#6d28d9" }}>réorganisez en un geste.</span>
               </h3>
               <p style={{ fontSize: 14, lineHeight: 1.55, color: "#6b6483", margin: "0 0 18px" }}>
-                Trafic, urgence, annulation de patient… SOINELY réorganise, recalcule et vous propose toujours la meilleure option.
+                Trafic, urgence, annulation de patient… réorganisez votre tournée en un geste, et laissez Waze vous guider en temps réel.
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
                 {IMPREVU_CHECKS.map((c) => (
@@ -47,10 +47,10 @@ export function EnTempsReel() {
             {/* Timeline 4 colonnes */}
             <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-4" style={{ alignItems: "stretch" }}>
 
-              {/* 08h17 — Embouteillage */}
+              {/* 08h17 — Imprévu */}
               <div style={{ background: "#faf8ff", border: "1px solid #f0ecfb", borderRadius: 16, padding: "18px 16px", display: "flex", flexDirection: "column", minHeight: 292 }}>
                 <div style={{ fontSize: 11, fontWeight: 800, color: "#9a92b3", marginBottom: 9 }}>08h17</div>
-                <div style={{ fontSize: 13.5, fontWeight: 800, color: "#1e1b3c", marginBottom: 11 }}>Embouteillage</div>
+                <div style={{ fontSize: 13.5, fontWeight: 800, color: "#1e1b3c", marginBottom: 11 }}>Imprévu sur la route</div>
                 <div style={{ position: "relative", borderRadius: 12, overflow: "hidden", height: 100, marginBottom: 12 }}>
                   <Image
                     src="/marketing/jour-embouteillage.webp"
@@ -62,16 +62,16 @@ export function EnTempsReel() {
                   {/* soleil superposé */}
                   <div style={{ position: "absolute", top: 6, right: 6, width: 18, height: 18, borderRadius: 9999, background: "radial-gradient(circle,#fbbf24,#f59e0b)", opacity: 0.85 }} />
                 </div>
-                <div style={{ fontSize: 11.5, fontWeight: 700, color: "#e11d48", marginBottom: 8 }}>+ 18 min de retard estimé</div>
+                <div style={{ fontSize: 11.5, fontWeight: 700, color: "#e11d48", marginBottom: 8 }}>Retard, urgence, absence…</div>
                 <div style={{ fontSize: 11, fontWeight: 600, color: "#7c3aed", marginTop: "auto", lineHeight: 1.4 }}>
-                  Pas d&apos;inquiétude : ELY veille et garde votre journée sereine.
+                  Un geste suffit pour réorganiser votre tournée.
                 </div>
               </div>
 
-              {/* 08h18 — Proposition ELY */}
+              {/* 08h18 — Vous réorganisez */}
               <div style={{ background: "#faf8ff", border: "1px solid #f0ecfb", borderRadius: 16, padding: "18px 16px", display: "flex", flexDirection: "column", minHeight: 292 }}>
                 <div style={{ fontSize: 11, fontWeight: 800, color: "#9a92b3", marginBottom: 9 }}>08h18</div>
-                <div style={{ fontSize: 13.5, fontWeight: 800, color: "#1e1b3c", marginBottom: 9 }}>Proposition d&apos;ELY</div>
+                <div style={{ fontSize: 13.5, fontWeight: 800, color: "#1e1b3c", marginBottom: 9 }}>Vous réorganisez</div>
                 <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
                   <Image
                     src="/marketing/ely-nouveau-consultation.webp"
@@ -82,13 +82,13 @@ export function EnTempsReel() {
                     style={{ width: 44, height: "auto", filter: "drop-shadow(0 6px 14px rgba(124,58,237,.28))" }}
                   />
                 </div>
-                <div style={{ fontSize: 11, fontWeight: 600, color: "#9a92b3", marginBottom: 8 }}>Nouvel ordre proposé</div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: "#9a92b3", marginBottom: 8 }}>Nouvel ordre de visite</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: "auto" }}>
                   {PATIENT_ORDER.map((p) => (
                     <div key={p} style={{ fontSize: 12, fontWeight: 600, color: "#3d3956" }}>→ {p}</div>
                   ))}
                 </div>
-                <div style={{ fontSize: 11.5, fontWeight: 700, color: "#16a34a", marginTop: 11 }}>Gain estimé : 18 min</div>
+                <div style={{ fontSize: 11.5, fontWeight: 700, color: "#16a34a", marginTop: 11 }}>Mis à jour en un tap</div>
               </div>
 
               {/* 08h18 — Vous validez */}
@@ -101,22 +101,21 @@ export function EnTempsReel() {
                       <path d="M20 6 9 17l-5-5" />
                     </svg>
                   </div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: "#1e1b3c" }}>Optimisation acceptée</div>
-                  <div style={{ fontSize: 11.5, color: "#9a92b3" }}>Tournée mise à jour</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: "#1e1b3c" }}>C&apos;est fait</div>
+                  <div style={{ fontSize: 11.5, color: "#9a92b3" }}>Tournée réorganisée</div>
                 </div>
               </div>
 
-              {/* 08h19 — Temps gagné */}
+              {/* 08h19 — Waze */}
               <div style={{ background: "#faf8ff", border: "1px solid #f0ecfb", borderRadius: 16, padding: "18px 16px", display: "flex", flexDirection: "column", minHeight: 292 }}>
                 <div style={{ fontSize: 11, fontWeight: 800, color: "#9a92b3", marginBottom: 9 }}>08h19</div>
-                <div style={{ fontSize: 13.5, fontWeight: 800, color: "#1e1b3c", marginBottom: "auto" }}>Vous gagnez du temps</div>
+                <div style={{ fontSize: 13.5, fontWeight: 800, color: "#1e1b3c", marginBottom: "auto" }}>Vous repartez</div>
                 <div style={{ textAlign: "center", flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 5 }}>
-                  <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ marginBottom: 2, transformOrigin: "50% 15%", animation: "alarm-ring 2s ease-in-out infinite" }}>
-                    <path d="M12 6v6l3 2" /><circle cx="12" cy="13" r="8" />
-                    <path d="M5 3 2 6M22 6l-3-3M6 19l-2 2M18 19l2 2" />
+                  <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ marginBottom: 2 }}>
+                    <path d="M3 11l19-9-9 19-2-8-8-2z" />
                   </svg>
-                  <div style={{ fontSize: 42, fontWeight: 800, letterSpacing: "-1px", color: "#7c3aed" }}>18 min</div>
-                  <div style={{ fontSize: 12.5, fontWeight: 700, color: "#3d3956" }}>Gagnées</div>
+                  <div style={{ fontSize: 30, fontWeight: 800, letterSpacing: "-0.5px", color: "#7c3aed" }}>Waze</div>
+                  <div style={{ fontSize: 12.5, fontWeight: 700, color: "#3d3956" }}>vous guide</div>
                   <div style={{ fontSize: 11, color: "#9a92b3", marginTop: 2 }}>et votre journée reste fluide.</div>
                 </div>
               </div>
