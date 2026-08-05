@@ -628,3 +628,58 @@ describe("genererTourneeDuJour", () => {
     expect(tourneeDeleteEqMock).toHaveBeenCalledWith("id", "t-nouvelle");
   });
 });
+
+describe("calculerOrdreVisites", () => {
+  // Points alignés sur une même longitude, à distance croissante de
+  // l'origine : l'ordre plus-proche-voisin attendu est donc non ambigu
+  // (A, puis B, puis C), y compris à chaque étape intermédiaire.
+  const ORIGINE = { latitude: 48.80, longitude: 2.30 };
+  const A = { latitude: 48.82, longitude: 2.30 };
+  const B = { latitude: 48.90, longitude: 2.30 };
+  const C = { latitude: 49.10, longitude: 2.30 };
+
+  beforeEach(() => {
+    // Force le repli local (Haversine), sans appel réseau : déterministe,
+    // même pattern que lib/distance.test.ts.
+    vi.stubEnv("OPENROUTESERVICE_API_KEY", "");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("ordonne les visites géocodées du plus proche au plus lointain de l'origine", async () => {
+    const { calculerOrdreVisites } = await import("./generation-tournee");
+    const ordre = await calculerOrdreVisites(ORIGINE, [
+      { missionId: "loin", latitude: C.latitude, longitude: C.longitude },
+      { missionId: "proche", latitude: A.latitude, longitude: A.longitude },
+      { missionId: "moyen", latitude: B.latitude, longitude: B.longitude },
+    ]);
+
+    expect(ordre).toEqual(["proche", "moyen", "loin"]);
+  });
+
+  it("place les visites non géocodées à la fin, dans leur ordre d'origine", async () => {
+    const { calculerOrdreVisites } = await import("./generation-tournee");
+    const ordre = await calculerOrdreVisites(ORIGINE, [
+      { missionId: "sans-coords-1", latitude: null, longitude: null },
+      { missionId: "proche", latitude: A.latitude, longitude: A.longitude },
+      { missionId: "sans-coords-2", latitude: null, longitude: A.longitude },
+    ]);
+
+    expect(ordre).toEqual(["proche", "sans-coords-1", "sans-coords-2"]);
+  });
+
+  it("rend une liste vide quand il n'y a aucune visite", async () => {
+    const { calculerOrdreVisites } = await import("./generation-tournee");
+    expect(await calculerOrdreVisites(ORIGINE, [])).toEqual([]);
+  });
+
+  it("rend l'unique visite quand il n'y en a qu'une", async () => {
+    const { calculerOrdreVisites } = await import("./generation-tournee");
+    const ordre = await calculerOrdreVisites(ORIGINE, [
+      { missionId: "seule", latitude: A.latitude, longitude: A.longitude },
+    ]);
+    expect(ordre).toEqual(["seule"]);
+  });
+});

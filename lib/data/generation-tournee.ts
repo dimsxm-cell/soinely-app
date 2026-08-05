@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { FrequenceSoin } from "@/lib/types/clinical";
 import type { Database } from "@/lib/types/database.types";
+import type { Coordonnees } from "@/lib/geocodage";
 import { echouer, journaliserEchec } from "@/lib/journal";
 import { calculerDistanceRoutiereKm } from "@/lib/distance";
 
@@ -124,6 +125,55 @@ async function calculerDistancesDepuisCabinet(
   }
 
   return distances;
+}
+
+export interface VisiteAPositionner {
+  missionId: string;
+  latitude: number | null;
+  longitude: number | null;
+}
+
+/**
+ * Ordre de passage des visites restantes, par plus-proche-voisin glouton
+ * depuis un point de départ.
+ *
+ * Les visites sans coordonnées sont replacées à la fin, dans leur ordre
+ * d'origine : aucune distance n'est calculable pour elles, et les mêler aux
+ * visites géocodées ferait échouer tout le calcul pour une seule adresse
+ * mal renseignée.
+ */
+export async function calculerOrdreVisites(
+  origine: Coordonnees,
+  visites: VisiteAPositionner[]
+): Promise<string[]> {
+  const nonGeocodees = visites.filter((v) => v.latitude === null || v.longitude === null);
+  let candidates = visites.filter(
+    (v): v is VisiteAPositionner & { latitude: number; longitude: number } =>
+      v.latitude !== null && v.longitude !== null
+  );
+
+  const ordre: string[] = [];
+  let point: Coordonnees = origine;
+
+  while (candidates.length > 0) {
+    const distances = await Promise.all(
+      candidates.map((v) =>
+        calculerDistanceRoutiereKm(point, { latitude: v.latitude, longitude: v.longitude })
+      )
+    );
+
+    let indexPlusProche = 0;
+    for (let i = 1; i < distances.length; i++) {
+      if (distances[i] < distances[indexPlusProche]) indexPlusProche = i;
+    }
+
+    const plusProche = candidates[indexPlusProche];
+    ordre.push(plusProche.missionId);
+    point = { latitude: plusProche.latitude, longitude: plusProche.longitude };
+    candidates = candidates.filter((_, i) => i !== indexPlusProche);
+  }
+
+  return [...ordre, ...nonGeocodees.map((v) => v.missionId)];
 }
 
 export async function genererTourneeDuJour(
