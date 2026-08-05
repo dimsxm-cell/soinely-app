@@ -97,7 +97,7 @@ describe("CarteMissionTournee", () => {
 
     expect(screen.getByRole("link", { name: /GPS/ })).toHaveAttribute(
       "href",
-      "https://maps.google.com/?q=12%20rue%20des%20Lilas"
+      "https://waze.com/ul?navigate=yes&q=12+rue+des+Lilas"
     );
     expect(screen.getByRole("link", { name: /Appeler/ })).toHaveAttribute(
       "href",

@@ -6,6 +6,7 @@ import { updateMissionStatutAction, updateMotifAbsenceAction } from "@/lib/data/
 import { formaterNomPropre } from "@/lib/format";
 import { calculerDetailPassage } from "@/lib/facturation";
 import { formaterEuros, type ContexteTarifaire } from "@/lib/cotation";
+import { hrefWaze } from "@/lib/waze";
 import {
   STATUT_BADGE,
   STATUT_LABEL,
@@ -45,9 +46,9 @@ export function CarteMissionTournee({
   const terminee = mission.statut === "terminee";
   const absent = mission.statut === "absent";
   const nomFormate = formaterNomPropre(mission.patientNom);
-  const mapsUrl = `https://maps.google.com/?q=${encodeURIComponent(
-    mission.patientAdresse
-  )}`;
+  // MissionTourneeVue ne porte pas les coordonnées géocodées du patient :
+  // hrefWaze se rabat donc toujours sur l'adresse en texte libre ici.
+  const wazeUrl = hrefWaze({ latitude: null, longitude: null, adresse: mission.patientAdresse });
   const telUrl = `tel:${mission.patientTelephone.replace(/\s/g, "")}`;
 
   return (
@@ -219,7 +220,7 @@ export function CarteMissionTournee({
               /* Mission en cours : GPS + Appeler + Valider */
               <div className="flex gap-2">
                 <a
-                  href={mapsUrl}
+                  href={wazeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex flex-1 items-center justify-center gap-1.5 rounded-[12px] border border-navy/15 bg-white py-2.5 text-[13px] font-semibold text-navy shadow-sm hover:bg-navy/[0.03]"
