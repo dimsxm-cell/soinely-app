@@ -47,9 +47,16 @@ type Message = MessageUtilisateur | MessageEly;
 interface ConversationElyProps {
   requeteInitiale: string;
   situationInitiale: SituationTerrain | null;
+  patientContexte?: string | null;
+  soinContexte?: string | null;
 }
 
-export function ConversationEly({ requeteInitiale, situationInitiale }: ConversationElyProps) {
+export function ConversationEly({
+  requeteInitiale,
+  situationInitiale,
+  patientContexte,
+  soinContexte,
+}: ConversationElyProps) {
   const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([]);
   const [brouillon, setBrouillon] = useState("");
@@ -167,6 +174,13 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
           </button>
         )}
       </div>
+
+      {patientContexte && (
+        <p className="mt-3 text-[13px] font-semibold text-navy/55">
+          Pour {patientContexte}
+          {soinContexte ? ` · ${soinContexte}` : ""}
+        </p>
+      )}
 
       <div className="py-6">
         {!aDesMessages ? (

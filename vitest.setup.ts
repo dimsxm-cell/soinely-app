@@ -17,6 +17,6 @@ class IntersectionObserverStub implements IntersectionObserver {
 
 vi.stubGlobal("IntersectionObserver", IntersectionObserverStub);
 
-// jsdom ne fournit pas scrollIntoView ; ce stub évite que les tests qui le
-// déclenchent (ex. components/ui/ConversationEly.tsx) ne lèvent une erreur.
+// jsdom ne fournit pas scrollIntoView ; utilisé par les composants qui
+// font défiler automatiquement vers un ancrage (ex. ConversationEly).
 Element.prototype.scrollIntoView = vi.fn();

@@ -432,6 +432,15 @@ export default async function ArriveePatientPage({
               <path d="m9 18 6-6-6-6" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </Link>
+          <Link
+            href={`/ely?patient=${encodeURIComponent(mission.patientNom)}&soin=${encodeURIComponent(mission.typeSoin)}`}
+            className="row-lift mt-2.5 flex items-center justify-between rounded-2xl border border-navy/[0.06] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,.04)]"
+          >
+            <span className="text-[15px] font-semibold text-navy">Demander à Ely</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[19px] w-[19px] shrink-0 text-navy/25">
+              <path d="m9 18 6-6-6-6" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </Link>
         </div>
 
         {prochainStatut ? (
