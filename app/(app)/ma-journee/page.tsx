@@ -2,8 +2,10 @@ import Image from "next/image";
 import { createClient, getUtilisateurConnecte } from "@/lib/supabase/server";
 import { formaterNomPropre } from "@/lib/format";
 import { getMissionEnCoursHref, getMissionsDuJour, getTourneeDuJour } from "@/lib/data/ma-journee";
+import { reorganiserTourneeAction } from "@/lib/data/reorganisation-tournee";
 import { CarteInformation } from "@/components/ui/CarteInformation";
 import { CarteMission } from "@/components/ui/CarteMission";
+import { FormulaireAvecRetour } from "@/components/ui/FormulaireAvecRetour";
 
 function formatDateDuJour(): string {
   const date = new Date().toLocaleDateString("fr-FR", {
@@ -44,6 +46,7 @@ export default async function MaJourneePage({
     ? missions.filter((m) => m.patientNom.toLowerCase().includes(requete.toLowerCase()))
     : missions;
   const missionsRestantes = missions.filter((m) => m.statut !== "terminee").length;
+  const missionsAFaire = missions.filter((m) => m.statut === "a_faire").length;
 
   return (
     <main className="min-h-screen bg-[#F6F7F5] text-navy">
@@ -116,6 +119,22 @@ export default async function MaJourneePage({
                   : "Tout est fait"}
               </p>
             </div>
+
+            {missionsAFaire >= 2 && (
+              <FormulaireAvecRetour
+                action={reorganiserTourneeAction}
+                messageSucces="Tournée réorganisée."
+                className="mt-3 flex flex-col items-start gap-1.5"
+              >
+                <input type="hidden" name="tourneeId" value={tournee.id} />
+                <button
+                  type="submit"
+                  className="btn-glace rounded-[12px] bg-brand-violet/10 px-4 py-2.5 text-[13.5px] font-semibold text-brand-violet"
+                >
+                  Réorganiser ma tournée
+                </button>
+              </FormulaireAvecRetour>
+            )}
 
             {missionsVisibles.length > 0 ? (
               <div className="mt-3 flex flex-col gap-3">

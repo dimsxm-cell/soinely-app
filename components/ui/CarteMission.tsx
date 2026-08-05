@@ -63,6 +63,14 @@ export function CarteMission({ mission, contexteHref, estDerniere }: CarteMissio
           aria-hidden="true"
           className={`relative z-10 h-3 w-3 rounded-full ring-4 ring-[#F6F7F5] ${DOT_CLASSES[mission.statut]}`}
         />
+        {mission.ordreVisite != null && (
+          <span
+            aria-label={`Ordre de passage suggéré : ${mission.ordreVisite}`}
+            className="relative z-10 flex h-4 w-4 items-center justify-center rounded-full bg-brand-violet text-[9px] font-bold text-white"
+          >
+            {mission.ordreVisite}
+          </span>
+        )}
       </div>
 
       <div

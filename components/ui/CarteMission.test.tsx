@@ -88,4 +88,14 @@ describe("CarteMission", () => {
     render(<CarteMission mission={{ ...mission, statut: "en_cours" }} />);
     expect(screen.getAllByRole("link")).toHaveLength(1);
   });
+
+  it("affiche un badge d'ordre de visite quand ordreVisite est défini", () => {
+    render(<CarteMission mission={{ ...mission, ordreVisite: 3 }} />);
+    expect(screen.getByLabelText("Ordre de passage suggéré : 3")).toBeInTheDocument();
+  });
+
+  it("n'affiche aucun badge d'ordre quand ordreVisite est nul", () => {
+    render(<CarteMission mission={{ ...mission, ordreVisite: null }} />);
+    expect(screen.queryByLabelText(/Ordre de passage suggéré/)).not.toBeInTheDocument();
+  });
 });
