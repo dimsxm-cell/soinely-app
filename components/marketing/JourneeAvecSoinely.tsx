@@ -117,13 +117,13 @@ export function JourneeAvecSoinely() {
                   <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
                   <path d="M12 9v4M12 17h.01" />
                 </svg>
-                Embouteillage détecté
+                Imprévu sur la tournée
               </div>
               <div style={{ fontSize: 11, lineHeight: 1.45, color: "#6b6483", marginBottom: 10 }}>
-                + 18 min de retard<br />Souhaitez-vous optimiser votre tournée ?
+                Retard, urgence, absence…<br />Réorganisez votre tournée en un geste.
               </div>
               <div style={{ display: "flex", gap: 7 }}>
-                <div className="btn-glace" style={{ flex: 1, textAlign: "center", background: "linear-gradient(135deg,#7c3aed,#a855f7)", color: "#fff", fontSize: 11.5, fontWeight: 700, padding: 8, borderRadius: 9, cursor: "pointer" }}>Optimiser</div>
+                <div className="btn-glace" style={{ flex: 1, textAlign: "center", background: "linear-gradient(135deg,#7c3aed,#a855f7)", color: "#fff", fontSize: 11.5, fontWeight: 700, padding: 8, borderRadius: 9, cursor: "pointer" }}>Réorganiser</div>
                 <div className="btn-glace-clair" style={{ textAlign: "center", background: "#f2eefe", color: "#6d28d9", fontSize: 11.5, fontWeight: 700, padding: "8px 13px", borderRadius: 9, cursor: "pointer" }}>Plus tard</div>
               </div>
             </div>

@@ -1,8 +1,8 @@
 /* Fonctionnalités grid — 6 colonnes */
 const FONCTIONNALITES = [
   {
-    titre: "Jusqu'à 1h gagnée par jour",
-    texte: "Des tournées optimisées qui s'adaptent en temps réel.",
+    titre: "Des tournées plus fluides",
+    texte: "Réorganisez l'ordre de vos visites en un geste, et laissez Waze gérer le trafic.",
     bg: "#eef4ff",
     couleur: "#2563eb",
     icone: (
@@ -34,8 +34,8 @@ const FONCTIONNALITES = [
     ),
   },
   {
-    titre: "Une tournée qui s'adapte à tout",
-    texte: "Imprévu, trafic, urgences… ELY réorganise pour vous.",
+    titre: "Une tournée qui s'adapte à l'imprévu",
+    texte: "Retard, urgence, absence… réorganisez en un geste, où que vous soyez.",
     bg: "#eefaf2",
     couleur: "#16a34a",
     icone: (

@@ -387,8 +387,7 @@ export function Hero() {
               </svg>
             </div>
             <p style={{ fontSize: 12, lineHeight: 1.5, color: "#4b4763", margin: "0 0 11px" }}>
-              Un embouteillage est détecté sur votre route. Je peux réorganiser votre tournée et vous faire gagner{" "}
-              <b>18 minutes</b>.
+              Un imprévu sur la route ? Réorganisez votre tournée en un geste, et laissez Waze vous guider en temps réel.
             </p>
             <div
               className="btn-glace mb-[9px] rounded-[11px] text-center font-bold text-white"
@@ -398,7 +397,7 @@ export function Hero() {
                 padding: 10,
               }}
             >
-              Optimiser ma tournée
+              Réorganiser ma tournée
             </div>
             <div className="flex items-center gap-[6px] font-bold" style={{ fontSize: 11, color: "#16a34a" }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
