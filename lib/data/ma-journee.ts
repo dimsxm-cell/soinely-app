@@ -265,7 +265,7 @@ export async function getMissionDetail(
   const { data, error } = await supabase
     .from("missions_du_jour")
     .select(
-      "id, patient_id, tournee_id, type_soin, heure_prevue, statut, mission_clinique_id, transmission, rappel, photo_path, distance_km, distance_km_corrigee, patients(id, nom_complet, adresse, telephone, allergies, consignes, date_naissance, forfait_bsi), tournees(date), actes_mission(libelle, ordre, ngap_codes(code, cotation, lettre_cle, coefficient, derogatoire_bsi, eligible_mci))"
+      "id, patient_id, tournee_id, type_soin, heure_prevue, statut, mission_clinique_id, transmission, rappel, photo_path, distance_km, distance_km_corrigee, patients(id, nom_complet, adresse, telephone, allergies, consignes, date_naissance, forfait_bsi, latitude, longitude), tournees(date), actes_mission(libelle, ordre, ngap_codes(code, cotation, lettre_cle, coefficient, derogatoire_bsi, eligible_mci))"
     )
     .eq("id", missionId)
     .maybeSingle();
@@ -283,6 +283,8 @@ export async function getMissionDetail(
     consignes: string | null;
     date_naissance: string | null;
     forfait_bsi: string | null;
+    latitude: number | null;
+    longitude: number | null;
   };
   const patientRow = Array.isArray(patientEmbed)
     ? (patientEmbed[0] as PatientRow)
@@ -335,6 +337,8 @@ export async function getMissionDetail(
       allergies: patientRow.allergies,
       consignes: patientRow.consignes,
       dateNaissance: patientRow.date_naissance,
+      latitude: patientRow.latitude,
+      longitude: patientRow.longitude,
     },
   };
 }

@@ -34,6 +34,13 @@ export interface Patient {
   allergies: string | null;
   consignes: string | null;
   dateNaissance: string | null;
+  /**
+   * Position géocodée du domicile, ou `null`/absente si l'adresse n'a pas pu
+   * être localisée. Optionnelle côté type pour ne pas casser les objets
+   * `Patient` déjà construits ailleurs (tests notamment).
+   */
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 export type Sexe = "homme" | "femme";
