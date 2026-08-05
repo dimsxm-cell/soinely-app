@@ -216,6 +216,7 @@ export type Database = {
           distance_km_corrigee: number | null
           mission_clinique_id: string | null
           motif_absence: string | null
+          ordre_visite: number | null
           patient_id: string
           photo_path: string | null
           rappel: string | null
@@ -231,6 +232,7 @@ export type Database = {
           distance_km_corrigee?: number | null
           mission_clinique_id?: string | null
           motif_absence?: string | null
+          ordre_visite?: number | null
           patient_id: string
           photo_path?: string | null
           rappel?: string | null
@@ -246,6 +248,7 @@ export type Database = {
           distance_km_corrigee?: number | null
           mission_clinique_id?: string | null
           motif_absence?: string | null
+          ordre_visite?: number | null
           patient_id?: string
           photo_path?: string | null
           rappel?: string | null

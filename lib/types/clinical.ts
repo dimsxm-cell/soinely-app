@@ -86,6 +86,13 @@ export interface MissionDuJour {
   heurePrevue: string;
   statut: StatutMission;
   missionCliniqueId: string | null;
+  /**
+   * Ordre de passage suggéré par la réorganisation manuelle, ou `null` tant
+   * qu'aucune réorganisation n'a eu lieu. Optionnel côté type pour ne pas
+   * casser les objets `MissionDuJour` déjà construits ailleurs (tests
+   * notamment) — toujours renseigné en pratique par `getMissionsDuJour`.
+   */
+  ordreVisite?: number | null;
 }
 
 export interface ActeVue {

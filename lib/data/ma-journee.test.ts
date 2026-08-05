@@ -129,35 +129,39 @@ describe("getTourneeDuJour — échecs", () => {
 });
 
 describe("getMissionsDuJour", () => {
-  it("mappe les colonnes snake_case Supabase vers MissionDuJour, avec le nom du patient joint, triées par heure", async () => {
+  it("mappe les colonnes snake_case Supabase vers MissionDuJour, avec le nom du patient joint, triées par ordre de visite puis par heure", async () => {
+    const orderHeureMock = vi.fn().mockResolvedValue({
+      data: [
+        {
+          id: "m1",
+          patient_id: "p1",
+          type_soin: "Pansement",
+          heure_prevue: "08:30:00",
+          statut: "a_faire",
+          mission_clinique_id: null,
+          ordre_visite: null,
+          patients: { nom_complet: "Mme Dupont" },
+        },
+        {
+          id: "m2",
+          patient_id: "p2",
+          type_soin: "Injection",
+          heure_prevue: "09:15:00",
+          statut: "terminee",
+          mission_clinique_id: "mc1",
+          ordre_visite: null,
+          patients: { nom_complet: "M. Martin" },
+        },
+      ],
+      error: null,
+    });
+    const orderOrdreVisiteMock = vi.fn(() => ({ order: orderHeureMock }));
+
     const fakeClient = {
       from: () => ({
         select: () => ({
           eq: () => ({
-            order: () =>
-              Promise.resolve({
-                data: [
-                  {
-                    id: "m1",
-                    patient_id: "p1",
-                    type_soin: "Pansement",
-                    heure_prevue: "08:30:00",
-                    statut: "a_faire",
-                    mission_clinique_id: null,
-                    patients: { nom_complet: "Mme Dupont" },
-                  },
-                  {
-                    id: "m2",
-                    patient_id: "p2",
-                    type_soin: "Injection",
-                    heure_prevue: "09:15:00",
-                    statut: "terminee",
-                    mission_clinique_id: "mc1",
-                    patients: { nom_complet: "M. Martin" },
-                  },
-                ],
-                error: null,
-              }),
+            order: orderOrdreVisiteMock,
           }),
         }),
       }),
@@ -166,6 +170,8 @@ describe("getMissionsDuJour", () => {
     const { getMissionsDuJour } = await import("./ma-journee");
     const missions = await getMissionsDuJour(fakeClient, "t1");
 
+    expect(orderOrdreVisiteMock).toHaveBeenCalledWith("ordre_visite", { nullsFirst: true });
+    expect(orderHeureMock).toHaveBeenCalledWith("heure_prevue");
     expect(missions).toEqual([
       {
         id: "m1",
@@ -175,6 +181,7 @@ describe("getMissionsDuJour", () => {
         heurePrevue: "08:30:00",
         statut: "a_faire",
         missionCliniqueId: null,
+        ordreVisite: null,
       },
       {
         id: "m2",
@@ -184,8 +191,42 @@ describe("getMissionsDuJour", () => {
         heurePrevue: "09:15:00",
         statut: "terminee",
         missionCliniqueId: "mc1",
+        ordreVisite: null,
       },
     ]);
+  });
+
+  it("porte l'ordre de visite quand une réorganisation a eu lieu", async () => {
+    const orderHeureMock = vi.fn().mockResolvedValue({
+      data: [
+        {
+          id: "m1",
+          patient_id: "p1",
+          type_soin: "Pansement",
+          heure_prevue: "08:30:00",
+          statut: "a_faire",
+          mission_clinique_id: null,
+          ordre_visite: 2,
+          patients: { nom_complet: "Mme Dupont" },
+        },
+      ],
+      error: null,
+    });
+
+    const fakeClient = {
+      from: () => ({
+        select: () => ({
+          eq: () => ({
+            order: () => ({ order: orderHeureMock }),
+          }),
+        }),
+      }),
+    } as unknown as SupabaseClient;
+
+    const { getMissionsDuJour } = await import("./ma-journee");
+    const missions = await getMissionsDuJour(fakeClient, "t1");
+
+    expect(missions[0].ordreVisite).toBe(2);
   });
 
   it("gère un embed patients renvoyé sous forme de tableau", async () => {
@@ -193,21 +234,24 @@ describe("getMissionsDuJour", () => {
       from: () => ({
         select: () => ({
           eq: () => ({
-            order: () =>
-              Promise.resolve({
-                data: [
-                  {
-                    id: "m3",
-                    patient_id: "p3",
-                    type_soin: "Glycémie",
-                    heure_prevue: "10:00:00",
-                    statut: "a_faire",
-                    mission_clinique_id: null,
-                    patients: [{ nom_complet: "Mme Bernard" }],
-                  },
-                ],
-                error: null,
-              }),
+            order: () => ({
+              order: () =>
+                Promise.resolve({
+                  data: [
+                    {
+                      id: "m3",
+                      patient_id: "p3",
+                      type_soin: "Glycémie",
+                      heure_prevue: "10:00:00",
+                      statut: "a_faire",
+                      mission_clinique_id: null,
+                      ordre_visite: null,
+                      patients: [{ nom_complet: "Mme Bernard" }],
+                    },
+                  ],
+                  error: null,
+                }),
+            }),
           }),
         }),
       }),
@@ -225,6 +269,7 @@ describe("getMissionsDuJour", () => {
         heurePrevue: "10:00:00",
         statut: "a_faire",
         missionCliniqueId: null,
+        ordreVisite: null,
       },
     ]);
   });
@@ -234,7 +279,9 @@ describe("getMissionsDuJour", () => {
       from: () => ({
         select: () => ({
           eq: () => ({
-            order: () => Promise.resolve({ data: null, error: { message: "boom" } }),
+            order: () => ({
+              order: () => Promise.resolve({ data: null, error: { message: "boom" } }),
+            }),
           }),
         }),
       }),

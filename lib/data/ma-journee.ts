@@ -108,8 +108,17 @@ export async function getMissionsDuJour(
 ): Promise<MissionDuJour[]> {
   const { data, error } = await supabase
     .from("missions_du_jour")
-    .select("id, patient_id, type_soin, heure_prevue, statut, mission_clinique_id, patients(nom_complet)")
+    .select(
+      "id, patient_id, type_soin, heure_prevue, statut, mission_clinique_id, ordre_visite, patients(nom_complet)"
+    )
     .eq("tournee_id", tourneeId)
+    // Les missions jamais réorganisées (ordre_visite nul) passent en premier,
+    // triées entre elles par heure_prevue — comportement identique à
+    // aujourd'hui tant qu'aucune ligne n'a de ordre_visite. Une fois la
+    // tournée réorganisée, les missions déjà faites (statut non touché par
+    // la réorganisation, donc toujours à ordre_visite nul) restent avant les
+    // visites à venir fraîchement numérotées.
+    .order("ordre_visite", { nullsFirst: true })
     .order("heure_prevue");
 
   if (error) echouer("getMissionsDuJour", error);
@@ -129,6 +138,7 @@ export async function getMissionsDuJour(
       heurePrevue: row.heure_prevue,
       statut: row.statut as StatutMission,
       missionCliniqueId: row.mission_clinique_id,
+      ordreVisite: row.ordre_visite,
     };
   });
 }
