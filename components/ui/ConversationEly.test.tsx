@@ -6,9 +6,6 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
 }));
 
-// Mock scrollIntoView for jsdom, which doesn't provide it by default
-Element.prototype.scrollIntoView = vi.fn();
-
 function situation(overrides: Partial<SituationTerrain> = {}): SituationTerrain {
   return {
     id: "s1",

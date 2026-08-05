@@ -226,7 +226,9 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
                   <div className="max-w-[80%] rounded-[18px] rounded-bl-[5px] border border-navy/[0.06] bg-white px-4 py-3.5 shadow-[0_1px_2px_rgba(15,23,42,.04)]">
                     {message.situation ? (
                       <>
-                        <BadgeNiveauConfiance niveau={message.situation.niveauConfiance} />
+                        <div className="flex flex-wrap items-center gap-2">
+                          <BadgeNiveauConfiance niveau={message.situation.niveauConfiance} />
+                        </div>
                         <p className="mt-1.5 text-[14.5px] font-bold tracking-tight text-brand-violet">{message.situation.titre}</p>
                         <p className="mt-1.5 text-[15px] leading-relaxed text-navy/85">{message.situation.observation}</p>
                         {message.situation.conduiteATenir.length > 0 && (
