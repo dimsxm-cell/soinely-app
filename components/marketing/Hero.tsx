@@ -253,7 +253,7 @@ export function Hero() {
                             alt="ELY"
                             width={379}
                             height={231}
-                            className="ely-wave h-[18px] w-[18px] object-contain"
+                            className="ely-wave h-[18px] w-[18px] rounded-full object-cover"
                           />
                         </span>
                       </div>
@@ -376,8 +376,8 @@ export function Hero() {
                     alt="ELY"
                     width={379}
                     height={231}
-                    className="object-contain"
-                    style={{ width: 46, height: "auto" }}
+                    className="rounded-full object-cover"
+                    style={{ width: 46, height: 46 }}
                   />
                 </div>
                 <span style={{ fontSize: 16, fontWeight: 800, color: "#6d28d9" }}>ELY</span>
