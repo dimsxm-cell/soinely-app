@@ -7,6 +7,7 @@ import Link from "next/link";
 import type { SituationTerrain } from "@/lib/types/clinical";
 import { poserQuestionElyAction } from "@/lib/data/ely-actions";
 import { IconeMicro } from "@/components/ui/IconeMicro";
+import { BadgeNiveauConfiance } from "@/components/ui/BadgeNiveauConfiance";
 import { LectureVocaleReponse } from "@/components/ui/LectureVocaleReponse";
 import {
   creerReconnaissanceVocale,
@@ -225,7 +226,8 @@ export function ConversationEly({ requeteInitiale, situationInitiale }: Conversa
                   <div className="max-w-[80%] rounded-[18px] rounded-bl-[5px] border border-navy/[0.06] bg-white px-4 py-3.5 shadow-[0_1px_2px_rgba(15,23,42,.04)]">
                     {message.situation ? (
                       <>
-                        <p className="text-[14.5px] font-bold tracking-tight text-brand-violet">{message.situation.titre}</p>
+                        <BadgeNiveauConfiance niveau={message.situation.niveauConfiance} />
+                        <p className="mt-1.5 text-[14.5px] font-bold tracking-tight text-brand-violet">{message.situation.titre}</p>
                         <p className="mt-1.5 text-[15px] leading-relaxed text-navy/85">{message.situation.observation}</p>
                         {message.situation.conduiteATenir.length > 0 && (
                           <ul className="mt-2.5 flex flex-col gap-1.5">
