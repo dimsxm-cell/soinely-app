@@ -112,6 +112,43 @@ test fiable, plus robuste qu'analyser le tableau texte.
 - **Jeton Supabase expiré ou révoqué** : le job échoue à l'étape
   `supabase link`, avant même la vérification — échec visible, pas silencieux.
 
+## Procédure de réparation
+
+Si le job CI détecte une désynchronisation de migrations, voici les étapes pour réparer le registre Supabase :
+
+1. **Authentification locale :**
+   ```bash
+   npx supabase login
+   ```
+   Génère ou réutilise un jeton personnel — le même qui sera utilisé par le job CI via `SUPABASE_ACCESS_TOKEN`.
+
+2. **Liaison au projet :**
+   ```bash
+   npx supabase link --project-ref jeqrajpqbquewevjmond
+   ```
+   Relie l'environnement local Supabase au projet de production (ref confirmé dans le doc et dans le job CI).
+
+3. **Inspection du désaccord :**
+   ```bash
+   npx supabase migration list
+   ```
+   Affiche un tableau Local/Remote pour chaque migration. Identifier les lignes où Remote est vide — ce sont les migrations non appliquées que le registre ignore.
+
+4. **Reparation du registre :**
+   ```bash
+   npx supabase migration repair --status applied <VERSION1> <VERSION2> …
+   ```
+   Remplace `<VERSION1> <VERSION2> …` par la liste complète des versions désynchronisées (ex. `20260714000000 20260716000001 20260720000002`). Cette commande **n'exécute pas** le SQL des migrations, elle met seulement à jour le registre pour marquer ces versions comme déjà appliquées.
+
+5. **Confirmation :**
+   ```bash
+   npx supabase migration list
+   ```
+   Vérifie que Local et Remote correspondent partout — les colonnes Local et Remote affichent les mêmes versions dans le même ordre.
+
+6. **Push et CI :**
+   Après la réparation du registre, la prochaine exécution du job CI sur un push vers `main` devrait passer au vert. Si le désaccord persiste ou réapparaît, investiguer plus avant (vérifier que toutes les migrations enregistrées en local existent aussi en Remote).
+
 ## Tests
 
 Pas de test automatisé unitaire : c'est un changement de configuration CI,
