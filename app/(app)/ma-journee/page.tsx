@@ -6,6 +6,8 @@ import { reorganiserTourneeAction } from "@/lib/data/reorganisation-tournee";
 import { CarteInformation } from "@/components/ui/CarteInformation";
 import { CarteMission } from "@/components/ui/CarteMission";
 import { FormulaireAvecRetour } from "@/components/ui/FormulaireAvecRetour";
+import { getMaterielDuJour } from "@/lib/data/materiel";
+import { CarteMateriel } from "@/components/ui/CarteMateriel";
 
 function formatDateDuJour(): string {
   const date = new Date().toLocaleDateString("fr-FR", {
@@ -35,12 +37,13 @@ export default async function MaJourneePage({
   const prenom = nomComplet ? formaterNomPropre(nomComplet).split(" ")[0] : undefined;
 
   const tournee = user ? await getTourneeDuJour(supabase, user.id) : null;
-  const [missions, contexte] = tournee
+  const [missions, contexte, materiel] = tournee
     ? await Promise.all([
         getMissionsDuJour(supabase, tournee.id),
         getMissionEnCoursHref(supabase, tournee.id),
+        getMaterielDuJour(supabase, tournee.id),
       ])
-    : [[], null];
+    : [[], null, []];
 
   const missionsVisibles = requete
     ? missions.filter((m) => m.patientNom.toLowerCase().includes(requete.toLowerCase()))
@@ -105,6 +108,15 @@ export default async function MaJourneePage({
             />
             <p className="text-navy/60">Aucune tournée enregistrée pour aujourd&apos;hui.</p>
           </div>
+        )}
+
+        {tournee && materiel.length > 0 && (
+          <CarteMateriel
+            items={materiel}
+            tourneeId={tournee.id}
+            prepare={tournee.materielPrepare}
+            verifie={tournee.materielVerifie}
+          />
         )}
 
         {tournee && (
