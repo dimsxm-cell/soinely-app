@@ -1,4 +1,5 @@
 import { FormulaireAvecRetour } from "@/components/ui/FormulaireAvecRetour";
+import { BadgeNiveauConfiance } from "@/components/ui/BadgeNiveauConfiance";
 import { updateMaterielAction } from "@/lib/data/materiel-actions";
 import type { MaterielItem } from "@/lib/data/materiel";
 
@@ -12,9 +13,12 @@ interface CarteMaterielProps {
 export function CarteMateriel({ items, tourneeId, prepare, verifie }: CarteMaterielProps) {
   return (
     <div className="mt-5 rounded-2xl border border-navy/[0.06] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,.04)]">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.07em] text-navy/45">
-        Matériel du jour
-      </p>
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.07em] text-navy/45">
+          Matériel du jour
+        </p>
+        <BadgeNiveauConfiance niveau="brouillon" />
+      </div>
       <ul className="mt-3 flex flex-col gap-1.5">
         {items.map((item) => (
           <li

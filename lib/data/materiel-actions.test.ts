@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const updateMock = vi.fn();
-const eqMock = vi.fn();
+const selectMock = vi.fn().mockResolvedValue({ data: [{ id: "t1" }], error: null });
+const eqMock = vi.fn().mockReturnValue({ select: selectMock });
+const updateMock = vi.fn().mockReturnValue({ eq: eqMock });
 const fromMock = vi.fn(() => ({ update: updateMock }));
 
 vi.mock("@/lib/supabase/server", () => ({
@@ -14,8 +15,9 @@ vi.mock("next/cache", () => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
+  selectMock.mockResolvedValue({ data: [{ id: "t1" }], error: null });
+  eqMock.mockReturnValue({ select: selectMock });
   updateMock.mockReturnValue({ eq: eqMock });
-  eqMock.mockResolvedValue({ error: null });
 });
 
 describe("updateMaterielAction", () => {
@@ -58,7 +60,7 @@ describe("updateMaterielAction", () => {
 
   it("signale un échec d'écriture", async () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
-    eqMock.mockResolvedValue({ error: { message: "boom" } });
+    eqMock.mockReturnValue({ select: vi.fn().mockResolvedValue({ error: { message: "boom" } }) });
 
     const { updateMaterielAction } = await import("./materiel-actions");
     const formData = new FormData();
@@ -69,5 +71,19 @@ describe("updateMaterielAction", () => {
 
     expect(resultat.succes).toBe(false);
     expect(resultat.erreur).toContain("boom");
+  });
+
+  it("signale si aucune ligne n'a été affectée par l'écriture", async () => {
+    selectMock.mockResolvedValue({ data: [], error: null });
+
+    const { updateMaterielAction } = await import("./materiel-actions");
+    const formData = new FormData();
+    formData.set("tourneeId", "inconnue");
+    formData.set("champ", "prepare");
+
+    const resultat = await updateMaterielAction(formData);
+
+    expect(resultat.succes).toBe(false);
+    expect(resultat.erreur).toBe("Tournée introuvable. Rien n'a été enregistré.");
   });
 });

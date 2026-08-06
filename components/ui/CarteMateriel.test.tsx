@@ -6,6 +6,10 @@ vi.mock("@/lib/data/materiel-actions", () => ({
   updateMaterielAction: vi.fn(),
 }));
 
+vi.mock("@/components/ui/BadgeNiveauConfiance", () => ({
+  BadgeNiveauConfiance: ({ niveau }: { niveau: string }) => <span>{niveau}</span>,
+}));
+
 const items = [
   { libelle: "Compresses stériles", quantite: 8 },
   { libelle: "Seringue", quantite: 2 },
@@ -35,5 +39,10 @@ describe("CarteMateriel", () => {
     render(<CarteMateriel items={items} tourneeId="t1" prepare={true} verifie={false} />);
     expect(screen.getByRole("button", { name: "✓ Préparé" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Tout vérifié" })).toBeInTheDocument();
+  });
+
+  it("affiche le badge de niveau de confiance 'brouillon'", () => {
+    render(<CarteMateriel items={items} tourneeId="t1" prepare={false} verifie={false} />);
+    expect(screen.getByText("brouillon")).toBeInTheDocument();
   });
 });

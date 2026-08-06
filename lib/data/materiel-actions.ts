@@ -24,14 +24,21 @@ export async function updateMaterielAction(formData: FormData): Promise<Resultat
     ? { materiel_prepare: true }
     : { materiel_verifie: true };
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("tournees")
     .update(updateData)
-    .eq("id", tourneeId);
+    .eq("id", tourneeId)
+    .select("id");
 
   if (error) {
     journaliserEchec("updateMaterielAction", error);
     return { succes: false, erreur: `Enregistrement impossible : ${error.message}` };
+  }
+
+  // Une écriture qui ne touche aucune ligne ne lève pas d'erreur : sans ce
+  // contrôle, un refus de la sécurité passerait pour un enregistrement.
+  if (!data || data.length === 0) {
+    return { succes: false, erreur: "Tournée introuvable. Rien n'a été enregistré." };
   }
 
   revalidatePath("/ma-journee");
