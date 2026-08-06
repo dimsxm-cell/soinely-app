@@ -23,3 +23,28 @@ jobs:
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test
+
+  verifie-migrations-supabase:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - name: Verifie que les migrations locales sont appliquees en production
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          npx supabase link --project-ref jeqrajpqbquewevjmond
+          RESULTAT=$(npx supabase migration list --linked --output-format json)
+          DESYNC=$(echo "$RESULTAT" | jq -r '[.migrations[] | select(.local != .remote)] | .[].local')
+          if [ -n "$DESYNC" ]; then
+            echo "::error::Migration(s) non appliquee(s) en production : $DESYNC"
+            echo "Voir docs/superpowers/specs/2026-08-05-migrations-deploiement-design.md pour la procedure de reparation (supabase migration repair)."
+            exit 1
+          fi
+          echo "Toutes les migrations sont synchronisees avec la production."
