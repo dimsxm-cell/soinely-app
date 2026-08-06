@@ -34,6 +34,8 @@ describe("getTourneeDuJour", () => {
                     nb_pansements: 8,
                     nb_glycemies: 6,
                     temps_estime_min: 435,
+                    materiel_prepare: false,
+                    materiel_verifie: false,
                   },
                   error: null,
                 }),
@@ -56,6 +58,8 @@ describe("getTourneeDuJour", () => {
       nbPansements: 8,
       nbGlycemies: 6,
       tempsEstimeMin: 435,
+      materielPrepare: false,
+      materielVerifie: false,
     });
   });
 
@@ -72,6 +76,8 @@ describe("getTourneeDuJour", () => {
           nb_pansements: 1,
           nb_glycemies: 0,
           temps_estime_min: 20,
+          materiel_prepare: true,
+          materiel_verifie: false,
         },
         error: null,
       });
@@ -103,6 +109,8 @@ describe("getTourneeDuJour", () => {
       nbPansements: 1,
       nbGlycemies: 0,
       tempsEstimeMin: 20,
+      materielPrepare: true,
+      materielVerifie: false,
     });
   });
 });

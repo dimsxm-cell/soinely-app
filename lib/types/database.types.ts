@@ -317,6 +317,41 @@ export type Database = {
         }
         Relationships: []
       }
+      materiel_ngap: {
+        Row: {
+          id: string
+          ngap_code_id: string
+          libelle: string
+          quantite: number
+          niveau_confiance: string
+          published: boolean
+        }
+        Insert: {
+          id?: string
+          ngap_code_id: string
+          libelle: string
+          quantite?: number
+          niveau_confiance?: string
+          published?: boolean
+        }
+        Update: {
+          id?: string
+          ngap_code_id?: string
+          libelle?: string
+          quantite?: number
+          niveau_confiance?: string
+          published?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "materiel_ngap_ngap_code_id_fkey"
+            columns: ["ngap_code_id"]
+            isOneToOne: false
+            referencedRelation: "ngap_codes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ngap_lettres_cles: {
         Row: {
           lettre_cle: string
@@ -610,6 +645,8 @@ export type Database = {
           date: string
           id: string
           idel_id: string
+          materiel_prepare: boolean
+          materiel_verifie: boolean
           nb_glycemies: number
           nb_injections: number
           nb_pansements: number
@@ -620,6 +657,8 @@ export type Database = {
           date?: string
           id?: string
           idel_id: string
+          materiel_prepare?: boolean
+          materiel_verifie?: boolean
           nb_glycemies?: number
           nb_injections?: number
           nb_pansements?: number
@@ -630,6 +669,8 @@ export type Database = {
           date?: string
           id?: string
           idel_id?: string
+          materiel_prepare?: boolean
+          materiel_verifie?: boolean
           nb_glycemies?: number
           nb_injections?: number
           nb_pansements?: number

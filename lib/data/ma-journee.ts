@@ -67,7 +67,9 @@ async function lireTourneeDuJour(
 ): Promise<Tournee | null> {
   const { data, error } = await supabase
     .from("tournees")
-    .select("id, date, nb_patients, nb_injections, nb_pansements, nb_glycemies, temps_estime_min")
+    .select(
+      "id, date, nb_patients, nb_injections, nb_pansements, nb_glycemies, temps_estime_min, materiel_prepare, materiel_verifie"
+    )
     .eq("idel_id", idelId)
     .eq("date", date)
     .maybeSingle();
@@ -85,6 +87,8 @@ async function lireTourneeDuJour(
     nbPansements: data.nb_pansements,
     nbGlycemies: data.nb_glycemies,
     tempsEstimeMin: data.temps_estime_min,
+    materielPrepare: data.materiel_prepare,
+    materielVerifie: data.materiel_verifie,
   };
 }
 

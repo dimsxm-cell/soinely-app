@@ -159,6 +159,8 @@ export interface Tournee {
   nbPansements: number;
   nbGlycemies: number;
   tempsEstimeMin: number;
+  materielPrepare: boolean;
+  materielVerifie: boolean;
 }
 
 export interface SituationTerrainDetail extends SituationTerrain {

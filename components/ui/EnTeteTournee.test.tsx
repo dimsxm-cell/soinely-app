@@ -17,6 +17,8 @@ const tournee: Tournee = {
   nbPansements: 2,
   nbGlycemies: 1,
   tempsEstimeMin: 240,
+  materielPrepare: false,
+  materielVerifie: false,
 };
 
 function creerMission(id: string, statut: StatutMission, heurePrevue: string): MissionTourneeVue {
