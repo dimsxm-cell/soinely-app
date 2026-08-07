@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { PersistanceRecherche } from "@/components/ui/PersistanceRecherche";
 import { Button } from "@/components/ui/Button";
 
@@ -10,10 +11,19 @@ interface FormulaireRechercheProps {
 
 export function FormulaireRecherche({ requeteInitiale }: FormulaireRechercheProps) {
   const [requete, setRequete] = useState(requeteInitiale);
+  const router = useRouter();
+  const pathname = usePathname();
 
   return (
     <>
-      <PersistanceRecherche cle="recherche_derniere_requete" requeteActuelle={requeteInitiale} onRestaurer={setRequete} />
+      <PersistanceRecherche
+        cle="recherche_derniere_requete"
+        requeteActuelle={requeteInitiale}
+        onRestaurer={(texte) => {
+          setRequete(texte);
+          router.replace(`${pathname}?q=${encodeURIComponent(texte)}`);
+        }}
+      />
       <form method="GET" className="flex gap-3">
         <input
           type="search"
