@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/types/database.types";
-import type { ReponseEly } from "@/lib/types/clinical";
+import type { ReponseEly, SituationTerrain } from "@/lib/types/clinical";
 import { searchSituationsTerrain } from "@/lib/data/recherche";
 import { getTourneeDuJour, getMissionsDuJour } from "@/lib/data/ma-journee";
 import { filtrerNomsPatients } from "@/lib/ely-redaction";
@@ -19,14 +19,18 @@ export async function obtenirReponseEly(
   question: string,
   idelId: string | null
 ): Promise<ReponseEly> {
-  const resultats = await searchSituationsTerrain(supabase, question);
-  const situationBrute = resultats[0] ?? null;
-
-  if (resultats.length === 0 || !idelId) {
-    return { situationBrute, situationsSources: [], synthese: null };
-  }
+  let situationBrute: SituationTerrain | null = null;
+  let resultatRechercheReussi = false;
 
   try {
+    const resultats = await searchSituationsTerrain(supabase, question);
+    resultatRechercheReussi = true;
+    situationBrute = resultats[0] ?? null;
+
+    if (resultats.length === 0 || !idelId) {
+      return { situationBrute, situationsSources: [], synthese: null };
+    }
+
     const tournee = await getTourneeDuJour(supabase, idelId);
     if (!tournee) return { situationBrute, situationsSources: [], synthese: null };
 
@@ -41,6 +45,10 @@ export async function obtenirReponseEly(
     return { situationBrute, situationsSources: synthese ? situationsSources : [], synthese };
   } catch (erreur) {
     journaliserEchec("obtenirReponseEly", erreur);
-    return { situationBrute, situationsSources: [], synthese: null };
+    // Si la recherche a échoué, repli complet (pas de situationBrute)
+    // Sinon, repli avec situationBrute qu'on a pu déterminer
+    return resultatRechercheReussi
+      ? { situationBrute, situationsSources: [], synthese: null }
+      : { situationBrute: null, situationsSources: [], synthese: null };
   }
 }

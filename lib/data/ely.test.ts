@@ -64,6 +64,18 @@ describe("obtenirReponseEly", () => {
     expect(synthetiserReponseElyMock).not.toHaveBeenCalled();
   });
 
+  it("se rabat complètement quand la recherche elle-même échoue", async () => {
+    const { obtenirReponseEly } = await import("./ely");
+    searchSituationsTerrainMock.mockRejectedValue(new Error("panne réseau"));
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const reponse = await obtenirReponseEly(supabase, "question", "idel-1");
+
+    expect(reponse).toEqual({ situationBrute: null, situationsSources: [], synthese: null });
+    expect(getTourneeDuJourMock).not.toHaveBeenCalled();
+    expect(synthetiserReponseElyMock).not.toHaveBeenCalled();
+  });
+
   it("ne synthétise pas sans infirmière identifiée", async () => {
     const { obtenirReponseEly } = await import("./ely");
     const s1 = situation();
@@ -73,6 +85,7 @@ describe("obtenirReponseEly", () => {
 
     expect(reponse).toEqual({ situationBrute: s1, situationsSources: [], synthese: null });
     expect(getTourneeDuJourMock).not.toHaveBeenCalled();
+    expect(synthetiserReponseElyMock).not.toHaveBeenCalled();
   });
 
   it("ne synthétise pas sans tournée du jour", async () => {
