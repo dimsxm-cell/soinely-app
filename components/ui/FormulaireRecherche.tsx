@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { PersistanceRecherche } from "@/components/ui/PersistanceRecherche";
 import { Button } from "@/components/ui/Button";
@@ -14,15 +14,20 @@ export function FormulaireRecherche({ requeteInitiale }: FormulaireRechercheProp
   const router = useRouter();
   const pathname = usePathname();
 
+  const restaurerEtRelancer = useCallback(
+    (texte: string) => {
+      setRequete(texte);
+      router.replace(`${pathname}?q=${encodeURIComponent(texte)}`);
+    },
+    [router, pathname]
+  );
+
   return (
     <>
       <PersistanceRecherche
         cle="recherche_derniere_requete"
         requeteActuelle={requeteInitiale}
-        onRestaurer={(texte) => {
-          setRequete(texte);
-          router.replace(`${pathname}?q=${encodeURIComponent(texte)}`);
-        }}
+        onRestaurer={restaurerEtRelancer}
       />
       <form method="GET" className="flex gap-3">
         <input
