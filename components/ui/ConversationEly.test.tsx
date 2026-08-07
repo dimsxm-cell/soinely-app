@@ -116,6 +116,25 @@ describe("ConversationEly — synthèse IA", () => {
     expect(screen.getByText("Validé")).toBeInTheDocument();
   });
 
+  it("n'affiche que les fiches sources citées dans fichesUtiliseesIds, pas les autres fiches sources", async () => {
+    const { ConversationEly } = await import("./ConversationEly");
+    const fichecitee = situation({ id: "s1", titre: "Hypoglycémie" });
+    const ficheNonCitee = situation({ id: "s2", titre: "Malaise vagal" });
+    render(
+      <ConversationEly
+        requeteInitiale="que faire en cas d'hypoglycémie"
+        reponseInitiale={{
+          situationBrute: fichecitee,
+          situationsSources: [fichecitee, ficheNonCitee],
+          synthese: synthese({ fichesUtiliseesIds: ["s1"] }),
+        }}
+      />
+    );
+
+    expect(screen.getByText("Hypoglycémie")).toBeInTheDocument();
+    expect(screen.queryByText("Malaise vagal")).not.toBeInTheDocument();
+  });
+
   it("n'affiche pas le badge Synthèse IA en l'absence de synthèse", async () => {
     const { ConversationEly } = await import("./ConversationEly");
     render(

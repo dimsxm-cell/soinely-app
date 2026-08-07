@@ -30,7 +30,11 @@ const MESSAGE_AUCUN_RESULTAT = "Je n'ai pas trouvé de réponse à cette questio
 
 function texteAVoixHaute(reponse: ReponseEly): string {
   if (reponse.synthese) {
-    return [reponse.synthese.situationComprise, ...reponse.synthese.actionsRetenues].join(". ");
+    return [
+      reponse.synthese.situationComprise,
+      ...reponse.synthese.actionsRetenues,
+      ...reponse.synthese.signesAlerteRetenus,
+    ].join(". ");
   }
   if (reponse.situationBrute) {
     return [
