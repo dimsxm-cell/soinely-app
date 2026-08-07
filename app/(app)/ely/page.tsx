@@ -1,5 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
-import { searchSituationsTerrain } from "@/lib/data/recherche";
+import { createClient, getUtilisateurConnecte } from "@/lib/supabase/server";
+import { obtenirReponseEly } from "@/lib/data/ely";
 import { ConversationEly } from "@/components/ui/ConversationEly";
 import { PersistanceRecherche } from "@/components/ui/PersistanceRecherche";
 
@@ -12,8 +12,10 @@ export default async function ElyPage({
   const query = q ?? "";
 
   const supabase = await createClient();
-  const results = query.trim() ? await searchSituationsTerrain(supabase, query) : [];
-  const situationInitiale = results[0] ?? null;
+  const user = await getUtilisateurConnecte();
+  const reponseInitiale = query.trim()
+    ? await obtenirReponseEly(supabase, query, user?.id ?? null)
+    : { situationBrute: null, situationsSources: [], synthese: null };
 
   return (
     <main className="min-h-screen bg-[#F6F7F5] text-navy">
@@ -21,7 +23,7 @@ export default async function ElyPage({
       <div className="mx-auto flex max-w-2xl flex-col px-6 py-6 sm:py-8">
         <ConversationEly
           requeteInitiale={query}
-          situationInitiale={situationInitiale}
+          reponseInitiale={reponseInitiale}
           patientContexte={patient ?? null}
           soinContexte={soin ?? null}
         />

@@ -1,11 +1,11 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
-import { searchSituationsTerrain } from "@/lib/data/recherche";
-import type { SituationTerrain } from "@/lib/types/clinical";
+import { createClient, getUtilisateurConnecte } from "@/lib/supabase/server";
+import { obtenirReponseEly } from "@/lib/data/ely";
+import type { ReponseEly } from "@/lib/types/clinical";
 
-export async function poserQuestionElyAction(question: string): Promise<SituationTerrain | null> {
+export async function poserQuestionElyAction(question: string): Promise<ReponseEly> {
   const supabase = await createClient();
-  const resultats = await searchSituationsTerrain(supabase, question);
-  return resultats[0] ?? null;
+  const user = await getUtilisateurConnecte();
+  return obtenirReponseEly(supabase, question, user?.id ?? null);
 }

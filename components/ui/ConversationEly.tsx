@@ -4,10 +4,11 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import type { SituationTerrain } from "@/lib/types/clinical";
+import type { ReponseEly } from "@/lib/types/clinical";
 import { poserQuestionElyAction } from "@/lib/data/ely-actions";
 import { IconeMicro } from "@/components/ui/IconeMicro";
 import { BadgeNiveauConfiance } from "@/components/ui/BadgeNiveauConfiance";
+import { BadgeSyntheseIA } from "@/components/ui/BadgeSyntheseIA";
 import { LectureVocaleReponse } from "@/components/ui/LectureVocaleReponse";
 import {
   creerReconnaissanceVocale,
@@ -27,9 +28,18 @@ const SUGGESTIONS = [
 
 const MESSAGE_AUCUN_RESULTAT = "Je n'ai pas trouvé de réponse à cette question. Essayez de la reformuler.";
 
-function texteAVoixHaute(situation: SituationTerrain | null): string {
-  if (!situation) return MESSAGE_AUCUN_RESULTAT;
-  return [situation.titre, situation.observation, ...situation.conduiteATenir.slice(0, 3)].join(". ");
+function texteAVoixHaute(reponse: ReponseEly): string {
+  if (reponse.synthese) {
+    return [reponse.synthese.situationComprise, ...reponse.synthese.actionsRetenues].join(". ");
+  }
+  if (reponse.situationBrute) {
+    return [
+      reponse.situationBrute.titre,
+      reponse.situationBrute.observation,
+      ...reponse.situationBrute.conduiteATenir.slice(0, 3),
+    ].join(". ");
+  }
+  return MESSAGE_AUCUN_RESULTAT;
 }
 
 interface MessageUtilisateur {
@@ -40,20 +50,20 @@ interface MessageUtilisateur {
 interface MessageEly {
   id: number;
   role: "ely";
-  situation: SituationTerrain | null;
+  reponse: ReponseEly;
 }
 type Message = MessageUtilisateur | MessageEly;
 
 interface ConversationElyProps {
   requeteInitiale: string;
-  situationInitiale: SituationTerrain | null;
+  reponseInitiale: ReponseEly;
   patientContexte?: string | null;
   soinContexte?: string | null;
 }
 
 export function ConversationEly({
   requeteInitiale,
-  situationInitiale,
+  reponseInitiale,
   patientContexte,
   soinContexte,
 }: ConversationElyProps) {
@@ -82,10 +92,10 @@ export function ConversationEly({
     setMessages((m) => [
       ...m,
       { id: idUser, role: "utilisateur", texte: requeteInitiale },
-      { id: idEly, role: "ely", situation: situationInitiale },
+      { id: idEly, role: "ely", reponse: reponseInitiale },
     ]);
     setDerniereReponseId(idEly);
-  }, [requeteInitiale, situationInitiale]);
+  }, [requeteInitiale, reponseInitiale]);
 
   useEffect(() => {
     ancreScroll.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -97,9 +107,9 @@ export function ConversationEly({
     setMessages((m) => [...m, { id: idSuivant(), role: "utilisateur", texte: q }]);
     setBrouillon("");
     setEnChargement(true);
-    const situation = await poserQuestionElyAction(q);
+    const reponse = await poserQuestionElyAction(q);
     const idEly = idSuivant();
-    setMessages((m) => [...m, { id: idEly, role: "ely", situation }]);
+    setMessages((m) => [...m, { id: idEly, role: "ely", reponse }]);
     setEnChargement(false);
     setDerniereReponseId(idEly);
   }
@@ -175,6 +185,10 @@ export function ConversationEly({
         )}
       </div>
 
+      <p className="mt-2 text-[12px] leading-relaxed text-navy/40">
+        Ely vous aide à analyser la situation ; la décision et la responsabilité restent à vous.
+      </p>
+
       {patientContexte && (
         <p className="mt-3 text-[13px] font-semibold text-navy/55">
           Pour {patientContexte}
@@ -238,16 +252,111 @@ export function ConversationEly({
                     />
                   </span>
                   <div className="max-w-[80%] rounded-[18px] rounded-bl-[5px] border border-navy/[0.06] bg-white px-4 py-3.5 shadow-[0_1px_2px_rgba(15,23,42,.04)]">
-                    {message.situation ? (
+                    {message.reponse.synthese ? (
                       <>
                         <div className="flex flex-wrap items-center gap-2">
-                          <BadgeNiveauConfiance niveau={message.situation.niveauConfiance} />
+                          <BadgeSyntheseIA />
                         </div>
-                        <p className="mt-1.5 text-[14.5px] font-bold tracking-tight text-brand-violet">{message.situation.titre}</p>
-                        <p className="mt-1.5 text-[15px] leading-relaxed text-navy/85">{message.situation.observation}</p>
-                        {message.situation.conduiteATenir.length > 0 && (
+                        <p className="mt-1.5 text-[15px] leading-relaxed text-navy/85">
+                          {message.reponse.synthese.situationComprise}
+                        </p>
+                        {message.reponse.synthese.informationsManquantes.length > 0 && (
+                          <div className="mt-2.5">
+                            <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-navy/45">
+                              À préciser
+                            </p>
+                            <ul className="mt-1 flex flex-col gap-1">
+                              {message.reponse.synthese.informationsManquantes.map((info) => (
+                                <li key={info} className="text-[14px] leading-relaxed text-navy/75">
+                                  {info}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {message.reponse.synthese.controlesRetenus.length > 0 && (
+                          <div className="mt-2.5">
+                            <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-navy/45">
+                              Contrôles
+                            </p>
+                            <ul className="mt-1 flex flex-col gap-1.5">
+                              {message.reponse.synthese.controlesRetenus.map((item) => (
+                                <li key={item} className="flex items-start gap-2 text-[14px] leading-relaxed text-navy/75">
+                                  <span aria-hidden="true" className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-brand-violet/50" />
+                                  {item}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {message.reponse.synthese.actionsRetenues.length > 0 && (
+                          <div className="mt-2.5">
+                            <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-navy/45">
+                              Actions
+                            </p>
+                            <ul className="mt-1 flex flex-col gap-1.5">
+                              {message.reponse.synthese.actionsRetenues.map((item) => (
+                                <li key={item} className="flex items-start gap-2 text-[14px] leading-relaxed text-navy/75">
+                                  <span aria-hidden="true" className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-brand-violet/50" />
+                                  {item}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {message.reponse.synthese.signesAlerteRetenus.length > 0 && (
+                          <div className="mt-2.5">
+                            <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-navy/45">
+                              Signes d&apos;alerte
+                            </p>
+                            <ul className="mt-1 flex flex-col gap-1.5">
+                              {message.reponse.synthese.signesAlerteRetenus.map((item) => (
+                                <li key={item} className="text-[14px] leading-relaxed text-danger">
+                                  {item}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {message.reponse.situationsSources
+                          .filter((s) => message.reponse.synthese!.fichesUtiliseesIds.includes(s.id))
+                          .length > 0 && (
+                          <div className="mt-3 flex flex-col gap-1.5 border-t border-navy/[0.06] pt-2.5">
+                            {message.reponse.situationsSources
+                              .filter((s) => message.reponse.synthese!.fichesUtiliseesIds.includes(s.id))
+                              .map((source) => (
+                                <div key={source.id} className="flex items-center justify-between gap-2">
+                                  <Link
+                                    href={`/situations/${source.id}`}
+                                    className="text-[13px] font-semibold text-brand-violet"
+                                  >
+                                    {source.titre}
+                                  </Link>
+                                  <BadgeNiveauConfiance niveau={source.niveauConfiance} />
+                                </div>
+                              ))}
+                          </div>
+                        )}
+                        {message.id === derniereReponseId && (
+                          <div className="mt-2.5">
+                            <LectureVocaleReponse key={message.id} texte={texteAVoixHaute(message.reponse)} />
+                          </div>
+                        )}
+                      </>
+                    ) : message.reponse.situationBrute ? (
+                      <>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <BadgeNiveauConfiance niveau={message.reponse.situationBrute.niveauConfiance} />
+                        </div>
+                        <p className="mt-1.5 text-[14.5px] font-bold tracking-tight text-brand-violet">
+                          {message.reponse.situationBrute.titre}
+                        </p>
+                        <p className="mt-1.5 text-[15px] leading-relaxed text-navy/85">
+                          {message.reponse.situationBrute.observation}
+                        </p>
+                        {message.reponse.situationBrute.conduiteATenir.length > 0 && (
                           <ul className="mt-2.5 flex flex-col gap-1.5">
-                            {message.situation.conduiteATenir.slice(0, 3).map((etape) => (
+                            {message.reponse.situationBrute.conduiteATenir.slice(0, 3).map((etape) => (
                               <li key={etape} className="flex items-start gap-2 text-[14px] leading-relaxed text-navy/75">
                                 <span aria-hidden="true" className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-brand-violet/50" />
                                 {etape}
@@ -256,7 +365,7 @@ export function ConversationEly({
                           </ul>
                         )}
                         <Link
-                          href={`/situations/${message.situation.id}`}
+                          href={`/situations/${message.reponse.situationBrute.id}`}
                           className="mt-3 inline-flex items-center gap-1 text-[13px] font-semibold text-brand-violet"
                         >
                           Voir la fiche complète
@@ -266,7 +375,7 @@ export function ConversationEly({
                         </Link>
                         {message.id === derniereReponseId && (
                           <div className="mt-2.5">
-                            <LectureVocaleReponse key={message.id} texte={texteAVoixHaute(message.situation)} />
+                            <LectureVocaleReponse key={message.id} texte={texteAVoixHaute(message.reponse)} />
                           </div>
                         )}
                       </>
