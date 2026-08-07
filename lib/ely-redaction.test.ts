@@ -62,4 +62,16 @@ describe("filtrerNomsPatients", () => {
       "Le fils de [patient] pleure"
     );
   });
+
+  it("redacte un mot composé dont une seule partie correspond à un nom connu (nom d'usage marital)", () => {
+    expect(filtrerNomsPatients("Madame Dupont-Legrand a une plaie", ["Jean Dupont"])).toBe(
+      "Madame [patient] a une plaie"
+    );
+  });
+
+  it("reconnaît l'apostrophe typographique (’) dans le nom du patient et dans la question", () => {
+    expect(filtrerNomsPatients("Le fils de O’Brien pleure", ["O’Brien Marie"])).toBe(
+      "Le fils de [patient] pleure"
+    );
+  });
 });

@@ -33,7 +33,6 @@ const OUTIL_STRUCTURATION = {
       controlesRetenus: { type: "array", items: { type: "string" } },
       signesAlerteRetenus: { type: "array", items: { type: "string" } },
       actionsRetenues: { type: "array", items: { type: "string" } },
-      fichesUtiliseesIds: { type: "array", items: { type: "string" } },
     },
     required: [
       "situationComprise",
@@ -41,7 +40,6 @@ const OUTIL_STRUCTURATION = {
       "controlesRetenus",
       "signesAlerteRetenus",
       "actionsRetenues",
-      "fichesUtiliseesIds",
     ],
   },
 } as const;
@@ -114,7 +112,6 @@ export async function synthetiserReponseEly(
       return null;
     }
 
-    const idsValides = new Set(situations.map((s) => s.id));
     const controlesSource = situations.flatMap((s) => s.verifications);
     const signesSource = situations.map((s) => s.quandAvisMedical);
     const actionsSource = situations.flatMap((s) => s.conduiteATenir);
@@ -127,9 +124,19 @@ export async function synthetiserReponseEly(
       return null;
     }
 
-    const fichesUtiliseesIds = Array.isArray(brut.fichesUtiliseesIds)
-      ? brut.fichesUtiliseesIds.filter((id): id is string => typeof id === "string" && idsValides.has(id))
-      : [];
+    // fichesUtiliseesIds est déduit ici, pas déclaré par le LLM : une fiche
+    // n'est "utilisée" — et n'affiche son badge de confiance — que si un de
+    // ses éléments a réellement été retenu ci-dessus, mot pour mot. Faire
+    // confiance à un id renvoyé par le LLM permettrait d'attribuer à une
+    // fiche "validé" un contenu en réalité tiré d'une fiche "brouillon".
+    const fichesUtiliseesIds = situations
+      .filter(
+        (s) =>
+          s.verifications.some((v) => controlesRetenus.includes(v)) ||
+          signesAlerteRetenus.includes(s.quandAvisMedical) ||
+          s.conduiteATenir.some((a) => actionsRetenues.includes(a))
+      )
+      .map((s) => s.id);
     const informationsManquantes = Array.isArray(brut.informationsManquantes)
       ? brut.informationsManquantes.filter((v): v is string => typeof v === "string")
       : [];

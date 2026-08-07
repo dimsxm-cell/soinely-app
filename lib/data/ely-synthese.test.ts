@@ -58,7 +58,6 @@ describe("synthetiserReponseEly", () => {
         controlesRetenus: ["Vérifier la fièvre"],
         signesAlerteRetenus: ["Si fièvre ou extension de la rougeur."],
         actionsRetenues: ["Nettoyer la plaie"],
-        fichesUtiliseesIds: ["s1"],
       })
     );
 
@@ -83,7 +82,6 @@ describe("synthetiserReponseEly", () => {
         controlesRetenus: ["Vérifier la fièvre", "Contrôle inventé qui n'existe dans aucune fiche"],
         signesAlerteRetenus: [],
         actionsRetenues: ["Nettoyer la plaie"],
-        fichesUtiliseesIds: ["s1"],
       })
     );
 
@@ -92,8 +90,52 @@ describe("synthetiserReponseEly", () => {
     expect(synthese?.controlesRetenus).toEqual(["Vérifier la fièvre"]);
   });
 
-  it("supprime les ids de fiches qui n'ont pas été envoyées au LLM", async () => {
+  it("calcule fichesUtiliseesIds à partir du contenu réellement retenu, pas de ce que renvoie le LLM", async () => {
     vi.stubEnv("ANTHROPIC_API_KEY", "cle-de-test");
+    const ficheA = situation({
+      id: "A",
+      verifications: ["Vérifier la fièvre"],
+      quandAvisMedical: "Si fièvre ou extension de la rougeur.",
+      conduiteATenir: ["Nettoyer la plaie"],
+      niveauConfiance: "valide",
+    });
+    const ficheB = situation({
+      id: "B",
+      titre: "Autre fiche",
+      verifications: ["Vérifier la tension"],
+      quandAvisMedical: "Si tension basse.",
+      conduiteATenir: ["Allonger le patient"],
+      niveauConfiance: "brouillon",
+    });
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      reponseOutil({
+        situationComprise: "Résumé.",
+        informationsManquantes: [],
+        // Le contenu retenu vient réellement de la fiche B (brouillon), mais
+        // le LLM prétend (à tort, ou sans qu'on lui demande) que c'est la
+        // fiche A (validée) qui a servi. On ne doit pas le croire.
+        controlesRetenus: ["Vérifier la tension"],
+        signesAlerteRetenus: [],
+        actionsRetenues: [],
+        fichesUtiliseesIds: ["A"],
+      })
+    );
+
+    const synthese = await synthetiserReponseEly("une question", [ficheA, ficheB]);
+
+    expect(synthese?.fichesUtiliseesIds).toEqual(["B"]);
+  });
+
+  it("exclut de fichesUtiliseesIds une fiche envoyée au LLM dont aucun contenu n'a été retenu", async () => {
+    vi.stubEnv("ANTHROPIC_API_KEY", "cle-de-test");
+    const ficheUtile = situation({ id: "s1" });
+    const ficheIgnoree = situation({
+      id: "s2",
+      titre: "Fiche non pertinente",
+      verifications: ["Vérifier la tension"],
+      quandAvisMedical: "Si tension basse.",
+      conduiteATenir: ["Allonger le patient"],
+    });
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       reponseOutil({
         situationComprise: "Résumé.",
@@ -101,11 +143,10 @@ describe("synthetiserReponseEly", () => {
         controlesRetenus: ["Vérifier la fièvre"],
         signesAlerteRetenus: [],
         actionsRetenues: [],
-        fichesUtiliseesIds: ["s1", "id-jamais-envoye"],
       })
     );
 
-    const synthese = await synthetiserReponseEly("une question", [situation({ id: "s1" })]);
+    const synthese = await synthetiserReponseEly("une question", [ficheUtile, ficheIgnoree]);
 
     expect(synthese?.fichesUtiliseesIds).toEqual(["s1"]);
   });
@@ -119,7 +160,6 @@ describe("synthetiserReponseEly", () => {
         controlesRetenus: ["Contrôle inventé"],
         signesAlerteRetenus: ["Signe inventé"],
         actionsRetenues: ["Action inventée"],
-        fichesUtiliseesIds: ["s1"],
       })
     );
 
