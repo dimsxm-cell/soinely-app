@@ -44,4 +44,22 @@ describe("filtrerNomsPatients", () => {
   it("renvoie la question inchangée sans patient dans la liste", () => {
     expect(filtrerNomsPatients("Une plaie qui s'infecte", [])).toBe("Une plaie qui s'infecte");
   });
+
+  it("filtre les prénoms composés avec trait d'union (Marie-Claude)", () => {
+    expect(filtrerNomsPatients("Marie-Claude a mal au dos", ["Marie-Claude Dubois"])).toBe(
+      "[patient] a mal au dos"
+    );
+  });
+
+  it("filtre les prénoms composés avec trait d'union (Jean-Baptiste)", () => {
+    expect(filtrerNomsPatients("Jean-Baptiste tousse", ["Jean-Baptiste Roy"])).toBe(
+      "[patient] tousse"
+    );
+  });
+
+  it("filtre les noms avec apostrophe (O'Brien)", () => {
+    expect(filtrerNomsPatients("Le fils de O'Brien pleure", ["O'Brien Marie"])).toBe(
+      "Le fils de [patient] pleure"
+    );
+  });
 });

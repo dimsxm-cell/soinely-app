@@ -14,12 +14,21 @@ function normaliser(texte: string): string {
 export function filtrerNomsPatients(question: string, nomsPatients: string[]): string {
   const tokens = new Set(
     nomsPatients
-      .flatMap((nom) => nom.split(/\s+/))
+      .flatMap((nom) => nom.split(/[\s\-']+/))
       .map(normaliser)
       .filter((token) => token.length >= 2)
   );
 
   if (tokens.size === 0) return question;
 
-  return question.replace(/\p{L}+/gu, (mot) => (tokens.has(normaliser(mot)) ? "[patient]" : mot));
+  return question.replace(/[\p{L}\-']+/gu, (mot) => {
+    const parties = mot.split(/[\-']+/)
+      .map(normaliser)
+      .filter((p) => p.length >= 2);
+
+    if (parties.length > 0 && parties.every((p) => tokens.has(p))) {
+      return "[patient]";
+    }
+    return mot;
+  });
 }
