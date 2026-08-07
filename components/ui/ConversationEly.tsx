@@ -10,6 +10,7 @@ import { IconeMicro } from "@/components/ui/IconeMicro";
 import { BadgeNiveauConfiance } from "@/components/ui/BadgeNiveauConfiance";
 import { BadgeSyntheseIA } from "@/components/ui/BadgeSyntheseIA";
 import { LectureVocaleReponse } from "@/components/ui/LectureVocaleReponse";
+import { PersistanceRecherche } from "@/components/ui/PersistanceRecherche";
 import {
   creerReconnaissanceVocale,
   lireSupportVocalClient,
@@ -155,6 +156,9 @@ export function ConversationEly({
 
   return (
     <div className="flex flex-col">
+      {!patientContexte && (
+        <PersistanceRecherche cle="ely_derniere_requete" requeteActuelle={requeteInitiale} onRestaurer={setBrouillon} />
+      )}
       <div className="flex items-center justify-between border-b border-navy/10 pb-4">
         <div className="flex items-center gap-2.5">
           <span className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white ring-2 ring-brand-violet/70">

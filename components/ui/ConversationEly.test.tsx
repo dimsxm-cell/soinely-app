@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ReponseEly, SituationTerrain, SyntheseEly } from "@/lib/types/clinical";
 
 vi.mock("next/navigation", () => ({
@@ -186,5 +186,62 @@ describe("ConversationEly — contexte de mission", () => {
     render(<ConversationEly requeteInitiale="" reponseInitiale={reponseBrute(null)} />);
 
     expect(screen.queryByText(/^Pour /)).not.toBeInTheDocument();
+  });
+});
+
+describe("ConversationEly — restauration de la dernière recherche", () => {
+  const mockLocalStorage = {
+    store: {} as Record<string, string>,
+    getItem: (key: string) => mockLocalStorage.store[key] ?? null,
+    setItem: (key: string, value: string) => {
+      mockLocalStorage.store[key] = value;
+    },
+    clear: () => {
+      mockLocalStorage.store = {};
+    },
+    removeItem: (key: string) => {
+      delete mockLocalStorage.store[key];
+    },
+    key: (index: number) => {
+      const keys = Object.keys(mockLocalStorage.store);
+      return keys[index] ?? null;
+    },
+    get length() {
+      return Object.keys(mockLocalStorage.store).length;
+    },
+  };
+
+  vi.stubGlobal("localStorage", mockLocalStorage);
+
+  beforeEach(() => {
+    mockLocalStorage.clear();
+  });
+
+  afterEach(() => {
+    mockLocalStorage.clear();
+  });
+
+  it("restaure la dernière question dans le champ de saisie quand patientContexte est absent, sans relancer de recherche", async () => {
+    mockLocalStorage.setItem("ely_derniere_requete", "plaie infectée");
+
+    const { ConversationEly } = await import("./ConversationEly");
+    render(<ConversationEly requeteInitiale="" reponseInitiale={reponseBrute(null)} />);
+
+    expect(screen.getByLabelText("Poser une question à Ely")).toHaveValue("plaie infectée");
+  });
+
+  it("ne restaure pas la dernière question quand patientContexte est présent (lien profond patient-spécifique)", async () => {
+    mockLocalStorage.setItem("ely_derniere_requete", "plaie infectée");
+
+    const { ConversationEly } = await import("./ConversationEly");
+    render(
+      <ConversationEly
+        requeteInitiale=""
+        reponseInitiale={reponseBrute(null)}
+        patientContexte="Marie Dupont"
+      />
+    );
+
+    expect(screen.getByLabelText("Poser une question à Ely")).toHaveValue("");
   });
 });

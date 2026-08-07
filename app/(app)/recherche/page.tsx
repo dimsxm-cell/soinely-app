@@ -2,8 +2,7 @@ import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { searchSituationsTerrain } from "@/lib/data/recherche";
 import { CarteSituationTerrain } from "@/components/ui/CarteSituationTerrain";
-import { Button } from "@/components/ui/Button";
-import { PersistanceRecherche } from "@/components/ui/PersistanceRecherche";
+import { FormulaireRecherche } from "@/components/ui/FormulaireRecherche";
 
 export default async function RecherchePage({
   searchParams,
@@ -19,21 +18,9 @@ export default async function RecherchePage({
   return (
     <main className="min-h-screen bg-[#F6F7F5] text-navy">
       <div className="mx-auto flex max-w-2xl flex-col gap-6 px-6 py-10 sm:py-14">
-        <PersistanceRecherche cle="recherche_derniere_requete" requeteActuelle={query} />
-
         <h1 className="font-display text-[28px] font-medium leading-tight sm:text-[32px]">Recherche</h1>
 
-        <form method="GET" className="flex gap-3">
-          <input
-            type="search"
-            name="q"
-            defaultValue={query}
-            placeholder="Ex. : la perfusion ne passe plus"
-            aria-label="Rechercher une situation terrain"
-            className="min-h-[44px] flex-1 rounded-card border border-navy/20 bg-white px-4 py-2 text-navy"
-          />
-          <Button type="submit">Rechercher</Button>
-        </form>
+        <FormulaireRecherche requeteInitiale={query} />
 
         {query.trim() && results.length === 0 && (
           <div className="flex items-center gap-4">

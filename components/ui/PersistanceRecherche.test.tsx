@@ -1,7 +1,6 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
-// Mock localStorage
 const mockLocalStorage = {
   store: {} as Record<string, string>,
   getItem: (key: string) => mockLocalStorage.store[key] ?? null,
@@ -25,57 +24,46 @@ const mockLocalStorage = {
 
 vi.stubGlobal("localStorage", mockLocalStorage);
 
-// Track mock calls
-let mockReplaceCall: string | null = null;
-
-vi.mock("next/navigation", () => ({
-  useRouter: () => ({
-    push: vi.fn(),
-    replace: (path: string) => {
-      mockReplaceCall = path;
-    },
-  }),
-  usePathname: () => "/ely",
-}));
-
 describe("PersistanceRecherche", () => {
   beforeEach(() => {
     mockLocalStorage.clear();
-    mockReplaceCall = null;
     vi.clearAllMocks();
   });
 
   afterEach(() => {
     mockLocalStorage.clear();
-    mockReplaceCall = null;
   });
 
-  it("restaure la dernière recherche depuis localStorage quand requeteActuelle est vide", async () => {
+  it("restaure la dernière recherche depuis localStorage quand requeteActuelle est vide, sans naviguer", async () => {
     mockLocalStorage.setItem("ely_derniere_requete", "plaie infectée");
+    const onRestaurer = vi.fn();
 
     const { PersistanceRecherche } = await import("./PersistanceRecherche");
     render(
-      <PersistanceRecherche cle="ely_derniere_requete" requeteActuelle="" />
+      <PersistanceRecherche cle="ely_derniere_requete" requeteActuelle="" onRestaurer={onRestaurer} />
     );
 
-    expect(mockReplaceCall).toBe("/ely?q=plaie%20infect%C3%A9e");
+    expect(onRestaurer).toHaveBeenCalledWith("plaie infectée");
   });
 
   it("sauvegarde la requete actuelle dans localStorage quand elle n'est pas vide", async () => {
+    const onRestaurer = vi.fn();
     const { PersistanceRecherche } = await import("./PersistanceRecherche");
     render(
-      <PersistanceRecherche cle="ely_derniere_requete" requeteActuelle="hypoglycémie" />
+      <PersistanceRecherche cle="ely_derniere_requete" requeteActuelle="hypoglycémie" onRestaurer={onRestaurer} />
     );
 
     expect(mockLocalStorage.getItem("ely_derniere_requete")).toBe("hypoglycémie");
+    expect(onRestaurer).not.toHaveBeenCalled();
   });
 
   it("ne restaure pas quand localStorage est vide et requeteActuelle est vide", async () => {
+    const onRestaurer = vi.fn();
     const { PersistanceRecherche } = await import("./PersistanceRecherche");
     render(
-      <PersistanceRecherche cle="ely_derniere_requete" requeteActuelle="" />
+      <PersistanceRecherche cle="ely_derniere_requete" requeteActuelle="" onRestaurer={onRestaurer} />
     );
 
-    expect(mockReplaceCall).toBeNull();
+    expect(onRestaurer).not.toHaveBeenCalled();
   });
 });

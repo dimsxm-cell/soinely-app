@@ -1,7 +1,6 @@
 import { createClient, getUtilisateurConnecte } from "@/lib/supabase/server";
 import { obtenirReponseEly } from "@/lib/data/ely";
 import { ConversationEly } from "@/components/ui/ConversationEly";
-import { PersistanceRecherche } from "@/components/ui/PersistanceRecherche";
 
 export default async function ElyPage({
   searchParams,
@@ -19,7 +18,6 @@ export default async function ElyPage({
 
   return (
     <main className="min-h-screen bg-[#F6F7F5] text-navy">
-      {!patient && <PersistanceRecherche cle="ely_derniere_requete" requeteActuelle={query} />}
       <div className="mx-auto flex max-w-2xl flex-col px-6 py-6 sm:py-8">
         <ConversationEly
           requeteInitiale={query}

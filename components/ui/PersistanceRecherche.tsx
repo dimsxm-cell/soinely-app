@@ -1,17 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
 
 interface PersistanceRechercheProps {
   cle: string;
   requeteActuelle: string;
+  onRestaurer: (texte: string) => void;
 }
 
-export function PersistanceRecherche({ cle, requeteActuelle }: PersistanceRechercheProps) {
-  const router = useRouter();
-  const pathname = usePathname();
-
+export function PersistanceRecherche({ cle, requeteActuelle, onRestaurer }: PersistanceRechercheProps) {
   useEffect(() => {
     if (requeteActuelle) {
       window.localStorage.setItem(cle, requeteActuelle);
@@ -20,9 +17,9 @@ export function PersistanceRecherche({ cle, requeteActuelle }: PersistanceRecher
 
     const derniereRequete = window.localStorage.getItem(cle);
     if (derniereRequete) {
-      router.replace(`${pathname}?q=${encodeURIComponent(derniereRequete)}`);
+      onRestaurer(derniereRequete);
     }
-  }, [cle, requeteActuelle, pathname, router]);
+  }, [cle, requeteActuelle, onRestaurer]);
 
   return null;
 }
