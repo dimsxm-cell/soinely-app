@@ -196,3 +196,18 @@ export interface FicheDossierSoin {
   version: number;
   published: boolean;
 }
+
+export interface SyntheseEly {
+  situationComprise: string;
+  informationsManquantes: string[];
+  controlesRetenus: string[];
+  signesAlerteRetenus: string[];
+  actionsRetenues: string[];
+  fichesUtiliseesIds: string[];
+}
+
+export interface ReponseEly {
+  situationBrute: SituationTerrain | null;
+  situationsSources: SituationTerrain[];
+  synthese: SyntheseEly | null;
+}
