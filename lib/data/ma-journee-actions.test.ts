@@ -47,13 +47,32 @@ describe("updateMissionStatutAction", () => {
     await updateMissionStatutAction(formData);
 
     expect(fromMock).toHaveBeenCalledWith("missions_du_jour");
-    expect(updateMock).toHaveBeenCalledWith({ statut: "en_cours" });
+    expect(updateMock).toHaveBeenCalledWith({
+      statut: "en_cours",
+      heure_debut_reelle: expect.any(String),
+    });
     expect(eqUpdateMock).toHaveBeenCalledWith("id", "m1");
     // Le garde-fou porte sur le statut lu avant l'écriture : ferme la fenêtre
     // entre la lecture et la mise à jour.
     expect(eqUpdateMock2).toHaveBeenCalledWith("statut", "a_faire");
     expect(revalidatePath).toHaveBeenCalledWith("/ma-journee");
     expect(revalidatePath).toHaveBeenCalledWith("/ma-journee/m1");
+  });
+
+  it("ne pose pas heure_debut_reelle pour une transition qui n'est pas vers en_cours", async () => {
+    eqSelectMock.mockResolvedValue({ data: { statut: "en_cours" }, error: null });
+    eqUpdateMock.mockReturnValue({ eq: eqUpdateMock2 });
+    eqUpdateMock2.mockResolvedValue({ error: null });
+
+    const { updateMissionStatutAction } = await import("./ma-journee-actions");
+
+    const formData = new FormData();
+    formData.set("missionId", "m1");
+    formData.set("nouveauStatut", "terminee");
+
+    await updateMissionStatutAction(formData);
+
+    expect(updateMock).toHaveBeenCalledWith({ statut: "terminee" });
   });
 
   it("applique la transition a_faire vers absent et invalide le cache", async () => {

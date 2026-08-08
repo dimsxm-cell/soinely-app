@@ -46,7 +46,9 @@ export async function updateMissionStatutAction(formData: FormData): Promise<Res
   const misAJour =
     nouveauStatut === "a_faire"
       ? { statut: nouveauStatut, motif_absence: null }
-      : { statut: nouveauStatut };
+      : nouveauStatut === "en_cours"
+        ? { statut: nouveauStatut, heure_debut_reelle: new Date().toISOString() }
+        : { statut: nouveauStatut };
 
   // Le filtre sur le statut lu referme la fenêtre entre la lecture et
   // l'écriture : si une autre requête a fait bouger le statut entre-temps,
