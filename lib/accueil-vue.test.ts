@@ -114,8 +114,8 @@ describe("conseilEly", () => {
     expect(conseilEly(missions)).toBe("Tournée bouclée. Vos transmissions sont à jour, bonne journée.");
   });
 
-  it("indique la tournee bouclee sans aucune mission", () => {
-    expect(conseilEly([])).toBe("Tournée bouclée. Vos transmissions sont à jour, bonne journée.");
+  it("indique qu'aucune visite n'est programmée sans aucune mission", () => {
+    expect(conseilEly([])).toBe("Aucune visite programmée aujourd'hui.");
   });
 });
 

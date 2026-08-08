@@ -52,6 +52,10 @@ export function calculerKmTournee(missions: MissionDuJour[]): number | null {
  * tournee — jamais de donnee inventee (pas de temps de trajet estime).
  */
 export function conseilEly(missions: MissionDuJour[]): string {
+  if (missions.length === 0) {
+    return "Aucune visite programmée aujourd'hui.";
+  }
+
   const enCours = missions.find((m) => m.statut === "en_cours");
   if (enCours) {
     return `Soin en cours chez ${formaterNomPropre(enCours.patientNom)} — pensez à la transmission avant de partir.`;

@@ -3,7 +3,13 @@ import { createClient, getUtilisateurConnecte } from "@/lib/supabase/server";
 import { formaterNomPropre } from "@/lib/format";
 import { getMissionEnCoursHref, getMissionsDuJour, getTourneeDuJour } from "@/lib/data/ma-journee";
 import { reorganiserTourneeAction } from "@/lib/data/reorganisation-tournee";
-import { conseilEly, formatDateDuJour, formatSalutation, prochaineActionAccueil } from "@/lib/accueil-vue";
+import {
+  compterMissionsAccueil,
+  conseilEly,
+  formatDateDuJour,
+  formatSalutation,
+  prochaineActionAccueil,
+} from "@/lib/accueil-vue";
 import { EnTeteAccueil } from "@/components/ui/EnTeteAccueil";
 import { CarteMission } from "@/components/ui/CarteMission";
 import { FormulaireAvecRetour } from "@/components/ui/FormulaireAvecRetour";
@@ -37,7 +43,7 @@ export default async function MaJourneePage({
   const missionsVisibles = requete
     ? missions.filter((m) => m.patientNom.toLowerCase().includes(requete.toLowerCase()))
     : missions;
-  const missionsRestantes = missions.filter((m) => m.statut !== "terminee").length;
+  const { restantes: missionsRestantes } = compterMissionsAccueil(missions);
   const missionsAFaire = missions.filter((m) => m.statut === "a_faire").length;
   const conseil = tournee ? conseilEly(missions) : null;
   const actionRapide = tournee ? prochaineActionAccueil(missions) : null;
