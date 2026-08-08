@@ -67,11 +67,11 @@ export function CarteMissionTournee({
 
       {/* Carte blanche */}
       <div
-        className={`mb-3 flex-1 overflow-hidden rounded-[20px] border bg-white ${
-          enCours ? "border-[1.5px] border-[#6d28d9]" : "border-[#e6e2db]"
-        } ${terminee || absent ? "opacity-70" : ""}`}
+        className={`mb-3 flex-1 overflow-hidden rounded-[20px] bg-white ${
+          enCours ? "border-[1.5px] border-[#6d28d9]" : "border border-[#e6e2db]"
+        }`}
       >
-        <div className="flex items-start gap-2.5 px-4 py-3.5">
+        <div className={`flex items-start gap-2.5 px-4 py-3.5 ${terminee || absent ? "opacity-70" : ""}`}>
           <div
             className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] text-[14px] font-bold ${
               enCours ? "bg-[linear-gradient(140deg,#a855f7,#6d28d9)] text-white" : "bg-[rgba(109,40,217,.1)] text-[#6d28d9]"
@@ -96,7 +96,7 @@ export function CarteMissionTournee({
           </span>
         </div>
 
-        <div className="border-t border-[#ece8f2] px-4 py-3">
+        <div className={`border-t border-[#ece8f2] px-4 py-3 ${terminee || absent ? "opacity-70" : ""}`}>
           <div className="flex flex-wrap gap-1.5">
             {mission.actes.length > 0 ? (
               mission.actes.map((acte, index) => (

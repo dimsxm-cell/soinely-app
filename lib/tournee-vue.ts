@@ -3,14 +3,6 @@ import type { StatutMission } from "@/lib/types/clinical";
 
 export type Filtre = "tout" | "a_faire" | "alertes" | "valides";
 
-export function formatDateTournee(): string {
-  return new Date().toLocaleDateString("fr-FR", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  });
-}
-
 export function formatHeure(iso: string): string {
   return iso.slice(0, 5);
 }
@@ -34,7 +26,6 @@ export function getInitiales(nomComplet: string): string {
   const nom = parts.find((p) => !CIVILITES.includes(p.toLowerCase().replace(/\.$/, "")));
   return (nom ?? parts[0]).slice(0, 2).toUpperCase();
 }
-
 
 export function estimerHeureFin(missions: MissionTourneeVue[]): string | null {
   const restantes = missions.filter((m) => m.statut === "a_faire" || m.statut === "en_cours");
@@ -79,13 +70,6 @@ export const STATUT_LABEL: Record<StatutMission, string> = {
   en_cours: "En cours",
   terminee: "Validé",
   absent: "Absent",
-};
-
-export const STATUT_BADGE: Record<StatutMission, string> = {
-  a_faire: "bg-navy/[0.06] text-navy/50",
-  en_cours: "bg-brand-violet/[0.12] text-brand-violet font-bold",
-  terminee: "bg-emerald-50 text-emerald-600 font-semibold",
-  absent: "bg-amber-50 text-amber-600 font-semibold",
 };
 
 const FUSEAU_TOURNEE = "Europe/Paris";

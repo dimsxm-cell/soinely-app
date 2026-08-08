@@ -48,7 +48,7 @@ export default async function MaTourneePage({
 
   const counts = compterMissions(missions);
   const missionsFiltrees = filtrerMissions(missions, filtre);
-  const prochaine = missions.find((m) => m.statut === "a_faire") ?? null;
+  const prochaine = missionsFiltrees.find((m) => m.statut === "a_faire") ?? null;
 
   return (
     <main className="min-h-screen bg-[#F6F7F5]" aria-label="Ma tournée">
@@ -84,7 +84,7 @@ export default async function MaTourneePage({
           </div>
 
           {prochaine && (
-            <div className="sticky bottom-4 z-10 mx-auto max-w-2xl px-4">
+            <div className="sticky bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] z-10 mx-auto max-w-2xl px-4">
               <a
                 href={`#stop-${prochaine.id}`}
                 className="flex min-h-[50px] items-center justify-center gap-2 rounded-[16px] bg-[linear-gradient(135deg,#6d28d9,#a855f7)] px-4 text-[15px] font-bold text-white shadow-[0_12px_28px_-10px_rgba(109,40,217,.7)]"
