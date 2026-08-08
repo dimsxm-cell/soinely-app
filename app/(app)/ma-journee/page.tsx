@@ -3,12 +3,13 @@ import { createClient, getUtilisateurConnecte } from "@/lib/supabase/server";
 import { formaterNomPropre } from "@/lib/format";
 import { getMissionEnCoursHref, getMissionsDuJour, getTourneeDuJour } from "@/lib/data/ma-journee";
 import { reorganiserTourneeAction } from "@/lib/data/reorganisation-tournee";
-import { formatDateDuJour, formatSalutation } from "@/lib/accueil-vue";
+import { conseilEly, formatDateDuJour, formatSalutation, prochaineActionAccueil } from "@/lib/accueil-vue";
 import { EnTeteAccueil } from "@/components/ui/EnTeteAccueil";
 import { CarteMission } from "@/components/ui/CarteMission";
 import { FormulaireAvecRetour } from "@/components/ui/FormulaireAvecRetour";
 import { getMaterielDuJour } from "@/lib/data/materiel";
 import { CarteMateriel } from "@/components/ui/CarteMateriel";
+import { updateMissionStatutAction } from "@/lib/data/ma-journee-actions";
 
 export default async function MaJourneePage({
   searchParams,
@@ -38,6 +39,8 @@ export default async function MaJourneePage({
     : missions;
   const missionsRestantes = missions.filter((m) => m.statut !== "terminee").length;
   const missionsAFaire = missions.filter((m) => m.statut === "a_faire").length;
+  const conseil = tournee ? conseilEly(missions) : null;
+  const actionRapide = tournee ? prochaineActionAccueil(missions) : null;
 
   return (
     <main className="min-h-screen bg-[#F6F7F5] text-navy">
@@ -91,6 +94,19 @@ export default async function MaJourneePage({
               className="min-h-[48px] w-full rounded-[14px] border border-[#e4e0ea] bg-[#faf9fc] px-4 text-[15px] text-navy placeholder:text-navy/40 focus:border-[#a855f7] focus:bg-white focus:outline-none focus:ring-[3px] focus:ring-[rgba(168,85,247,.16)]"
             />
           </form>
+
+          {conseil && (
+            <div className="mt-4 flex items-start gap-2.5 rounded-[16px] border border-[rgba(168,85,247,.26)] bg-[linear-gradient(140deg,rgba(168,85,247,.13),rgba(109,40,217,.05))] px-3.5 py-3">
+              <Image
+                src="/marketing/ely-nouveau-portrait.webp"
+                alt=""
+                width={379}
+                height={231}
+                className="h-7 w-7 shrink-0 rounded-full border border-[rgba(168,85,247,.3)] bg-white object-contain"
+              />
+              <p className="text-[12.5px] leading-relaxed text-[#4b4359]">{conseil}</p>
+            </div>
+          )}
 
           {materiel.length > 0 && (
             <CarteMateriel
@@ -146,6 +162,21 @@ export default async function MaJourneePage({
               </p>
             )}
           </div>
+        </div>
+      )}
+
+      {tournee && actionRapide && (
+        <div className="sticky bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] z-10 mx-auto max-w-2xl px-4">
+          <FormulaireAvecRetour action={updateMissionStatutAction} messageSucces="Passage mis à jour.">
+            <input type="hidden" name="missionId" value={actionRapide.missionId} />
+            <input type="hidden" name="nouveauStatut" value={actionRapide.nouveauStatut} />
+            <button
+              type="submit"
+              className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-[16px] bg-[linear-gradient(135deg,#6d28d9,#a855f7)] px-4 text-[15px] font-bold text-white shadow-[0_14px_28px_-12px_rgba(109,40,217,.9)]"
+            >
+              {actionRapide.label}
+            </button>
+          </FormulaireAvecRetour>
         </div>
       )}
     </main>
