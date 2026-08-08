@@ -416,6 +416,8 @@ export interface MissionTourneeVue {
   dureeEstimeeMin: number;
   actes: ActeVue[];
   motifAbsence: string | null;
+  /** Heure réelle de début du soin, posée à la transition vers `en_cours`. */
+  heureDebutReelle: string | null;
 }
 
 export async function getMissionsTourneeVue(
@@ -425,7 +427,7 @@ export async function getMissionsTourneeVue(
   const { data, error } = await supabase
     .from("missions_du_jour")
     .select(
-      "id, patient_id, type_soin, heure_prevue, statut, motif_absence, mission_clinique_id, distance_km, distance_km_corrigee, patients(nom_complet, adresse, telephone, allergies, consignes, date_naissance, forfait_bsi), missions_cliniques(duree_estimee_min), actes_mission(libelle, ordre, ngap_codes(code, cotation, lettre_cle, coefficient, derogatoire_bsi, eligible_mci))"
+      "id, patient_id, type_soin, heure_prevue, statut, motif_absence, heure_debut_reelle, mission_clinique_id, distance_km, distance_km_corrigee, patients(nom_complet, adresse, telephone, allergies, consignes, date_naissance, forfait_bsi), missions_cliniques(duree_estimee_min), actes_mission(libelle, ordre, ngap_codes(code, cotation, lettre_cle, coefficient, derogatoire_bsi, eligible_mci))"
     )
     .eq("tournee_id", tourneeId)
     .order("heure_prevue");
@@ -474,6 +476,7 @@ export async function getMissionsTourneeVue(
       dureeEstimeeMin: mc?.duree_estimee_min ?? 0,
       actes,
       motifAbsence: row.motif_absence,
+      heureDebutReelle: row.heure_debut_reelle ?? null,
     };
   });
 }

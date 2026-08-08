@@ -214,6 +214,7 @@ export type Database = {
           id: string
           distance_km: number | null
           distance_km_corrigee: number | null
+          heure_debut_reelle: string | null
           mission_clinique_id: string | null
           motif_absence: string | null
           ordre_visite: number | null
@@ -230,6 +231,7 @@ export type Database = {
           id?: string
           distance_km?: number | null
           distance_km_corrigee?: number | null
+          heure_debut_reelle?: string | null
           mission_clinique_id?: string | null
           motif_absence?: string | null
           ordre_visite?: number | null
@@ -246,6 +248,7 @@ export type Database = {
           id?: string
           distance_km?: number | null
           distance_km_corrigee?: number | null
+          heure_debut_reelle?: string | null
           mission_clinique_id?: string | null
           motif_absence?: string | null
           ordre_visite?: number | null

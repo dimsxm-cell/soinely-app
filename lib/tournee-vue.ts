@@ -102,3 +102,45 @@ export const STATUT_BADGE: Record<StatutMission, string> = {
   terminee: "bg-emerald-50 text-emerald-600 font-semibold",
   absent: "bg-amber-50 text-amber-600 font-semibold",
 };
+
+const FUSEAU_TOURNEE = "Europe/Paris";
+
+function partiesHeureParis(iso: string): { heures: number; minutes: number } {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: FUSEAU_TOURNEE,
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(new Date(iso));
+  const heures = Number(parts.find((p) => p.type === "hour")?.value ?? 0);
+  const minutes = Number(parts.find((p) => p.type === "minute")?.value ?? 0);
+  return { heures, minutes };
+}
+
+/** Formate un timestamp en heure de Paris, quel que soit le fuseau du serveur. */
+export function formatHeureDepuisTimestamp(iso: string): string {
+  const { heures, minutes } = partiesHeureParis(iso);
+  return `${String(heures).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+}
+
+function minutesDepuisMinuit(iso: string): number {
+  const { heures, minutes } = partiesHeureParis(iso);
+  return heures * 60 + minutes;
+}
+
+function minutesDepuisChaineHeure(heure: string): number {
+  const [h, m] = heure.split(":").map(Number);
+  return h * 60 + m;
+}
+
+/**
+ * Retard en minutes du soin en cours, figé à l'heure réelle de début —
+ * ne grossit pas pendant le soin. Comparaison en minutes-depuis-minuit
+ * heure de Paris des deux côtés, pour rester correcte quel que soit le
+ * fuseau du serveur qui exécute ce calcul (Vercel tourne en UTC).
+ */
+export function calculerRetardMinutes(mission: MissionTourneeVue): number | null {
+  if (mission.statut !== "en_cours" || !mission.heureDebutReelle) return null;
+  const retard = minutesDepuisMinuit(mission.heureDebutReelle) - minutesDepuisChaineHeure(mission.heurePrevue);
+  return retard > 0 ? retard : null;
+}
