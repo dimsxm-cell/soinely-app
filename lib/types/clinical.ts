@@ -100,6 +100,13 @@ export interface MissionDuJour {
    * notamment) — toujours renseigné en pratique par `getMissionsDuJour`.
    */
   ordreVisite?: number | null;
+  /**
+   * Distance routière depuis le cabinet, aller simple, et sa correction
+   * manuelle éventuelle. Optionnelles côté type pour la même raison que
+   * `ordreVisite` — toujours renseignées en pratique par `getMissionsDuJour`.
+   */
+  distanceKm?: number | null;
+  distanceKmCorrigee?: number | null;
 }
 
 export interface ActeVue {

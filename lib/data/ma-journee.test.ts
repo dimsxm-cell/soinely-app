@@ -299,6 +299,43 @@ describe("getMissionsDuJour", () => {
 
     await expect(getMissionsDuJour(fakeClient, "t1")).rejects.toThrow(/getMissionsDuJour/);
   });
+
+  it("mappe la distance depuis le cabinet et sa correction manuelle", async () => {
+    const fakeClient = {
+      from: () => ({
+        select: () => ({
+          eq: () => ({
+            order: () => ({
+              order: () =>
+                Promise.resolve({
+                  data: [
+                    {
+                      id: "m4",
+                      patient_id: "p4",
+                      type_soin: "Pansement",
+                      heure_prevue: "11:00:00",
+                      statut: "a_faire",
+                      mission_clinique_id: null,
+                      ordre_visite: null,
+                      distance_km: 4.8,
+                      distance_km_corrigee: 5.2,
+                      patients: { nom_complet: "M. Petit" },
+                    },
+                  ],
+                  error: null,
+                }),
+            }),
+          }),
+        }),
+      }),
+    } as unknown as SupabaseClient;
+
+    const { getMissionsDuJour } = await import("./ma-journee");
+    const missions = await getMissionsDuJour(fakeClient, "t1");
+
+    expect(missions[0].distanceKm).toBe(4.8);
+    expect(missions[0].distanceKmCorrigee).toBe(5.2);
+  });
 });
 
 describe("getMissionDetail", () => {

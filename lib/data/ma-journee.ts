@@ -113,7 +113,7 @@ export async function getMissionsDuJour(
   const { data, error } = await supabase
     .from("missions_du_jour")
     .select(
-      "id, patient_id, type_soin, heure_prevue, statut, mission_clinique_id, ordre_visite, patients(nom_complet)"
+      "id, patient_id, type_soin, heure_prevue, statut, mission_clinique_id, ordre_visite, distance_km, distance_km_corrigee, patients(nom_complet)"
     )
     .eq("tournee_id", tourneeId)
     // Les missions jamais réorganisées (ordre_visite nul) passent en premier,
@@ -143,6 +143,8 @@ export async function getMissionsDuJour(
       statut: row.statut as StatutMission,
       missionCliniqueId: row.mission_clinique_id,
       ordreVisite: row.ordre_visite,
+      distanceKm: row.distance_km,
+      distanceKmCorrigee: row.distance_km_corrigee,
     };
   });
 }
