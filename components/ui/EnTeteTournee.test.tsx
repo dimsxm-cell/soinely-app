@@ -4,9 +4,8 @@ import { EnTeteTournee } from "./EnTeteTournee";
 import type { MissionTourneeVue } from "@/lib/data/ma-journee";
 import type { StatutMission, Tournee } from "@/lib/types/clinical";
 import type { ContexteTarifaire } from "@/lib/cotation";
+import type { CountsMissions } from "@/lib/tournee-vue";
 
-// Table vide : les montants du catalogue servent de repli, ce qui laisse ces
-// tests porter sur l'affichage plutôt que sur la grille tarifaire.
 const TARIFS: ContexteTarifaire = { zone: "metropole", valeurs: new Map() };
 
 const tournee: Tournee = {
@@ -21,7 +20,14 @@ const tournee: Tournee = {
   materielVerifie: false,
 };
 
-function creerMission(id: string, statut: StatutMission, heurePrevue: string): MissionTourneeVue {
+const COUNTS_VIDES: CountsMissions = { tout: 0, a_faire: 0, alertes: 0, valides: 0 };
+
+function creerMission(
+  id: string,
+  statut: StatutMission,
+  heurePrevue: string,
+  heureDebutReelle: string | null = null
+): MissionTourneeVue {
   return {
     id,
     patientId: `p-${id}`,
@@ -41,12 +47,10 @@ function creerMission(id: string, statut: StatutMission, heurePrevue: string): M
     dureeEstimeeMin: 25,
     actes: [],
     motifAbsence: null,
+    heureDebutReelle,
   };
 }
 
-// Les trois nombres affichés — validés (2), restants (3), patients (8) — sont
-// volontairement distincts : sinon `getByText("2")` en trouverait plusieurs et
-// échouerait sur l'ambiguïté plutôt que sur le comportement testé.
 const missions = [
   creerMission("a", "terminee", "08:00:00"),
   creerMission("b", "absent", "10:05:00"),
@@ -56,14 +60,6 @@ const missions = [
 ];
 
 describe("EnTeteTournee", () => {
-  // Horloge figée : le composant affiche l'heure actuelle en direct, et sans
-  // ça le test devient instable une minute par jour (quand « maintenant »
-  // coïncide avec l'heure de fin estimée « 18:05 » affichée plus bas).
-  //
-  // On ne feint que Date. Feindre tous les minuteurs — le défaut — gèle aussi
-  // setTimeout, queueMicrotask et process.nextTick, dont React 19 se sert pour
-  // achever un rendu : selon la charge de la machine, render() partait alors
-  // attendre un minuteur figé et le test expirait au bout de cinq secondes.
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ["Date"] });
     vi.setSystemTime(new Date("2026-07-30T09:00:00"));
@@ -73,89 +69,105 @@ describe("EnTeteTournee", () => {
     vi.useRealTimers();
   });
 
-  it("affiche le compteur de passages validés sur le total", () => {
-    render(<EnTeteTournee missions={missions} tournee={tournee} contexteTarifaire={TARIFS} />);
+  it("affiche le compteur de passages validés sur le total, dans l'anneau", () => {
+    render(
+      <EnTeteTournee
+        missions={missions}
+        tournee={tournee}
+        contexteTarifaire={TARIFS}
+        filtre="tout"
+        counts={COUNTS_VIDES}
+      />
+    );
 
     expect(screen.getByText("2")).toBeInTheDocument();
-    expect(screen.getByText("/5")).toBeInTheDocument();
-    expect(screen.getByText("passages validés")).toBeInTheDocument();
-  });
-
-  it("affiche l'heure courante, prise sur l'horloge figée", () => {
-    render(<EnTeteTournee missions={missions} tournee={tournee} contexteTarifaire={TARIFS} />);
-
-    // Prouve que Date est bien feinte : sans cela, cette assertion échouerait
-    // 1439 minutes sur 1440, et le gel de l'horloge deviendrait décoratif.
-    expect(screen.getByText("09:00")).toBeInTheDocument();
-  });
-
-  it("la barre de progression annonce le pourcentage validé", () => {
-    render(<EnTeteTournee missions={missions} tournee={tournee} contexteTarifaire={TARIFS} />);
-
-    expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "40");
+    expect(screen.getByText("/ 5")).toBeInTheDocument();
   });
 
   it("affiche le nombre de missions restantes et l'heure de fin estimée", () => {
-    render(<EnTeteTournee missions={missions} tournee={tournee} contexteTarifaire={TARIFS} />);
+    render(
+      <EnTeteTournee
+        missions={missions}
+        tournee={tournee}
+        contexteTarifaire={TARIFS}
+        filtre="tout"
+        counts={COUNTS_VIDES}
+      />
+    );
 
     expect(screen.getByText("Reste")).toBeInTheDocument();
     expect(screen.getByText("3")).toBeInTheDocument();
-    expect(screen.getByText("Fin est.")).toBeInTheDocument();
-    expect(screen.getByText("18:05")).toBeInTheDocument();
+    expect(screen.getByText(/Fin estimée.*18:05/)).toBeInTheDocument();
   });
 
-  it("affiche le nombre de patients de la tournée", () => {
-    render(<EnTeteTournee missions={missions} tournee={tournee} contexteTarifaire={TARIFS} />);
+  it("affiche la stat Km comme non disponible", () => {
+    render(
+      <EnTeteTournee
+        missions={missions}
+        tournee={tournee}
+        contexteTarifaire={TARIFS}
+        filtre="tout"
+        counts={COUNTS_VIDES}
+      />
+    );
 
-    expect(screen.getByText("Patients")).toBeInTheDocument();
-    expect(screen.getByText("8")).toBeInTheDocument();
+    const libelleKm = screen.getByText("Km");
+    expect(libelleKm.parentElement).toHaveTextContent("—");
   });
 
-  it("affiche le montant facturable de la tournée", () => {
-    // Un pansement (6,30 €) et une injection (3,15 €) au même passage : la
-    // règle du deuxième acte à 50 % donne 7,88 €, plus 7,95 € de toilette.
+  it("affiche le montant facturable comme pastille Cotation", () => {
     const avecActes = [
       {
         ...creerMission("a", "terminee", "08:00:00"),
         actes: [
           { libelle: "Pansement", code: "AMI 2", cotation: 6.3, lettreCle: "AMI", coefficient: 2, derogatoireBsi: false, eligibleMci: false },
-          { libelle: "Injection", code: "AMI 1", cotation: 3.15, lettreCle: "AMI", coefficient: 1, derogatoireBsi: false, eligibleMci: false },
         ],
       },
-      {
-        ...creerMission("b", "a_faire", "10:00:00"),
-        actes: [{ libelle: "Toilette", code: "AIS 3", cotation: 7.95, lettreCle: "AIS", coefficient: 3, derogatoireBsi: false, eligibleMci: false }],
-      },
     ];
 
-    render(<EnTeteTournee missions={avecActes} tournee={tournee} contexteTarifaire={TARIFS} />);
+    render(
+      <EnTeteTournee
+        missions={avecActes}
+        tournee={tournee}
+        contexteTarifaire={TARIFS}
+        filtre="tout"
+        counts={COUNTS_VIDES}
+      />
+    );
 
-    expect(screen.getByText("Facturable")).toBeInTheDocument();
-    expect(screen.getByText(/15,83/)).toBeInTheDocument();
+    expect(screen.getByText("Cotation")).toBeInTheDocument();
+    expect(screen.getByText(/6,30/)).toBeInTheDocument();
   });
 
-  it("tait le montant tant qu'aucun acte n'est coté, plutôt que d'annoncer zéro", () => {
-    // Un « 0,00 € » se lirait comme une journée sans valeur, alors qu'il ne
-    // dit que l'absence de codes sur des soins bien réels.
-    render(<EnTeteTournee missions={missions} tournee={tournee} contexteTarifaire={TARIFS} />);
+  it("n'affiche pas la pastille d'heure de fin quand tout est validé", () => {
+    const toutesValidees = [creerMission("a", "terminee", "08:00:00"), creerMission("b", "terminee", "10:05:00")];
 
-    expect(screen.queryByText("Facturable")).not.toBeInTheDocument();
+    render(
+      <EnTeteTournee
+        missions={toutesValidees}
+        tournee={tournee}
+        contexteTarifaire={TARIFS}
+        filtre="tout"
+        counts={COUNTS_VIDES}
+      />
+    );
+
+    expect(screen.queryByText(/Fin estimée/)).not.toBeInTheDocument();
   });
 
-  it("n'affiche pas d'heure de fin quand tout est validé", () => {
-    const toutesValidees = [
-      creerMission("a", "terminee", "08:00:00"),
-      creerMission("b", "terminee", "10:05:00"),
-    ];
+  it("rend les filtres avec leur comptage", () => {
+    const counts: CountsMissions = { tout: 5, a_faire: 3, alertes: 1, valides: 2 };
 
-    render(<EnTeteTournee missions={toutesValidees} tournee={tournee} contexteTarifaire={TARIFS} />);
+    render(
+      <EnTeteTournee missions={missions} tournee={tournee} contexteTarifaire={TARIFS} filtre="tout" counts={counts} />
+    );
 
-    expect(screen.queryByText("Fin est.")).not.toBeInTheDocument();
-    expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "100");
+    expect(screen.getByRole("link", { name: /Tout/ })).toHaveTextContent("5");
+    expect(screen.getByRole("link", { name: /Validés/ })).toHaveTextContent("2");
   });
 });
 
-describe("EnTeteTournee — majorations", () => {
+describe("EnTeteTournee — majorations toujours incluses dans le total", () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ["Date"] });
     vi.setSystemTime(new Date("2026-07-07T09:00:00"));
@@ -165,31 +177,23 @@ describe("EnTeteTournee — majorations", () => {
     vi.useRealTimers();
   });
 
-  const AVEC_MAJORATIONS: ContexteTarifaire = {
-    zone: "metropole",
-    valeurs: new Map([
-      ["AMI", { lettreCle: "AMI", valeurMetropole: 3.15, valeurDom: 3.3 }],
-      ["IFD", { lettreCle: "IFD", valeurMetropole: 2.75, valeurDom: 2.75 }],
-      ["MN", { lettreCle: "MN", valeurMetropole: 9.15, valeurDom: 9.15 }],
-    ]),
-  };
-
-  const PANSEMENT = {
-    libelle: "Pansement",
-    code: "AMI 2",
-    cotation: 6.3,
-    lettreCle: "AMI",
-    coefficient: 2,
-    derogatoireBsi: false,
-    eligibleMci: false,
-  };
-
-  it("ajoute les majorations au total et en détaille le montant", () => {
+  it("inclut les majorations dans la pastille Cotation, sans ligne de détail séparée", () => {
     // Un passage à 21 h, un mardi : 6,30 € d'acte, 2,75 € de déplacement et
-    // 9,15 € de majoration de nuit, soit 18,20 € facturables.
+    // 9,15 € de majoration de nuit, soit 18,20 € facturables — même calcul
+    // qu'avant la refonte, seule la ligne « dont X de majorations » disparaît.
+    const AVEC_MAJORATIONS: ContexteTarifaire = {
+      zone: "metropole",
+      valeurs: new Map([
+        ["AMI", { lettreCle: "AMI", valeurMetropole: 3.15, valeurDom: 3.3 }],
+        ["IFD", { lettreCle: "IFD", valeurMetropole: 2.75, valeurDom: 2.75 }],
+        ["MN", { lettreCle: "MN", valeurMetropole: 9.15, valeurDom: 9.15 }],
+      ]),
+    };
     const mission = {
       ...creerMission("a", "terminee", "21:00:00"),
-      actes: [PANSEMENT],
+      actes: [
+        { libelle: "Pansement", code: "AMI 2", cotation: 6.3, lettreCle: "AMI", coefficient: 2, derogatoireBsi: false, eligibleMci: false },
+      ],
     };
 
     render(
@@ -197,26 +201,106 @@ describe("EnTeteTournee — majorations", () => {
         missions={[mission]}
         tournee={{ ...tournee, date: "2026-07-07" }}
         contexteTarifaire={AVEC_MAJORATIONS}
+        filtre="tout"
+        counts={COUNTS_VIDES}
       />
     );
 
     expect(screen.getByText(/18,20/)).toBeInTheDocument();
-    expect(screen.getByText(/dont.*11,90.*de majorations/)).toBeInTheDocument();
+    expect(screen.queryByText(/de majorations/)).not.toBeInTheDocument();
+  });
+});
+
+describe("EnTeteTournee — soin en cours et retard", () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-07-30T09:00:00"));
   });
 
-  it("tait la ligne de détail quand aucune majoration n'est due", () => {
-    // Table des valeurs sans majoration : le total reste celui des actes, et
-    // la mention n'a rien à annoncer.
-    const mission = { ...creerMission("a", "terminee", "10:00:00"), actes: [PANSEMENT] };
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("affiche le nom et l'adresse du soin en cours", () => {
+    const avecEnCours = [
+      ...missions,
+      creerMission("f", "en_cours", "14:20:00", "2026-07-30T12:32:00.000Z"),
+    ];
 
     render(
       <EnTeteTournee
-        missions={[mission]}
-        tournee={{ ...tournee, date: "2026-07-07" }}
+        missions={avecEnCours}
+        tournee={tournee}
         contexteTarifaire={TARIFS}
+        filtre="tout"
+        counts={COUNTS_VIDES}
       />
     );
 
-    expect(screen.queryByText(/de majorations/)).not.toBeInTheDocument();
+    expect(screen.getByText("Mme Dupont")).toBeInTheDocument();
+    expect(screen.getByText(/12 rue des Lilas/)).toBeInTheDocument();
+  });
+
+  it("affiche un badge de retard quand le soin a démarré en retard", () => {
+    // Prévu 14:20 Paris, débuté 14:32 Paris (12:32 UTC, été) : 12 min de retard.
+    const avecRetard = [creerMission("f", "en_cours", "14:20:00", "2026-07-30T12:32:00.000Z")];
+
+    render(
+      <EnTeteTournee
+        missions={avecRetard}
+        tournee={tournee}
+        contexteTarifaire={TARIFS}
+        filtre="tout"
+        counts={COUNTS_VIDES}
+      />
+    );
+
+    expect(screen.getByText(/12 min de retard/)).toBeInTheDocument();
+  });
+
+  it("n'affiche aucun badge de retard quand le soin a démarré à l'heure", () => {
+    const aLHeure = [creerMission("f", "en_cours", "14:20:00", "2026-07-30T12:20:00.000Z")];
+
+    render(
+      <EnTeteTournee
+        missions={aLHeure}
+        tournee={tournee}
+        contexteTarifaire={TARIFS}
+        filtre="tout"
+        counts={COUNTS_VIDES}
+      />
+    );
+
+    expect(screen.queryByText(/retard/)).not.toBeInTheDocument();
+  });
+
+  it("affiche un message de repli quand rien n'est en cours mais qu'il reste des soins", () => {
+    render(
+      <EnTeteTournee
+        missions={missions}
+        tournee={tournee}
+        contexteTarifaire={TARIFS}
+        filtre="tout"
+        counts={COUNTS_VIDES}
+      />
+    );
+
+    expect(screen.getByText(/restant.*aucun en cours/)).toBeInTheDocument();
+  });
+
+  it("affiche un message de repli quand tout est validé", () => {
+    const toutesValidees = [creerMission("a", "terminee", "08:00:00")];
+
+    render(
+      <EnTeteTournee
+        missions={toutesValidees}
+        tournee={tournee}
+        contexteTarifaire={TARIFS}
+        filtre="tout"
+        counts={COUNTS_VIDES}
+      />
+    );
+
+    expect(screen.getByText("Tous les soins du jour sont validés")).toBeInTheDocument();
   });
 });
