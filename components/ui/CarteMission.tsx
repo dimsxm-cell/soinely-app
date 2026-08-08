@@ -13,16 +13,16 @@ const STATUT_LABEL: Record<MissionDuJour["statut"], string> = {
 };
 
 const STATUT_CLASSES: Record<MissionDuJour["statut"], string> = {
-  a_faire: "bg-navy/5 text-navy/50",
-  en_cours: "bg-brand-violet/[0.12] text-brand-violet tabular-nums",
-  terminee: "bg-teal/10 text-[#0E7E70]",
-  absent: "bg-navy/5 text-navy/40",
+  a_faire: "text-[#8d8798] bg-[rgba(141,135,152,.1)]",
+  en_cours: "text-[#6d28d9] bg-[rgba(109,40,217,.11)] font-bold",
+  terminee: "text-[#1a7f5a] bg-[rgba(26,127,90,.11)] font-semibold",
+  absent: "text-[#c2410c] bg-[rgba(194,65,12,.11)] font-semibold",
 };
 
 const DOT_CLASSES: Record<MissionDuJour["statut"], string> = {
-  a_faire: "bg-brand-violet/50",
-  en_cours: "bg-brand-violet shadow-[0_0_0_4px_rgba(124,58,237,0.2)]",
-  terminee: "bg-[#1a7f37]",
+  a_faire: "bg-[rgba(109,40,217,.5)]",
+  en_cours: "bg-[#6d28d9] shadow-[0_0_0_4px_rgba(109,40,217,.2)]",
+  terminee: "bg-[#1a7f5a]",
   absent: "bg-navy/20",
 };
 
@@ -37,8 +37,8 @@ const LIBELLE_ACTION: Partial<Record<StatutMission, string>> = {
 };
 
 const BOUTON_CLASSES: Partial<Record<StatutMission, string>> = {
-  a_faire: "bg-gradient-to-r from-brand-violet to-brand-rose shadow-[0_4px_12px_rgba(124,58,237,0.3)]",
-  en_cours: "bg-[#1a7f37] shadow-[0_4px_12px_rgba(26,127,55,0.28)]",
+  a_faire: "bg-[linear-gradient(135deg,#6d28d9,#a855f7)] shadow-[0_4px_12px_rgba(109,40,217,.3)]",
+  en_cours: "bg-[#1a7f5a] shadow-[0_4px_12px_rgba(26,127,55,.28)]",
 };
 
 interface CarteMissionProps {
@@ -50,6 +50,7 @@ interface CarteMissionProps {
 export function CarteMission({ mission, contexteHref, estDerniere }: CarteMissionProps) {
   const prochainStatut = PROCHAIN_STATUT[mission.statut];
   const heureAffichee = mission.heurePrevue.slice(0, 5);
+  const enCours = mission.statut === "en_cours";
   const terminee = mission.statut === "terminee";
 
   return (
@@ -66,7 +67,7 @@ export function CarteMission({ mission, contexteHref, estDerniere }: CarteMissio
         {mission.ordreVisite != null && (
           <span
             aria-label={`Ordre de passage suggéré : ${mission.ordreVisite}`}
-            className="relative z-10 flex h-4 w-4 items-center justify-center rounded-full bg-brand-violet text-[9px] font-bold text-white"
+            className="relative z-10 flex h-4 w-4 items-center justify-center rounded-full bg-[#6d28d9] text-[9px] font-bold text-white"
           >
             {mission.ordreVisite}
           </span>
@@ -75,17 +76,23 @@ export function CarteMission({ mission, contexteHref, estDerniere }: CarteMissio
 
       <div
         className={`flex flex-1 flex-col gap-3 rounded-2xl border bg-white p-3.5 sm:flex-row sm:items-center ${
-          mission.statut === "en_cours"
-            ? "border-brand-violet/60 shadow-[0_6px_18px_rgba(124,58,237,0.18)]"
+          enCours
+            ? "border-[1.5px] border-[#6d28d9] shadow-[0_6px_18px_rgba(109,40,217,.18)]"
             : "border-navy/[0.06] shadow-[0_1px_2px_rgba(15,23,42,.04)]"
         } ${terminee ? "opacity-70" : ""}`}
       >
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <span
             aria-hidden="true"
-            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] ${terminee ? "bg-brand-violet/[0.06]" : "bg-brand-violet/[0.12]"}`}
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] ${
+              enCours
+                ? "bg-[linear-gradient(140deg,#a855f7,#6d28d9)] text-white"
+                : terminee
+                  ? "bg-[rgba(109,40,217,.06)] text-[#6d28d9]"
+                  : "bg-[rgba(109,40,217,.12)] text-[#6d28d9]"
+            }`}
           >
-            <IconeSoin typeSoin={mission.typeSoin} className="h-5 w-5 text-brand-violet" />
+            <IconeSoin typeSoin={mission.typeSoin} className="h-5 w-5" />
           </span>
 
           <Link href={`/ma-journee/${mission.id}`} className="min-w-0 flex-1 hover:opacity-80">
@@ -98,7 +105,7 @@ export function CarteMission({ mission, contexteHref, estDerniere }: CarteMissio
 
         <div className="flex flex-wrap items-center gap-2.5 sm:shrink-0 sm:flex-nowrap sm:justify-end">
           {contexteHref && (
-            <Link href={contexteHref} className="text-sm font-semibold text-brand-violet hover:underline">
+            <Link href={contexteHref} className="text-sm font-semibold text-[#6d28d9] hover:underline">
               Contexte clinique
             </Link>
           )}
