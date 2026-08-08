@@ -163,10 +163,10 @@ export function ConversationEly({
         <div className="flex items-center gap-2.5">
           <span className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white ring-2 ring-brand-violet/70">
             <Image
-              src="/marketing/ely-nouveau-portrait.webp"
+              src="/marketing/ely-colibri-heureux.webp"
               alt=""
-              width={379}
-              height={231}
+              width={323}
+              height={304}
               className="h-[38px] w-[38px] rounded-full object-cover"
             />
           </span>
@@ -214,10 +214,10 @@ export function ConversationEly({
               />
               <span className="relative">
                 <Image
-                  src="/marketing/ely-nouveau-portrait.webp"
+                  src="/marketing/ely-colibri-heureux.webp"
                   alt=""
-                  width={379}
-                  height={231}
+                  width={323}
+                  height={304}
                   className="h-[150px] w-auto object-contain drop-shadow-[0_18px_28px_rgba(124,58,237,0.32)]"
                 />
               </span>
@@ -252,10 +252,10 @@ export function ConversationEly({
                 <div key={message.id} className="flex items-end gap-2.5">
                   <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center overflow-hidden rounded-full bg-white ring-2 ring-brand-violet/70">
                     <Image
-                      src="/marketing/ely-nouveau-portrait.webp"
+                      src="/marketing/ely-colibri-heureux.webp"
                       alt=""
-                      width={379}
-                      height={231}
+                      width={323}
+                      height={304}
                       className="h-[26px] w-[26px] rounded-full object-cover"
                     />
                   </span>
@@ -405,10 +405,10 @@ export function ConversationEly({
               <div className="flex items-end gap-2.5">
                 <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center overflow-hidden rounded-full bg-white ring-2 ring-brand-violet/70">
                   <Image
-                    src="/marketing/ely-nouveau-portrait.webp"
+                    src="/marketing/ely-colibri-concentre.webp"
                     alt=""
-                    width={379}
-                    height={231}
+                    width={318}
+                    height={305}
                     className="h-[26px] w-[26px] rounded-full object-cover"
                   />
                 </span>

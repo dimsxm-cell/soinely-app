@@ -137,10 +137,10 @@ export default function LoginPage() {
           formulaire est étroite et centrée, tout l'espace latéral est perdu.
           Sur mobile il n'y a pas la place, le personnage ne s'affiche pas. */}
       <Image
-        src="/marketing/ely-nouveau-professionnel.webp"
+        src="/marketing/ely-colibri-action-phone.webp"
         alt=""
-        width={379}
-        height={890}
+        width={478}
+        height={457}
         aria-hidden="true"
         className="pointer-events-none absolute bottom-0 left-[4%] hidden h-[74vh] w-auto object-contain lg:block xl:left-[10%]"
       />
@@ -167,10 +167,10 @@ export default function LoginPage() {
               place est la seule qui ne coûte rien en vertical, et elle équilibre
               la barre du haut : même cercle blanc que le bouton d'à côté. */}
           <Image
-            src="/marketing/ely-nouveau-portrait.webp"
+            src="/marketing/ely-colibri-heureux.webp"
             alt=""
-            width={379}
-            height={231}
+            width={323}
+            height={304}
             aria-hidden="true"
             className="h-16 w-16 shrink-0 rounded-full border border-[#e0e0e0] bg-white object-cover lg:hidden"
           />

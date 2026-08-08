@@ -28,10 +28,10 @@ export function EnTeteAccueil({
             </p>
           </div>
           <Image
-            src="/marketing/ely-nouveau-portrait.webp"
+            src="/marketing/ely-colibri-heureux.webp"
             alt="ELY"
-            width={379}
-            height={231}
+            width={323}
+            height={304}
             className="h-[100px] w-[100px] shrink-0 object-contain"
             priority
           />

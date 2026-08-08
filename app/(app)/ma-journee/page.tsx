@@ -60,10 +60,10 @@ export default async function MaJourneePage({
               {prenom ? `, ${prenom}` : ""}
             </h1>
             <Image
-              src="/marketing/ely-nouveau-portrait.webp"
+              src="/marketing/ely-colibri-heureux.webp"
               alt="ELY"
-              width={379}
-              height={231}
+              width={323}
+              height={304}
               className="h-[52px] w-[52px] shrink-0 object-contain"
               priority
             />
@@ -77,10 +77,10 @@ export default async function MaJourneePage({
           </div>
           <div className="mt-8 flex items-center gap-4">
             <Image
-              src="/marketing/ely-nouveau-portrait.webp"
+              src="/marketing/ely-colibri-rassurant.webp"
               alt=""
-              width={379}
-              height={231}
+              width={297}
+              height={301}
               className="h-16 w-16 shrink-0 object-contain"
             />
             <p className="text-navy/60">Aucune tournée enregistrée pour aujourd&apos;hui.</p>
@@ -104,10 +104,10 @@ export default async function MaJourneePage({
           {conseil && (
             <div className="mt-4 flex items-start gap-2.5 rounded-[16px] border border-[rgba(168,85,247,.26)] bg-[linear-gradient(140deg,rgba(168,85,247,.13),rgba(109,40,217,.05))] px-3.5 py-3">
               <Image
-                src="/marketing/ely-nouveau-portrait.webp"
+                src="/marketing/ely-colibri-reflechi.webp"
                 alt=""
-                width={379}
-                height={231}
+                width={293}
+                height={337}
                 className="h-7 w-7 shrink-0 rounded-full border border-[rgba(168,85,247,.3)] bg-white object-contain"
               />
               <p className="text-[12.5px] leading-relaxed text-[#4b4359]">{conseil}</p>

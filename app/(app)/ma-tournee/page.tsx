@@ -103,10 +103,10 @@ export default async function MaTourneePage({
               c'est le seul endroit de la tournée où la mascotte a la place de
               se montrer en entier. */}
           <Image
-            src="/marketing/ely-nouveau-professionnel.webp"
+            src="/marketing/ely-colibri-action-checklist.webp"
             alt=""
-            width={379}
-            height={890}
+            width={407}
+            height={442}
             className="h-[210px] w-auto object-contain"
             priority={false}
           />

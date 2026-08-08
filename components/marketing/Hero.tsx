@@ -249,10 +249,10 @@ export function Hero() {
                           }}
                         >
                           <Image
-                            src="/marketing/ely-nouveau-portrait.webp"
+                            src="/marketing/ely-colibri-heureux.webp"
                             alt="ELY"
-                            width={379}
-                            height={231}
+                            width={323}
+                            height={304}
                             className="ely-wave h-[18px] w-[18px] rounded-full object-cover"
                           />
                         </span>
@@ -339,7 +339,7 @@ export function Hero() {
                   ].map((tab) => (
                     <div key={tab.l} className="flex flex-col items-center gap-[3px]">
                       {tab.active ? (
-                        <Image src="/marketing/ely-nouveau-portrait.webp" alt="ELY" width={379} height={231} className="h-[22px] w-[22px] object-contain" />
+                        <Image src="/marketing/ely-colibri-heureux.webp" alt="ELY" width={323} height={304} className="h-[22px] w-[22px] object-contain" />
                       ) : (
                         <span className="h-[14px] w-[14px] rounded-[5px] border-2 border-[#1e1b3c]/20" />
                       )}
@@ -372,10 +372,10 @@ export function Hero() {
                 <div className="flex h-[54px] w-[54px] shrink-0 items-center justify-center overflow-hidden rounded-full"
                   style={{ background: "radial-gradient(circle at 50% 35%,#efe7fb,#fff)" }}>
                   <Image
-                    src="/marketing/ely-nouveau-portrait.webp"
+                    src="/marketing/ely-colibri-reflechi.webp"
                     alt="ELY"
-                    width={379}
-                    height={231}
+                    width={293}
+                    height={337}
                     className="rounded-full object-cover"
                     style={{ width: 46, height: 46 }}
                   />

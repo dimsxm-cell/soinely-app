@@ -77,10 +77,10 @@ export function ListePatients({ patients, prochaineVisiteParPatient }: ListePati
         {patientsVisibles.length === 0 && (
           <div className="flex flex-col items-center gap-3 py-7 text-center">
             <Image
-              src="/marketing/ely-nouveau-portrait.webp"
+              src="/marketing/ely-colibri-rassurant.webp"
               alt=""
-              width={379}
-              height={231}
+              width={297}
+              height={301}
               className="h-16 w-16 object-contain"
             />
             <p className="text-navy/50">

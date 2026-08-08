@@ -46,10 +46,10 @@ export function ListeAttente() {
             {/* object-contain (et non cover) : le personnage est détouré, il
                 doit tenir entier dans le cadre plutôt que d'être rogné. */}
             <Image
-              src="/marketing/ely-nouveau-professionnel.webp"
+              src="/marketing/ely-colibri-motive.webp"
               alt="Mascotte ELY"
-              width={379}
-              height={890}
+              width={303}
+              height={295}
               className="h-full w-full object-contain drop-shadow-[0_8px_18px_rgba(0,0,0,.25)]"
             />
           </div>

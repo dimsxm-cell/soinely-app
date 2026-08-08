@@ -74,10 +74,10 @@ export function EnTempsReel() {
                 <div style={{ fontSize: 13.5, fontWeight: 800, color: "#1e1b3c", marginBottom: 9 }}>Vous réorganisez</div>
                 <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
                   <Image
-                    src="/marketing/ely-nouveau-consultation.webp"
+                    src="/marketing/ely-colibri-action-itineraire.webp"
                     alt="ELY"
-                    width={353}
-                    height={875}
+                    width={486}
+                    height={425}
                     className="object-contain"
                     style={{ width: 44, height: "auto", filter: "drop-shadow(0 6px 14px rgba(124,58,237,.28))" }}
                   />
