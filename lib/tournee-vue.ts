@@ -35,21 +35,6 @@ export function getInitiales(nomComplet: string): string {
   return (nom ?? parts[0]).slice(0, 2).toUpperCase();
 }
 
-const PALETTE_AVATAR = [
-  { bg: "bg-blue-100", text: "text-blue-700" },
-  { bg: "bg-emerald-100", text: "text-emerald-700" },
-  { bg: "bg-violet-100", text: "text-violet-700" },
-  { bg: "bg-amber-100", text: "text-amber-700" },
-  { bg: "bg-rose-100", text: "text-rose-700" },
-  { bg: "bg-teal-100", text: "text-teal-700" },
-  { bg: "bg-orange-100", text: "text-orange-700" },
-  { bg: "bg-pink-100", text: "text-pink-700" },
-];
-
-export function getCouleurAvatar(id: string) {
-  const hash = id.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
-  return PALETTE_AVATAR[hash % PALETTE_AVATAR.length];
-}
 
 export function estimerHeureFin(missions: MissionTourneeVue[]): string | null {
   const restantes = missions.filter((m) => m.statut === "a_faire" || m.statut === "en_cours");

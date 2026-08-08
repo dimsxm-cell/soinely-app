@@ -46,6 +46,7 @@ function creerMission(surcharge: Partial<MissionTourneeVue> = {}): MissionTourne
     dureeEstimeeMin: 25,
     actes: [PANSEMENT],
     motifAbsence: null,
+    heureDebutReelle: null,
     ...surcharge,
   };
 }

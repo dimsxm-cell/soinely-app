@@ -29,6 +29,7 @@ function creerMission(surcharge: Partial<MissionTourneeVue> = {}): MissionTourne
     dureeEstimeeMin: 25,
     actes: [],
     motifAbsence: null,
+    heureDebutReelle: null,
     ...surcharge,
   };
 }
@@ -74,10 +75,9 @@ describe("CarteMissionTournee", () => {
 
     const consignes = screen.getByText("3e étage sans ascenseur");
     expect(consignes).toBeInTheDocument();
-    // Le pied est un simple filet pointillé, pas un encart coloré d'alerte.
-    expect(consignes.className).toContain("text-navy/45");
-    expect(consignes.closest("div")?.className).toContain("border-dashed");
-    // Le pictogramme ⚠️ n'apparaît que dans l'encart d'allergie.
+    // Le pied est un encart clair, pas un encart coloré d'alerte.
+    expect(consignes.className).toContain("text-[#6e6880]");
+    // Le pictogramme SVG d'alerte n'apparaît que dans l'encart d'allergie.
     expect(screen.queryByText("⚠️")).not.toBeInTheDocument();
   });
 
@@ -374,5 +374,17 @@ describe("CarteMissionTournee — montant du passage", () => {
     );
 
     expect(screen.queryByText(/€/)).not.toBeInTheDocument();
+  });
+});
+
+describe("CarteMissionTournee — ancrage de défilement", () => {
+  it("porte un id dérivé de l'identifiant de la mission", () => {
+    const { container } = render(
+      <CarteMissionTournee mission={creerMission({ id: "abc123" })} estDerniere={false}
+        dateTournee="2026-07-07"
+        contexteTarifaire={TARIFS} />
+    );
+
+    expect(container.querySelector("#stop-abc123")).toBeInTheDocument();
   });
 });

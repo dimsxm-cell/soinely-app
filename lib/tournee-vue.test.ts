@@ -7,7 +7,6 @@ import {
   estimerHeureFin,
   filtrerMissions,
   formatHeureDepuisTimestamp,
-  getCouleurAvatar,
   getInitiales,
 } from "./tournee-vue";
 
@@ -146,19 +145,6 @@ describe("getInitiales", () => {
 
   it("prend le premier mot quand il n'y a pas de civilité", () => {
     expect(getInitiales("Nguyen")).toBe("NG");
-  });
-});
-
-describe("getCouleurAvatar", () => {
-  it("donne toujours la même couleur pour un même identifiant", () => {
-    expect(getCouleurAvatar("patient-1")).toEqual(getCouleurAvatar("patient-1"));
-  });
-
-  it("renvoie une paire de classes Tailwind", () => {
-    const couleur = getCouleurAvatar("patient-1");
-
-    expect(couleur.bg).toMatch(/^bg-/);
-    expect(couleur.text).toMatch(/^text-/);
   });
 });
 
