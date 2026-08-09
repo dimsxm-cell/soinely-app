@@ -70,6 +70,7 @@ function CarteKpi({ label, valeur }: { label: string; valeur: string }) {
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Panneau is used by Task 3 (contenu principal dashboard)
 function Panneau({ titre, sous, children }: { titre: string; sous?: string; children: ReactNode }) {
   return (
     <div className="rounded-[22px] border border-navy/10 bg-white p-5">
