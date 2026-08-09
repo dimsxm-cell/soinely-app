@@ -113,3 +113,12 @@ export function calculerRetardMinutes(mission: MissionTourneeVue): number | null
   const retard = minutesDepuisMinuit(mission.heureDebutReelle) - minutesDepuisChaineHeure(mission.heurePrevue);
   return retard > 0 ? retard : null;
 }
+
+/**
+ * Trouve le prochain arrêt à traiter : la mission en cours si elle existe,
+ * sinon la première mission à faire, sinon null.
+ * Cette logique est partagée entre CarteTourneeEnCoursDesktop et TableauDeBordDesktop.
+ */
+export function trouverProchainArret(missions: MissionTourneeVue[]): MissionTourneeVue | null {
+  return missions.find((m) => m.statut === "en_cours") ?? missions.find((m) => m.statut === "a_faire") ?? null;
+}

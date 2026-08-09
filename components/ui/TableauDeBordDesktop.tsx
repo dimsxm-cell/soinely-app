@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import type { MissionTourneeVue } from "@/lib/data/ma-journee";
 import { formatDateDuJour, formatSalutation } from "@/lib/accueil-vue";
 import { formaterEuros } from "@/lib/cotation";
-import { formatHeure } from "@/lib/tournee-vue";
+import { formatHeure, trouverProchainArret } from "@/lib/tournee-vue";
 import { formaterNomPropre } from "@/lib/format";
 import { LogoSoinely } from "@/components/ui/LogoSoinely";
 import { CarteTourneeEnCoursDesktop } from "@/components/ui/CarteTourneeEnCoursDesktop";
@@ -93,8 +93,7 @@ export function TableauDeBordDesktop({
   nombrePatients: number;
   montantCotationJour: number;
 }) {
-  const prochainArretId =
-    (missions.find((m) => m.statut === "en_cours") ?? missions.find((m) => m.statut === "a_faire"))?.id ?? null;
+  const prochainArretId = trouverProchainArret(missions)?.id ?? null;
   const suiteDeLaTournee = missions.filter(
     (m) => (m.statut === "a_faire" || m.statut === "en_cours") && m.id !== prochainArretId
   );
@@ -213,7 +212,7 @@ export function TableauDeBordDesktop({
                 </div>
                 <div className="mt-4 flex h-16 items-end gap-2">
                   {DONNEES_EXEMPLE.facturationSemaine.barres.map((valeur, index) => (
-                    <div key={DONNEES_EXEMPLE.facturationSemaine.jours[index]} className="flex flex-1 flex-col items-center gap-1.5">
+                    <div key={`${DONNEES_EXEMPLE.facturationSemaine.jours[index]}-${index}`} className="flex flex-1 flex-col items-center gap-1.5">
                       <div
                         className="w-full rounded-t-[4px] bg-brand-violet/25"
                         style={{ height: `${valeur}%` }}

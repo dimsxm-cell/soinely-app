@@ -8,6 +8,7 @@ import {
   filtrerMissions,
   formatHeureDepuisTimestamp,
   getInitiales,
+  trouverProchainArret,
 } from "./tournee-vue";
 
 function creerMission(surcharge: Partial<MissionTourneeVue> = {}): MissionTourneeVue {
@@ -206,5 +207,39 @@ describe("calculerRetardMinutes", () => {
   it("renvoie null sans heure de début réelle", () => {
     const mission = creerMissionEnCours("14:20:00", null);
     expect(calculerRetardMinutes(mission)).toBeNull();
+  });
+});
+
+describe("trouverProchainArret", () => {
+  it("choisit la mission en cours plutôt qu'une mission à faire", () => {
+    const missions = [
+      creerMission({ id: "a", statut: "a_faire" }),
+      creerMission({ id: "b", statut: "en_cours" }),
+      creerMission({ id: "c", statut: "a_faire" }),
+    ];
+
+    const resultat = trouverProchainArret(missions);
+    expect(resultat?.id).toBe("b");
+  });
+
+  it("bascule sur la première mission à faire quand rien n'est en cours", () => {
+    const missions = [
+      creerMission({ id: "a", statut: "a_faire" }),
+      creerMission({ id: "b", statut: "a_faire" }),
+      creerMission({ id: "c", statut: "terminee" }),
+    ];
+
+    const resultat = trouverProchainArret(missions);
+    expect(resultat?.id).toBe("a");
+  });
+
+  it("renvoie null quand rien n'est en cours ou à faire", () => {
+    const missions = [
+      creerMission({ id: "a", statut: "terminee" }),
+      creerMission({ id: "b", statut: "absent" }),
+    ];
+
+    const resultat = trouverProchainArret(missions);
+    expect(resultat).toBeNull();
   });
 });

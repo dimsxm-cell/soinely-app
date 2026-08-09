@@ -1,5 +1,5 @@
 import type { MissionTourneeVue } from "@/lib/data/ma-journee";
-import { estimerHeureFin, formatHeure, formatHeureDepuisTimestamp, getInitiales } from "@/lib/tournee-vue";
+import { estimerHeureFin, formatHeure, formatHeureDepuisTimestamp, getInitiales, trouverProchainArret } from "@/lib/tournee-vue";
 import { formaterNomPropre } from "@/lib/format";
 import { hrefWaze } from "@/lib/waze";
 
@@ -19,8 +19,7 @@ export function CarteTourneeEnCoursDesktop({ missions }: { missions: MissionTour
   const circonference = 2 * Math.PI * 54;
   const dashoffset = circonference * (1 - pct / 100);
 
-  const prochainArret =
-    missions.find((m) => m.statut === "en_cours") ?? missions.find((m) => m.statut === "a_faire") ?? null;
+  const prochainArret = trouverProchainArret(missions);
   const heureFin = estimerHeureFin(missions);
   const km = kmRestants(missions);
 
