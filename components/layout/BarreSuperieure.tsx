@@ -26,11 +26,11 @@ interface BarreSuperieureProps {
   avatarUrl?: string | null;
 }
 
-/** Fiche patient (Identité/Soins/Documents) : son propre en-tête violet
- *  porte déjà le retour et « Mon compte », la barre blanche globale
- *  ferait doublon. La liste /patients et /patients/nouveau la gardent. */
-function estFichePatient(pathname: string): boolean {
-  return /^\/patients\/(?!nouveau($|\/))[^/]+/.test(pathname);
+/** Toute la zone /patients (liste, création, fiche et ses sous-routes) porte
+ *  désormais son propre en-tête violet — la barre blanche globale ferait
+ *  doublon. */
+function estZonePatients(pathname: string): boolean {
+  return pathname === "/patients" || pathname.startsWith("/patients/");
 }
 
 /** Accueil et Ma tournée : leur bandeau violet porte désormais lui-même le
@@ -47,9 +47,26 @@ function estEly(pathname: string): boolean {
   return pathname === "/ely";
 }
 
+/** Les 3 listes d'Explorer portent désormais leur propre bandeau violet
+ *  (onglets + recherche). Leurs fiches de détail (/situations/[id] etc.)
+ *  n'en ont pas et gardent la barre globale. */
+function estListeExplorer(pathname: string): boolean {
+  return (
+    pathname === "/situations" ||
+    pathname === "/situations/dossier" ||
+    pathname === "/situations/informations-professionnelles"
+  );
+}
+
 export function BarreSuperieure({ avatarUrl }: BarreSuperieureProps) {
   const pathname = usePathname();
-  if (estFichePatient(pathname) || estAccueilOuTournee(pathname) || estEly(pathname)) return null;
+  if (
+    estZonePatients(pathname) ||
+    estAccueilOuTournee(pathname) ||
+    estEly(pathname) ||
+    estListeExplorer(pathname)
+  )
+    return null;
 
   return (
     <header className="print:hidden">

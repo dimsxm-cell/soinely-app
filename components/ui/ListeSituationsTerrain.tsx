@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { SituationTerrain } from "@/lib/types/clinical";
 import { CarteSituationTerrain } from "./CarteSituationTerrain";
+import { EnTeteExplorer } from "./EnTeteExplorer";
 
 interface ListeSituationsTerrainProps {
   situations: SituationTerrain[];
@@ -20,27 +21,29 @@ export function ListeSituationsTerrain({ situations }: ListeSituationsTerrainPro
   }, [situations, requete]);
 
   return (
-    <div>
-      <input
-        type="search"
-        value={requete}
-        onChange={(event) => setRequete(event.target.value)}
-        placeholder="Rechercher une situation..."
-        aria-label="Rechercher une situation"
-        className="mt-4 min-h-[48px] w-full rounded-[14px] border border-navy/10 bg-white px-4 text-[15px] text-navy placeholder:text-navy/40"
+    <>
+      <EnTeteExplorer
+        actif="situations"
+        titre="Situations Terrain"
+        sous="Conduites à tenir pour les situations fréquentes en soins à domicile."
+        query={requete}
+        onQuery={setRequete}
+        placeholder="Rechercher une situation…"
       />
 
-      <div className="mt-4 flex flex-col gap-4">
-        {visibles.map((situation) => (
-          <CarteSituationTerrain key={situation.id} situation={situation} />
-        ))}
+      <div className="mx-auto max-w-2xl px-6 py-6">
+        <div className="flex flex-col gap-4">
+          {visibles.map((situation) => (
+            <CarteSituationTerrain key={situation.id} situation={situation} />
+          ))}
 
-        {visibles.length === 0 && (
-          <p className="py-7 text-center text-navy/50">
-            {requete ? "Aucune situation ne correspond." : "Aucune situation disponible pour le moment."}
-          </p>
-        )}
+          {visibles.length === 0 && (
+            <p className="py-7 text-center text-navy/50">
+              {requete ? "Aucune situation ne correspond." : "Aucune situation disponible pour le moment."}
+            </p>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

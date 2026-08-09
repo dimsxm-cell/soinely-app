@@ -19,30 +19,15 @@ describe("BarreSuperieure", () => {
     expect(screen.getByRole("link", { name: "Mon compte" })).toHaveAttribute("href", "/compte");
   });
 
-  it("reste affichée sur la liste des patients et la création d'un patient", async () => {
+  it("disparaît sur toute la zone /patients, qui porte désormais son propre en-tête", async () => {
     const { BarreSuperieure } = await import("./BarreSuperieure");
 
-    usePathnameMock.mockReturnValue("/patients");
-    const { unmount } = render(<BarreSuperieure />);
-    expect(screen.getByRole("link", { name: "Mon compte" })).toBeInTheDocument();
-    unmount();
-
-    usePathnameMock.mockReturnValue("/patients/nouveau");
-    render(<BarreSuperieure />);
-    expect(screen.getByRole("link", { name: "Mon compte" })).toBeInTheDocument();
-  });
-
-  it("disparaît sur la fiche patient, qui porte déjà son propre en-tête", async () => {
-    const { BarreSuperieure } = await import("./BarreSuperieure");
-
-    usePathnameMock.mockReturnValue("/patients/p1");
-    const { container, unmount } = render(<BarreSuperieure />);
-    expect(container).toBeEmptyDOMElement();
-    unmount();
-
-    usePathnameMock.mockReturnValue("/patients/p1/prescriptions");
-    const { container: container2 } = render(<BarreSuperieure />);
-    expect(container2).toBeEmptyDOMElement();
+    for (const pathname of ["/patients", "/patients/nouveau", "/patients/p1", "/patients/p1/prescriptions"]) {
+      usePathnameMock.mockReturnValue(pathname);
+      const { container, unmount } = render(<BarreSuperieure />);
+      expect(container).toBeEmptyDOMElement();
+      unmount();
+    }
   });
 
   it("disparaît sur Accueil et Ma tournée, qui portent désormais leur propre logo et profil", async () => {
@@ -71,5 +56,20 @@ describe("BarreSuperieure", () => {
     usePathnameMock.mockReturnValue("/ely");
     const { container } = render(<BarreSuperieure />);
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it("disparaît sur les 3 listes d'Explorer, mais reste sur leurs fiches de détail", async () => {
+    const { BarreSuperieure } = await import("./BarreSuperieure");
+
+    for (const pathname of ["/situations", "/situations/dossier", "/situations/informations-professionnelles"]) {
+      usePathnameMock.mockReturnValue(pathname);
+      const { container, unmount } = render(<BarreSuperieure />);
+      expect(container).toBeEmptyDOMElement();
+      unmount();
+    }
+
+    usePathnameMock.mockReturnValue("/situations/s1");
+    render(<BarreSuperieure />);
+    expect(screen.getByRole("link", { name: "Mon compte" })).toBeInTheDocument();
   });
 });

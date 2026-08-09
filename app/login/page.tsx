@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { LogoSoinely } from "@/components/ui/LogoSoinely";
+import { RubanLemniscateHero } from "@/components/ui/RubanLemniscateHero";
 import { createClient } from "@/lib/supabase/client";
 import { signInAction, signUpAction, requestPasswordResetAction } from "./actions";
 
@@ -114,6 +115,10 @@ export default function LoginPage() {
 
   const heroTitle =
     mode === "forgot" ? "Mot de passe oublié" : mode === "signup" ? "Créez votre compte" : "Bienvenue sur Soinely";
+  const elyLine =
+    mode === "signup"
+      ? "ELY prépare votre première tournée dès votre inscription."
+      : "ELY vous attend : votre tournée du jour est déjà prête.";
 
   return (
     <main className="relative min-h-screen overflow-hidden" style={{ background: "#faf8ff" }}>
@@ -145,87 +150,88 @@ export default function LoginPage() {
         className="pointer-events-none absolute bottom-0 left-[4%] hidden h-[74vh] w-auto object-contain lg:block xl:left-[10%]"
       />
 
-      {/* Marges verticales resserrées sur téléphone : elles financent les
-          24 px que prend le portrait d'ELY ci-dessous, le mode Connexion
-          remplissant l'écran au pixel près. Valeurs d'origine dès sm. */}
-      <div className="mx-auto flex min-h-screen w-full max-w-[430px] flex-col px-[22px] pb-9 pt-5 sm:pb-12 sm:pt-14">
-        <div className="flex shrink-0 items-center justify-between">
-          {/* Retour — même traitement de verre que les autres boutons clairs */}
-          <Link
-            href="/"
-            className="btn-glace-clair inline-flex w-fit items-center gap-1 rounded-[12px] border border-[#e0e0e0] bg-white px-4 py-[9px] text-[15px] font-semibold text-[#1d1d1f]"
-          >
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="m15 18-6-6 6-6" />
-            </svg>
-            Accueil
-          </Link>
+      {/* En-tête violet, cohérent avec le reste de l'app (Accueil, Ma tournée,
+          Ely, Patients) : logo, ruban lemniscate, titre et bascule de mode. */}
+      <div className="relative overflow-hidden bg-[linear-gradient(168deg,#221b33_0%,#2c1f47_60%,#3a2260_100%)] px-[22px] pb-7 pt-5 text-white sm:pt-14">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-16 -top-24 h-[280px] w-[280px] rounded-full bg-[radial-gradient(circle,rgba(168,85,247,.4),transparent_68%)]"
+        />
+        <RubanLemniscateHero />
+        <div className="relative mx-auto flex w-full max-w-[430px] flex-col">
+          <div className="flex shrink-0 items-center justify-between">
+            {/* Retour — même traitement de verre que les autres boutons clairs */}
+            <Link
+              href="/"
+              className="btn-glace-clair inline-flex w-fit items-center gap-1 rounded-full border border-white/15 bg-white/10 px-4 py-[9px] text-[15px] font-semibold text-white"
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="m15 18-6-6 6-6" />
+              </svg>
+              Accueil
+            </Link>
 
-          {/* ELY sur petit écran, en portrait. Le personnage entier ci-dessous
-              ne tient qu'à partir de lg ; ici la colonne du formulaire remplit
-              déjà la hauteur de l'écran, au pixel près en mode Connexion. Cette
-              place est la seule qui ne coûte rien en vertical, et elle équilibre
-              la barre du haut : même cercle blanc que le bouton d'à côté. */}
-          <Image
-            src="/marketing/ely-colibri-heureux.webp"
-            alt=""
-            width={323}
-            height={304}
-            aria-hidden="true"
-            className="h-16 w-16 shrink-0 rounded-full border border-[#e0e0e0] bg-white object-cover lg:hidden"
-          />
-        </div>
-
-        {/* Bloc centré verticalement : les formulaires Connexion et Créer un
-            compte n'ont pas la même hauteur. Sans ce centrage, passer de l'un
-            à l'autre décalait tout le contenu vers le bas, d'où l'impression
-            de rebond. Le bloc grandit désormais symétriquement. */}
-        <div className="flex flex-1 flex-col justify-center">
-        {/* En-tête */}
-        <div className="mt-8 flex flex-col items-center text-center">
-          <div className="flex items-center gap-[9px]">
-            <LogoSoinely variante="carre" className="h-8 w-8" />
-            <span className="text-[22px] font-bold tracking-[-0.4px] text-[#1d1d1f]">Soinely</span>
+            {/* ELY sur petit écran, en portrait. Le personnage entier ci-dessous
+                ne tient qu'à partir de lg ; cette place équilibre la barre du
+                haut, même cercle que sur les autres en-têtes violets. */}
+            <Image
+              src="/marketing/ely-colibri-heureux.webp"
+              alt=""
+              width={323}
+              height={304}
+              aria-hidden="true"
+              className="h-16 w-16 shrink-0 rounded-full border border-white/20 bg-white/10 object-cover lg:hidden"
+            />
           </div>
-          <h1 className="mt-[22px] font-display text-[30px] font-semibold leading-[1.1] tracking-[-0.5px] text-[#1d1d1f] sm:text-[34px]">
-            {heroTitle}
-          </h1>
+
+          {/* En-tête */}
+          <div className="mt-8 flex flex-col items-center text-center">
+            <div className="flex items-center gap-[9px]">
+              <LogoSoinely variante="carre" className="h-8 w-8" />
+              <span className="text-[22px] font-bold tracking-[-0.4px] text-white">Soinely</span>
+            </div>
+            <h1 className="mt-[22px] font-display text-[30px] font-semibold leading-[1.1] tracking-[-0.5px] text-white sm:text-[34px]">
+              {heroTitle}
+            </h1>
+            {mode !== "forgot" && (
+              <p className="mt-2 text-[15.5px] tracking-[-0.2px] text-[#b3aacd]">Fait par une IDEL, pour les IDEL.</p>
+            )}
+          </div>
+
+          {/* Onglets Connexion / Créer un compte */}
           {mode !== "forgot" && (
-            <p className="mt-2 text-[15.5px] tracking-[-0.2px] text-[#8a8a8e]">Fait par une IDEL, pour les IDEL.</p>
+            <div className="glass-pill mt-[26px] flex gap-[5px] rounded-[14px] border border-white/50 p-[5px]">
+              <span className="glass-pill-effect" aria-hidden="true" />
+              <span className="glass-pill-tint" aria-hidden="true" />
+              <span className="glass-pill-shine" aria-hidden="true" />
+              <button
+                type="button"
+                onClick={() => switchMode("login")}
+                className={`glass-pill-content appbtn flex-1 rounded-[10px] py-[11px] text-[15px] font-semibold tracking-[-0.2px] transition-colors ${
+                  mode === "login"
+                    ? "bg-gradient-to-r from-brand-violet to-brand-rose text-white shadow-[0_6px_16px_rgba(124,58,237,0.3)]"
+                    : "text-[#c9c1de]"
+                }`}
+              >
+                Connexion
+              </button>
+              <button
+                type="button"
+                onClick={() => switchMode("signup")}
+                className={`glass-pill-content appbtn flex-1 rounded-[10px] py-[11px] text-[15px] font-semibold tracking-[-0.2px] transition-colors ${
+                  mode === "signup"
+                    ? "bg-gradient-to-r from-brand-violet to-brand-rose text-white shadow-[0_6px_16px_rgba(124,58,237,0.3)]"
+                    : "text-[#c9c1de]"
+                }`}
+              >
+                Créer un compte
+              </button>
+            </div>
           )}
         </div>
+      </div>
 
-        {/* Onglets Connexion / Créer un compte */}
-        {mode !== "forgot" && (
-          <div className="glass-pill mt-[26px] flex gap-[5px] rounded-[14px] border border-white/50 p-[5px]">
-            <span className="glass-pill-effect" aria-hidden="true" />
-            <span className="glass-pill-tint" aria-hidden="true" />
-            <span className="glass-pill-shine" aria-hidden="true" />
-            <button
-              type="button"
-              onClick={() => switchMode("login")}
-              className={`glass-pill-content appbtn flex-1 rounded-[10px] py-[11px] text-[15px] font-semibold tracking-[-0.2px] transition-colors ${
-                mode === "login"
-                  ? "bg-gradient-to-r from-brand-violet to-brand-rose text-white shadow-[0_6px_16px_rgba(124,58,237,0.3)]"
-                  : "text-[#8a8a8e]"
-              }`}
-            >
-              Connexion
-            </button>
-            <button
-              type="button"
-              onClick={() => switchMode("signup")}
-              className={`glass-pill-content appbtn flex-1 rounded-[10px] py-[11px] text-[15px] font-semibold tracking-[-0.2px] transition-colors ${
-                mode === "signup"
-                  ? "bg-gradient-to-r from-brand-violet to-brand-rose text-white shadow-[0_6px_16px_rgba(124,58,237,0.3)]"
-                  : "text-[#8a8a8e]"
-              }`}
-            >
-              Créer un compte
-            </button>
-          </div>
-        )}
-
+      <div className="mx-auto flex w-full max-w-[430px] flex-col px-[22px] pb-9 sm:pb-12">
         {/* Carte formulaire */}
         <div
           className="mt-[18px] flex flex-col gap-[13px] rounded-[18px] bg-white p-[22px_20px]"
@@ -408,6 +414,19 @@ export default function LoginPage() {
               </button>
             </div>
 
+            <div className="mt-4 flex items-center gap-3 rounded-[18px] border border-[#e2d6fa] bg-[#f1ebfd] p-[12px_13px]">
+              <span className="h-[38px] w-[38px] shrink-0 overflow-hidden rounded-full bg-[#efeaf9]">
+                <Image
+                  src="/marketing/ely-colibri-heureux.webp"
+                  alt="ELY"
+                  width={323}
+                  height={304}
+                  className="h-full w-full object-cover object-[center_42%]"
+                />
+              </span>
+              <p className="text-[13.5px] leading-relaxed text-[#3b3648]">{elyLine}</p>
+            </div>
+
             {/* Mention affichée dans les deux modes : se connecter avec Apple
                 ou Google crée aussi un compte le cas échéant. Les liens
                 s'ouvrent dans un nouvel onglet pour ne pas perdre la saisie. */}
@@ -434,7 +453,6 @@ export default function LoginPage() {
             </p>
           </>
         )}
-        </div>
       </div>
     </main>
   );
