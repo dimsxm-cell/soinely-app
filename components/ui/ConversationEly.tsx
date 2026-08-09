@@ -27,7 +27,7 @@ const SUGGESTIONS = [
   "Signes d'hypoglycémie",
 ];
 
-const MESSAGE_AUCUN_RESULTAT = "Je n'ai pas trouvé de réponse à cette question. Essayez de la reformuler.";
+const MESSAGE_AUCUN_RESULTAT = "Je n'ai pas trouvé de réponse à cette question. Essaie de la reformuler.";
 
 function texteAVoixHaute(reponse: ReponseEly): string {
   if (reponse.synthese) {
@@ -194,7 +194,7 @@ export function ConversationEly({
       </div>
 
       <p className="mt-2 text-[12px] leading-relaxed text-navy/40">
-        Ely vous aide à analyser la situation ; la décision et la responsabilité restent à vous.
+        Ely t'aide à analyser la situation ; la décision et la responsabilité restent à toi.
       </p>
 
       {patientContexte && (
@@ -224,7 +224,7 @@ export function ConversationEly({
             </span>
             <h1 className="mt-5 font-display text-[24px] font-bold tracking-tight text-navy">Bonjour, je suis ELY</h1>
             <p className="mt-2 max-w-[280px] text-[15px] leading-relaxed text-navy/55">
-              Votre assistant de tournée. Posez-moi une question de terrain, je vous guide sur la conduite à tenir.
+              Ton assistant de tournée. Pose-moi une question de terrain, je te guide sur la conduite à tenir.
             </p>
             <div className="mt-5 flex flex-wrap justify-center gap-2">
               {SUGGESTIONS.map((label) => (

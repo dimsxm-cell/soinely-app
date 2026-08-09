@@ -151,7 +151,7 @@ describe("ConversationEly — rappel de limite", () => {
     render(<ConversationEly requeteInitiale="" reponseInitiale={reponseBrute(null)} />);
 
     expect(
-      screen.getByText("Ely vous aide à analyser la situation ; la décision et la responsabilité restent à vous.")
+      screen.getByText("Ely t'aide à analyser la situation ; la décision et la responsabilité restent à toi.")
     ).toBeInTheDocument();
   });
 });

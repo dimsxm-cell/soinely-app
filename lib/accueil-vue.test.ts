@@ -100,7 +100,7 @@ describe("conseilEly", () => {
       creerMission({ id: "b", statut: "en_cours", patientNom: "Mme Dupont" }),
     ];
     expect(conseilEly(missions)).toBe(
-      "Soin en cours chez Mme Dupont — pensez à la transmission avant de partir."
+      "Tu es chez Mme Dupont — pense à ta transmission avant de repartir."
     );
   });
 
@@ -111,11 +111,11 @@ describe("conseilEly", () => {
 
   it("indique la tournee bouclee quand il ne reste aucune mission a faire ou en cours", () => {
     const missions = [creerMission({ statut: "terminee" })];
-    expect(conseilEly(missions)).toBe("Tournée bouclée. Vos transmissions sont à jour, bonne journée.");
+    expect(conseilEly(missions)).toBe("Tournée bouclée. Tes transmissions sont à jour, bonne journée.");
   });
 
   it("indique qu'aucune visite n'est programmée sans aucune mission", () => {
-    expect(conseilEly([])).toBe("Aucune visite programmée aujourd'hui.");
+    expect(conseilEly([])).toBe("Pas de visite prévue aujourd'hui — profite de cette pause.");
   });
 });
 

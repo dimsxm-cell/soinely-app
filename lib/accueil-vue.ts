@@ -53,12 +53,12 @@ export function calculerKmTournee(missions: MissionDuJour[]): number | null {
  */
 export function conseilEly(missions: MissionDuJour[]): string {
   if (missions.length === 0) {
-    return "Aucune visite programmée aujourd'hui.";
+    return "Pas de visite prévue aujourd'hui — profite de cette pause.";
   }
 
   const enCours = missions.find((m) => m.statut === "en_cours");
   if (enCours) {
-    return `Soin en cours chez ${formaterNomPropre(enCours.patientNom)} — pensez à la transmission avant de partir.`;
+    return `Tu es chez ${formaterNomPropre(enCours.patientNom)} — pense à ta transmission avant de repartir.`;
   }
 
   const prochaine = missions.find((m) => m.statut === "a_faire");
@@ -66,7 +66,7 @@ export function conseilEly(missions: MissionDuJour[]): string {
     return `Prochaine visite : ${formaterNomPropre(prochaine.patientNom)} à ${prochaine.heurePrevue.slice(0, 5)}.`;
   }
 
-  return "Tournée bouclée. Vos transmissions sont à jour, bonne journée.";
+  return "Tournée bouclée. Tes transmissions sont à jour, bonne journée.";
 }
 
 export interface ActionRapideAccueil {
