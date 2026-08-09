@@ -13,6 +13,7 @@ import { calculerMajorationsTournee } from "@/lib/majorations";
 import { formaterNomPropre } from "@/lib/format";
 import { OngletsFiltresTournee } from "@/components/ui/OngletsFiltresTournee";
 import { BarreLogoProfilHero } from "@/components/ui/BarreLogoProfilHero";
+import { RubanLemniscateHero } from "@/components/ui/RubanLemniscateHero";
 
 const CIRCONFERENCE = 2 * Math.PI * 33;
 
@@ -57,6 +58,7 @@ export function EnTeteTournee({
         aria-hidden="true"
         className="pointer-events-none absolute -left-12 -top-20 h-[260px] w-[260px] rounded-full bg-[radial-gradient(circle,rgba(168,85,247,.4),transparent_68%)]"
       />
+      <RubanLemniscateHero />
       <div className="relative mx-auto max-w-2xl">
         <BarreLogoProfilHero avatarUrl={avatarUrl} />
 

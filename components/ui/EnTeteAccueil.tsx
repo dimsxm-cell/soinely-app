@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { MissionDuJour } from "@/lib/types/clinical";
 import { calculerKmTournee, compterMissionsAccueil, formatDateDuJour, formatSalutation } from "@/lib/accueil-vue";
 import { BarreLogoProfilHero } from "@/components/ui/BarreLogoProfilHero";
+import { RubanLemniscateHero } from "@/components/ui/RubanLemniscateHero";
 
 export function EnTeteAccueil({
   prenom,
@@ -21,6 +22,7 @@ export function EnTeteAccueil({
         aria-hidden="true"
         className="pointer-events-none absolute -right-16 -top-24 h-[280px] w-[280px] rounded-full bg-[radial-gradient(circle,rgba(168,85,247,.4),transparent_68%)]"
       />
+      <RubanLemniscateHero />
       <div className="relative mx-auto max-w-2xl">
         <BarreLogoProfilHero avatarUrl={avatarUrl} />
 
