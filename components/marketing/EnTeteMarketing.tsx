@@ -4,7 +4,8 @@ import { LogoSoinely } from "@/components/ui/LogoSoinely";
 const LIENS_NAV = [
   { href: "#feat", label: "Fonctionnalités" },
   { href: "#ely", label: "ELY, votre copilote" },
-  { href: "/abonnement", label: "Tarifs" },
+  { href: "#demo", label: "Démonstration" },
+  { href: "#securite", label: "Sécurité" },
 ];
 
 export function EnTeteMarketing() {
@@ -52,7 +53,7 @@ export function EnTeteMarketing() {
             boxShadow: "0 6px 18px rgba(124,58,237,.32)",
           }}
         >
-          Se connecter
+          Rejoindre la bêta privée
         </Link>
       </div>
     </header>
