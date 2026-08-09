@@ -7,9 +7,9 @@ const TEXTE =
 
 /**
  * Ruban en forme de lemniscate (infini), texte animé en filigrane très
- * discret dans le coin des en-têtes violets. Décoration pure, aria-hidden.
- * `useId` évite un id SVG dupliqué si jamais deux en-têtes se retrouvaient
- * montés en même temps.
+ * discret, centré derrière le contenu des en-têtes violets. Décoration
+ * pure, aria-hidden. `useId` évite un id SVG dupliqué si jamais deux
+ * en-têtes se retrouvaient montés en même temps.
  */
 export function RubanLemniscateHero() {
   const lemniId = `lemni-${useId()}`;
@@ -18,7 +18,7 @@ export function RubanLemniscateHero() {
     <svg
       viewBox="0 0 280 200"
       aria-hidden="true"
-      className="pointer-events-none absolute -right-6 top-2 h-[178px] w-[223px] overflow-visible"
+      className="pointer-events-none absolute left-1/2 top-1/2 h-[178px] w-[223px] -translate-x-1/2 -translate-y-1/2 overflow-visible"
     >
       <path
         id={lemniId}
