@@ -4,6 +4,7 @@ import { Benefices } from "@/components/marketing/Benefices";
 import { RangeeFonctionnalites } from "@/components/marketing/RangeeFonctionnalites";
 import { JourneeAvecSoinely } from "@/components/marketing/JourneeAvecSoinely";
 import { EnTempsReel } from "@/components/marketing/EnTempsReel";
+import { SecuriteConfiance } from "@/components/marketing/SecuriteConfiance";
 import { VideoDemo } from "@/components/marketing/VideoDemo";
 import { ListeAttente } from "@/components/marketing/ListeAttente";
 import { PiedDePageMarketing } from "@/components/marketing/PiedDePageMarketing";
@@ -23,6 +24,9 @@ export default function Page() {
       </Reveal>
       <Reveal variant="left">
         <EnTempsReel />
+      </Reveal>
+      <Reveal variant="up">
+        <SecuriteConfiance />
       </Reveal>
       <Reveal variant="blur">
         <VideoDemo />
