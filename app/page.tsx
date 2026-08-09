@@ -7,6 +7,7 @@ import { EnTempsReel } from "@/components/marketing/EnTempsReel";
 import { SecuriteConfiance } from "@/components/marketing/SecuriteConfiance";
 import { VideoDemo } from "@/components/marketing/VideoDemo";
 import { ListeAttente } from "@/components/marketing/ListeAttente";
+import { CtaFinal } from "@/components/marketing/CtaFinal";
 import { PiedDePageMarketing } from "@/components/marketing/PiedDePageMarketing";
 import { Reveal } from "@/components/marketing/Reveal";
 
@@ -34,6 +35,7 @@ export default function Page() {
       <Reveal variant="rise">
         <ListeAttente />
       </Reveal>
+      <CtaFinal />
       <PiedDePageMarketing />
     </main>
   );
