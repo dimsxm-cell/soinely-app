@@ -20,6 +20,7 @@ export function Hero() {
           muted
           loop
           playsInline
+          preload="none"
           className="h-full w-full object-cover"
           poster="/marketing/hero-nurse.webp"
         >
@@ -117,8 +118,8 @@ export function Hero() {
             ))}
           </div>
 
-          {/* CTA unique — Essayer gratuitement */}
-          <div className="mb-[24px] flex items-center gap-[14px]">
+          {/* CTA primaire + secondaire */}
+          <div className="mb-[24px] flex flex-wrap items-center gap-[14px]">
             <Link
               href="/login"
               className="btn-glace inline-flex items-center gap-[9px] rounded-[12px] font-bold text-white"
@@ -129,7 +130,7 @@ export function Hero() {
                 boxShadow: "0 10px 26px rgba(124,58,237,.35)",
               }}
             >
-              Essayer gratuitement
+              Rejoindre la bêta privée
               <svg
                 width="18"
                 height="18"
@@ -145,42 +146,25 @@ export function Hero() {
                 <path d="M5 12h14M13 6l6 6-6 6" />
               </svg>
             </Link>
+            <Link
+              href="#demo"
+              className="btn-glace-clair inline-flex items-center gap-[9px] rounded-[12px] font-bold"
+              style={{
+                background: "#fff",
+                border: "1px solid #e9defb",
+                color: "#6d28d9",
+                fontSize: 16,
+                padding: "16px 30px",
+              }}
+            >
+              Voir SOINELY en action
+            </Link>
           </div>
 
-          {/* Badges sous le CTA */}
-          <div
-            className="flex flex-wrap items-center gap-[22px] font-semibold"
-            style={{ fontSize: 12.5, color: "#8a83a0" }}
-          >
-            {[
-              {
-                label: "Données de santé chiffrées",
-                d: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
-              },
-              { label: "Sans engagement", d: "M20 6 9 17l-5-5" },
-              {
-                label: "Conçu par et pour les IDEL",
-                d: "M12 21s-7-4.4-9.5-8.5C.5 9 2 5 5.5 5 7.8 5 9 6.5 12 9c3-2.5 4.2-4 6.5-4C22 5 23.5 9 21.5 12.5 19 16.6 12 21 12 21z",
-              },
-            ].map((badge) => (
-              <span key={badge.label} className="flex items-center gap-[6px]">
-                <svg
-                  width="15"
-                  height="15"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#a855f7"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d={badge.d} />
-                </svg>
-                {badge.label}
-              </span>
-            ))}
-          </div>
+          {/* Micro-copy */}
+          <p style={{ fontSize: 12.5, fontWeight: 600, color: "#8a83a0", margin: 0 }}>
+            Bêta gratuite • Sans engagement
+          </p>
         </div>
 
         {/* Colonne droite — téléphone + carte ELY */}

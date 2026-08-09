@@ -70,7 +70,7 @@ export function ListeAttente() {
               className="btn-glace-clair mb-3 inline-flex items-center gap-[9px] rounded-[12px] font-extrabold"
               style={{ background: "#fff", color: "#7c3aed", fontSize: 15, padding: "14px 26px", boxShadow: "0 10px 26px rgba(0,0,0,.18)", display: "inline-flex", marginBottom: 12 }}
             >
-              Rejoindre la liste d&apos;attente
+              Rejoindre la bêta privée
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M5 12h14M13 6l6 6-6 6" />
               </svg>
