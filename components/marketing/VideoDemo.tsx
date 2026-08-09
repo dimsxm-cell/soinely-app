@@ -61,6 +61,8 @@ export function VideoDemo() {
                 data-testid="video-player"
                 controls
                 autoPlay
+                playsInline
+                muted
                 poster="/marketing/video-thumb.webp"
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               >

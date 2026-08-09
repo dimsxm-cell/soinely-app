@@ -12,10 +12,13 @@ describe("Home page", () => {
   it("links the primary CTAs to /login with consistent beta copy", () => {
     render(<Page />);
     const ctas = screen.getAllByRole("link", { name: /rejoindre la bêta privée/i });
-    expect(ctas.length).toBeGreaterThanOrEqual(4); // header, hero, liste d'attente, CTA final
+    expect(ctas.length).toBe(4); // header, hero, liste d'attente, CTA final
     for (const cta of ctas) {
       expect(cta).toHaveAttribute("href", "/login");
     }
+    expect(
+      screen.queryByRole("link", { name: /se connecter|essayer gratuitement|liste d'attente/i })
+    ).not.toBeInTheDocument();
   });
 
   it("le hero propose un CTA secondaire vers la démonstration", () => {

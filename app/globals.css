@@ -25,6 +25,10 @@
   --radius-card: 16px;
 }
 
+html {
+  scroll-padding-top: 88px;
+}
+
 :root {
   --background: #F6F7F5;
   --foreground: #0F172A;

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { DUREE_ESSAI_GRATUIT_JOURS } from "@/lib/data/abonnement";
 
 const HERO_CHECKS = [
   "Données de santé chiffrées",
@@ -163,7 +164,7 @@ export function Hero() {
 
           {/* Micro-copy */}
           <p style={{ fontSize: 12.5, fontWeight: 600, color: "#8a83a0", margin: 0 }}>
-            Bêta gratuite • Sans engagement
+            {`Gratuit ${DUREE_ESSAI_GRATUIT_JOURS} jours • Sans engagement`}
           </p>
         </div>
 

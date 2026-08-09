@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DUREE_ESSAI_GRATUIT_JOURS } from "@/lib/data/abonnement";
 
 export function CtaFinal() {
   return (
@@ -34,7 +35,7 @@ export function CtaFinal() {
           </svg>
         </Link>
         <p style={{ marginTop: 16, fontSize: 12.5, fontWeight: 600, color: "rgba(255,255,255,.7)" }}>
-          Gratuit pendant la bêta • Sans engagement
+          {`Gratuit ${DUREE_ESSAI_GRATUIT_JOURS} jours • Sans engagement`}
         </p>
       </div>
     </section>
