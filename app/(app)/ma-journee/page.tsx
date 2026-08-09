@@ -2,6 +2,7 @@ import Image from "next/image";
 import { createClient, getUtilisateurConnecte } from "@/lib/supabase/server";
 import { formaterNomPropre } from "@/lib/format";
 import { getMissionEnCoursHref, getMissionsDuJour, getTourneeDuJour } from "@/lib/data/ma-journee";
+import { getAvatarUrl } from "@/lib/data/profil";
 import { reorganiserTourneeAction } from "@/lib/data/reorganisation-tournee";
 import {
   compterMissionsAccueil,
@@ -17,19 +18,14 @@ import { getMaterielDuJour } from "@/lib/data/materiel";
 import { CarteMateriel } from "@/components/ui/CarteMateriel";
 import { updateMissionStatutAction } from "@/lib/data/ma-journee-actions";
 
-export default async function MaJourneePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ q?: string }>;
-}) {
-  const { q } = await searchParams;
-  const requete = (q ?? "").trim();
-
+export default async function MaJourneePage() {
   const supabase = await createClient();
   const user = await getUtilisateurConnecte();
 
   const nomComplet = user?.user_metadata?.full_name as string | undefined;
   const prenom = nomComplet ? formaterNomPropre(nomComplet).split(" ")[0] : undefined;
+  const avatarPath = user?.user_metadata?.avatar_path as string | undefined;
+  const avatarUrl = avatarPath ? await getAvatarUrl(supabase, avatarPath) : null;
 
   const tournee = user ? await getTourneeDuJour(supabase, user.id) : null;
   const [missions, contexte, materiel] = tournee
@@ -40,9 +36,6 @@ export default async function MaJourneePage({
       ])
     : [[], null, []];
 
-  const missionsVisibles = requete
-    ? missions.filter((m) => m.patientNom.toLowerCase().includes(requete.toLowerCase()))
-    : missions;
   const { restantes: missionsRestantes } = compterMissionsAccueil(missions);
   const missionsAFaire = missions.filter((m) => m.statut === "a_faire").length;
   const conseil = tournee ? conseilEly(missions) : null;
@@ -51,7 +44,7 @@ export default async function MaJourneePage({
   return (
     <main className="min-h-screen bg-[#F6F7F5] text-navy">
       {tournee ? (
-        <EnTeteAccueil prenom={prenom} missions={missions} />
+        <EnTeteAccueil prenom={prenom} missions={missions} avatarUrl={avatarUrl} />
       ) : (
         <div className="mx-auto w-full max-w-2xl px-6 py-6 sm:py-10">
           <div className="flex items-center gap-2.5">
@@ -90,17 +83,6 @@ export default async function MaJourneePage({
 
       {tournee && (
         <div className="mx-auto w-full max-w-2xl px-6 py-6 sm:py-10">
-          <form method="GET">
-            <input
-              type="search"
-              name="q"
-              defaultValue={requete}
-              placeholder="Rechercher un patient..."
-              aria-label="Rechercher un patient dans les missions du jour"
-              className="min-h-[48px] w-full rounded-[14px] border border-[#e4e0ea] bg-[#faf9fc] px-4 text-[15px] text-navy placeholder:text-navy/40 focus:border-[#a855f7] focus:bg-white focus:outline-none focus:ring-[3px] focus:ring-[rgba(168,85,247,.16)]"
-            />
-          </form>
-
           {conseil && (
             <div className="mt-4 flex items-start gap-2.5 rounded-[16px] border border-[rgba(168,85,247,.26)] bg-[linear-gradient(140deg,rgba(168,85,247,.13),rgba(109,40,217,.05))] px-3.5 py-3">
               <Image
@@ -151,21 +133,19 @@ export default async function MaJourneePage({
               </FormulaireAvecRetour>
             )}
 
-            {missionsVisibles.length > 0 ? (
+            {missions.length > 0 ? (
               <div className="mt-3 flex flex-col gap-3">
-                {missionsVisibles.map((mission, index) => (
+                {missions.map((mission, index) => (
                   <CarteMission
                     key={mission.id}
                     mission={mission}
                     contexteHref={mission.id === contexte?.missionId ? contexte.href : undefined}
-                    estDerniere={index === missionsVisibles.length - 1}
+                    estDerniere={index === missions.length - 1}
                   />
                 ))}
               </div>
             ) : (
-              <p className="mt-6 text-center text-navy/60">
-                {requete ? "Aucun patient ne correspond." : "Aucune mission prévue pour aujourd'hui."}
-              </p>
+              <p className="mt-6 text-center text-navy/60">Aucune mission prévue pour aujourd&apos;hui.</p>
             )}
           </div>
         </div>

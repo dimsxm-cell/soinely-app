@@ -7,6 +7,7 @@ import {
   getTourneeDuJour,
   type MissionTourneeVue,
 } from "@/lib/data/ma-journee";
+import { getAvatarUrl } from "@/lib/data/profil";
 import { CarteMissionTournee } from "@/components/ui/CarteMissionTournee";
 import { EnTeteTournee } from "@/components/ui/EnTeteTournee";
 import { getContexteTarifaire } from "@/lib/data/ngap";
@@ -28,6 +29,9 @@ export default async function MaTourneePage({
 
   const supabase = await createClient();
   const user = await getUtilisateurConnecte();
+
+  const avatarPath = user?.user_metadata?.avatar_path as string | undefined;
+  const avatarUrl = avatarPath ? await getAvatarUrl(supabase, avatarPath) : null;
 
   const tournee: Tournee | null = user ? await getTourneeDuJour(supabase, user.id) : null;
 
@@ -60,6 +64,7 @@ export default async function MaTourneePage({
             contexteTarifaire={contexteTarifaire}
             filtre={filtre}
             counts={counts}
+            avatarUrl={avatarUrl}
           />
 
           <div className="mx-auto max-w-2xl px-4 pt-4 pb-8">

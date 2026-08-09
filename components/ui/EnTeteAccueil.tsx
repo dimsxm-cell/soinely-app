@@ -1,25 +1,30 @@
 import Image from "next/image";
 import type { MissionDuJour } from "@/lib/types/clinical";
 import { calculerKmTournee, compterMissionsAccueil, formatDateDuJour, formatSalutation } from "@/lib/accueil-vue";
+import { BarreLogoProfilHero } from "@/components/ui/BarreLogoProfilHero";
 
 export function EnTeteAccueil({
   prenom,
   missions,
+  avatarUrl,
 }: {
   prenom: string | undefined;
   missions: MissionDuJour[];
+  avatarUrl?: string | null;
 }) {
   const { visites, faites, restantes } = compterMissionsAccueil(missions);
   const km = calculerKmTournee(missions);
 
   return (
-    <div className="relative overflow-hidden bg-[linear-gradient(168deg,#221b33_0%,#2c1f47_58%,#3a2260_100%)] px-5 pb-4 pt-8 text-white">
+    <div className="relative overflow-hidden bg-[linear-gradient(168deg,#221b33_0%,#2c1f47_58%,#3a2260_100%)] px-5 pb-4 pt-6 text-white">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -right-16 -top-24 h-[280px] w-[280px] rounded-full bg-[radial-gradient(circle,rgba(168,85,247,.4),transparent_68%)]"
       />
       <div className="relative mx-auto max-w-2xl">
-        <div className="flex items-center gap-3.5">
+        <BarreLogoProfilHero avatarUrl={avatarUrl} />
+
+        <div className="mt-5 flex items-center gap-3.5">
           <div className="min-w-0 flex-1">
             <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#a99ccb]">{formatDateDuJour()}</p>
             <p className="mt-1 font-display text-[26px] font-bold leading-tight tracking-tight">

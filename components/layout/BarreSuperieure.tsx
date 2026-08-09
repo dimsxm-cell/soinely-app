@@ -33,9 +33,17 @@ function estFichePatient(pathname: string): boolean {
   return /^\/patients\/(?!nouveau($|\/))[^/]+/.test(pathname);
 }
 
+/** Accueil et Ma tournée : leur bandeau violet porte désormais lui-même le
+ *  logo et « Mon compte » (BarreLogoProfilHero), la barre blanche globale
+ *  ferait doublon. Uniquement ces deux pages, pas leurs sous-routes
+ *  (ex. /ma-journee/[missionId] n'a pas de bandeau violet). */
+function estAccueilOuTournee(pathname: string): boolean {
+  return pathname === "/ma-journee" || pathname === "/ma-tournee";
+}
+
 export function BarreSuperieure({ avatarUrl }: BarreSuperieureProps) {
   const pathname = usePathname();
-  if (estFichePatient(pathname)) return null;
+  if (estFichePatient(pathname) || estAccueilOuTournee(pathname)) return null;
 
   return (
     <header className="print:hidden">

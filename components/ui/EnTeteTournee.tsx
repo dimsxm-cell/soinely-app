@@ -12,6 +12,7 @@ import { calculerMontantTournee, formaterEuros, type ContexteTarifaire } from "@
 import { calculerMajorationsTournee } from "@/lib/majorations";
 import { formaterNomPropre } from "@/lib/format";
 import { OngletsFiltresTournee } from "@/components/ui/OngletsFiltresTournee";
+import { BarreLogoProfilHero } from "@/components/ui/BarreLogoProfilHero";
 
 const CIRCONFERENCE = 2 * Math.PI * 33;
 
@@ -21,12 +22,14 @@ export function EnTeteTournee({
   contexteTarifaire,
   filtre,
   counts,
+  avatarUrl,
 }: {
   missions: MissionTourneeVue[];
   tournee: Tournee;
   contexteTarifaire: ContexteTarifaire;
   filtre: Filtre;
   counts: CountsMissions;
+  avatarUrl?: string | null;
 }) {
   const total = missions.length;
   const valides = missions.filter((m) => m.statut === "terminee" || m.statut === "absent").length;
@@ -49,13 +52,15 @@ export function EnTeteTournee({
       : "Tous les soins du jour sont validés";
 
   return (
-    <div className="relative overflow-hidden bg-[linear-gradient(168deg,#221b33_0%,#2c1f47_58%,#3a2260_100%)] px-5 pb-4 pt-8 text-white">
+    <div className="relative overflow-hidden bg-[linear-gradient(168deg,#221b33_0%,#2c1f47_58%,#3a2260_100%)] px-5 pb-4 pt-6 text-white">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -left-12 -top-20 h-[260px] w-[260px] rounded-full bg-[radial-gradient(circle,rgba(168,85,247,.4),transparent_68%)]"
       />
       <div className="relative mx-auto max-w-2xl">
-        <div className="flex items-center gap-3.5">
+        <BarreLogoProfilHero avatarUrl={avatarUrl} />
+
+        <div className="mt-5 flex items-center gap-3.5">
           <div className="relative h-[70px] w-[70px] shrink-0">
             <svg width="70" height="70" viewBox="0 0 70 70" className="absolute inset-0 -rotate-90">
               <circle cx="35" cy="35" r="33" fill="none" stroke="rgba(255,255,255,.13)" strokeWidth="4" />
