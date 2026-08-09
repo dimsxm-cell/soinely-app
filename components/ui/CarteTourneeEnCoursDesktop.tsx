@@ -87,7 +87,9 @@ export function CarteTourneeEnCoursDesktop({ missions }: { missions: MissionTour
               )}
             </>
           ) : (
-            <p className="font-display text-[22px] font-bold tracking-tight text-white/90">Tournée terminée</p>
+            <p className="font-display text-[22px] font-bold tracking-tight text-white/90">
+              {total === 0 ? "Aucune tournée aujourd'hui" : "Tournée terminée"}
+            </p>
           )}
         </div>
 

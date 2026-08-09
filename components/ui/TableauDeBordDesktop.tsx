@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import type { MissionTourneeVue } from "@/lib/data/ma-journee";
 import { formatDateDuJour, formatSalutation } from "@/lib/accueil-vue";
 import { formaterEuros } from "@/lib/cotation";
-import { formatHeure, trouverProchainArret } from "@/lib/tournee-vue";
+import { formatHeure, getInitiales, trouverProchainArret } from "@/lib/tournee-vue";
 import { formaterNomPropre } from "@/lib/format";
 import { LogoSoinely } from "@/components/ui/LogoSoinely";
 import { CarteTourneeEnCoursDesktop } from "@/components/ui/CarteTourneeEnCoursDesktop";
@@ -27,7 +27,7 @@ const DONNEES_EXEMPLE = {
     tendance: "+12,4 %",
     barres: [58, 72, 45, 88, 64, 96, 78],
     jours: ["L", "M", "M", "J", "V", "S", "D"],
-    teletransmission: "Télétransmission SCOR à jour · 0 rejet",
+    teletransmission: "Télétransmission SCOR · 1 rejet à traiter",
   },
 };
 
@@ -173,7 +173,7 @@ export function TableauDeBordDesktop({
                         {formatHeure(mission.heurePrevue)}
                       </span>
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-brand-violet/10 text-[12px] font-bold text-brand-violet">
-                        {formaterNomPropre(mission.patientNom).slice(0, 2).toUpperCase()}
+                        {getInitiales(mission.patientNom)}
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-[14px] font-semibold tracking-tight text-navy">
@@ -190,7 +190,7 @@ export function TableauDeBordDesktop({
             </Panneau>
 
             <div className="flex flex-col gap-5">
-              <Panneau titre="À traiter">
+              <Panneau titre="À traiter" sous="Exemple — brique agrégation à venir">
                 <div className="flex flex-col gap-2">
                   {DONNEES_EXEMPLE.aTraiter.map((item) => (
                     <div key={item.titre} className="rounded-[13px] border border-[#ece8f2] bg-[#fbfafd] px-3 py-2.5">

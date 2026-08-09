@@ -80,6 +80,13 @@ describe("CarteTourneeEnCoursDesktop", () => {
     expect(screen.getByText("Tournée terminée")).toBeInTheDocument();
   });
 
+  it("distingue l'absence de tournée du jour d'une tournée terminée", () => {
+    render(<CarteTourneeEnCoursDesktop missions={[]} />);
+
+    expect(screen.getByText("Aucune tournée aujourd'hui")).toBeInTheDocument();
+    expect(screen.queryByText("Tournée terminée")).not.toBeInTheDocument();
+  });
+
   it("affiche les bonnes initiales en ignorant la civilité", () => {
     const nomAvecCivilite = "M. Nguyen";
     const missions = [creerMission({ id: "a", statut: "en_cours", patientNom: nomAvecCivilite })];

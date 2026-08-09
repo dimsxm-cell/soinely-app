@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { TableauDeBordDesktop } from "./TableauDeBordDesktop";
+import { getInitiales } from "@/lib/tournee-vue";
 import type { MissionTourneeVue } from "@/lib/data/ma-journee";
 
 function creerMission(surcharge: Partial<MissionTourneeVue> = {}): MissionTourneeVue {
@@ -94,5 +95,34 @@ describe("TableauDeBordDesktop — suite de la tournée", () => {
     );
 
     expect(screen.getByText("Aucun autre arrêt aujourd'hui.")).toBeInTheDocument();
+  });
+
+  it("affiche les bonnes initiales en ignorant la civilité dans la liste 'suite de la tournée'", () => {
+    const nomAvecCivilite = "M. Nguyen";
+    const missions = [
+      creerMission({ id: "a", statut: "en_cours", patientNom: "Mme Lefèvre" }),
+      creerMission({ id: "b", statut: "a_faire", patientNom: nomAvecCivilite, heurePrevue: "15:15:00" }),
+    ];
+    render(
+      <TableauDeBordDesktop prenom="Camille" missions={missions} nombrePatients={12} montantCotationJour={64.5} />
+    );
+
+    const initialesAttendue = getInitiales(nomAvecCivilite);
+    expect(screen.getByText(initialesAttendue)).toBeInTheDocument();
+  });
+});
+
+describe("TableauDeBordDesktop — actions rapides factices", () => {
+  it("n'affiche pas les tuiles factices comme des liens ou des boutons interactifs", () => {
+    render(
+      <TableauDeBordDesktop prenom="Camille" missions={[creerMission()]} nombrePatients={12} montantCotationJour={64.5} />
+    );
+
+    expect(screen.getByText("Scanner une ordonnance")).toBeInTheDocument();
+    expect(screen.getByText("Facturer la journée")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Scanner une ordonnance/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Scanner une ordonnance/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Facturer la journée/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Facturer la journée/ })).not.toBeInTheDocument();
   });
 });
