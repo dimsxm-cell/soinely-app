@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LogoSoinely } from "@/components/ui/LogoSoinely";
+import { MenuMobileMarketing } from "@/components/marketing/MenuMobileMarketing";
 
 const LIENS_NAV = [
   { href: "#feat", label: "Fonctionnalités" },
@@ -43,10 +44,10 @@ export function EnTeteMarketing() {
           ))}
         </nav>
 
-        {/* CTA — Se connecter */}
+        {/* CTA — Rejoindre la bêta privée */}
         <Link
           href="/login"
-          className="btn-glace whitespace-nowrap rounded-[12px] text-[14.5px] font-bold text-white"
+          className="btn-glace hidden whitespace-nowrap rounded-[12px] text-[14.5px] font-bold text-white lg:inline-flex"
           style={{
             background: "linear-gradient(135deg,#7c3aed,#a855f7)",
             padding: "12px 22px",
@@ -55,6 +56,8 @@ export function EnTeteMarketing() {
         >
           Rejoindre la bêta privée
         </Link>
+
+        <MenuMobileMarketing liens={LIENS_NAV} />
       </div>
     </header>
   );
