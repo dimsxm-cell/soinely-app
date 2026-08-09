@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import type { MissionTourneeVue } from "@/lib/data/ma-journee";
 import { formatDateDuJour, formatSalutation } from "@/lib/accueil-vue";
 import { formaterEuros } from "@/lib/cotation";
+import { formatHeure } from "@/lib/tournee-vue";
+import { formaterNomPropre } from "@/lib/format";
 import { LogoSoinely } from "@/components/ui/LogoSoinely";
 import { CarteTourneeEnCoursDesktop } from "@/components/ui/CarteTourneeEnCoursDesktop";
 
@@ -70,7 +72,6 @@ function CarteKpi({ label, valeur }: { label: string; valeur: string }) {
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Panneau is used by Task 3 (contenu principal dashboard)
 function Panneau({ titre, sous, children }: { titre: string; sous?: string; children: ReactNode }) {
   return (
     <div className="rounded-[22px] border border-navy/10 bg-white p-5">
@@ -92,6 +93,12 @@ export function TableauDeBordDesktop({
   nombrePatients: number;
   montantCotationJour: number;
 }) {
+  const prochainArretId =
+    (missions.find((m) => m.statut === "en_cours") ?? missions.find((m) => m.statut === "a_faire"))?.id ?? null;
+  const suiteDeLaTournee = missions.filter(
+    (m) => (m.statut === "a_faire" || m.statut === "en_cours") && m.id !== prochainArretId
+  );
+
   return (
     <div className="grid min-h-screen grid-cols-[246px_1fr] bg-[#0f0e14] text-navy">
       <aside className="flex flex-col gap-6 border-r border-white/[0.07] bg-[#0f0e14] px-4 py-6 text-white">
@@ -157,7 +164,114 @@ export function TableauDeBordDesktop({
             </div>
           </section>
 
-          <div id="tableau-de-bord-contenu-principal" />
+          <section className="grid grid-cols-[1.55fr_1fr] items-start gap-5">
+            <Panneau titre="Suite de la tournée" sous={`${suiteDeLaTournee.length} arrêt${suiteDeLaTournee.length > 1 ? "s" : ""} restant${suiteDeLaTournee.length > 1 ? "s" : ""}`}>
+              {suiteDeLaTournee.length > 0 ? (
+                <div className="flex flex-col divide-y divide-[#f0ede7]">
+                  {suiteDeLaTournee.map((mission) => (
+                    <div key={mission.id} className="flex items-center gap-3.5 py-3 first:pt-0 last:pb-0">
+                      <span className="w-11 shrink-0 text-[13px] font-bold tabular-nums text-[#3b3648]">
+                        {formatHeure(mission.heurePrevue)}
+                      </span>
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-brand-violet/10 text-[12px] font-bold text-brand-violet">
+                        {formaterNomPropre(mission.patientNom).slice(0, 2).toUpperCase()}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-[14px] font-semibold tracking-tight text-navy">
+                          {formaterNomPropre(mission.patientNom)}
+                        </span>
+                        <span className="block truncate text-[12px] text-navy/45">{mission.patientAdresse}</span>
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="py-4 text-center text-[13px] text-navy/45">Aucun autre arrêt aujourd&apos;hui.</p>
+              )}
+            </Panneau>
+
+            <div className="flex flex-col gap-5">
+              <Panneau titre="À traiter">
+                <div className="flex flex-col gap-2">
+                  {DONNEES_EXEMPLE.aTraiter.map((item) => (
+                    <div key={item.titre} className="rounded-[13px] border border-[#ece8f2] bg-[#fbfafd] px-3 py-2.5">
+                      <p className="text-[13px] font-semibold text-navy">{item.titre}</p>
+                      <p className="mt-0.5 text-[11.5px] text-navy/45">{item.sous}</p>
+                    </div>
+                  ))}
+                </div>
+              </Panneau>
+
+              <Panneau titre="Facturation" sous="7 derniers jours (exemple)">
+                <div className="flex items-baseline justify-between">
+                  <span className="font-display text-[22px] font-bold tracking-tight">
+                    {DONNEES_EXEMPLE.facturationSemaine.montant}
+                  </span>
+                  <span className="text-[12px] font-bold text-[#1a7f5a]">
+                    {DONNEES_EXEMPLE.facturationSemaine.tendance}
+                  </span>
+                </div>
+                <div className="mt-4 flex h-16 items-end gap-2">
+                  {DONNEES_EXEMPLE.facturationSemaine.barres.map((valeur, index) => (
+                    <div key={DONNEES_EXEMPLE.facturationSemaine.jours[index]} className="flex flex-1 flex-col items-center gap-1.5">
+                      <div
+                        className="w-full rounded-t-[4px] bg-brand-violet/25"
+                        style={{ height: `${valeur}%` }}
+                      />
+                      <span className="text-[10px] font-semibold text-navy/40">
+                        {DONNEES_EXEMPLE.facturationSemaine.jours[index]}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 flex items-center gap-2 border-t border-[#efece6] pt-3.5">
+                  <span aria-hidden="true" className="h-[7px] w-[7px] shrink-0 rounded-full bg-[#34c759]" />
+                  <p className="text-[12px] text-navy/50">{DONNEES_EXEMPLE.facturationSemaine.teletransmission}</p>
+                </div>
+              </Panneau>
+            </div>
+          </section>
+
+          <section className="grid grid-cols-4 gap-4">
+            <Link
+              href="/patients/nouveau"
+              className="flex items-center gap-3 rounded-[16px] border border-navy/10 bg-white px-4 py-3.5"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px] bg-brand-violet/10 text-brand-violet">
+                <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+              </span>
+              <span className="text-[13.5px] font-bold text-navy">Nouveau patient</span>
+            </Link>
+            <div className="flex items-center gap-3 rounded-[16px] border border-navy/10 bg-white px-4 py-3.5 opacity-60">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px] bg-navy/5 text-navy/40">
+                <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 8V5a1 1 0 0 1 1-1h3M20 8V5a1 1 0 0 0-1-1h-3M4 16v3a1 1 0 0 0 1 1h3M20 16v3a1 1 0 0 1-1 1h-3" />
+                </svg>
+              </span>
+              <span className="text-[13.5px] font-bold text-navy/50">Scanner une ordonnance</span>
+            </div>
+            <div className="flex items-center gap-3 rounded-[16px] border border-navy/10 bg-white px-4 py-3.5 opacity-60">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px] bg-navy/5 text-navy/40">
+                <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17 6.2A6.5 6.5 0 0 0 7.4 9m0 6A6.5 6.5 0 0 0 17 17.8" />
+                </svg>
+              </span>
+              <span className="text-[13.5px] font-bold text-navy/50">Facturer la journée</span>
+            </div>
+            <Link
+              href="/ely"
+              className="flex items-center gap-3 rounded-[16px] border border-navy/10 bg-white px-4 py-3.5"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px] bg-brand-violet/10 text-brand-violet">
+                <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 11.5a8 8 0 0 1-8 8H5l-1.5 3 .5-4.6A8 8 0 1 1 21 11.5Z" />
+                </svg>
+              </span>
+              <span className="text-[13.5px] font-bold text-navy">Demander à Ely</span>
+            </Link>
+          </section>
         </div>
       </main>
     </div>

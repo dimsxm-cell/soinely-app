@@ -69,3 +69,30 @@ describe("TableauDeBordDesktop", () => {
     expect(screen.getByText("Agenda")).toBeInTheDocument();
   });
 });
+
+describe("TableauDeBordDesktop — suite de la tournée", () => {
+  it("liste les arrêts restants sans répéter celui déjà mis en avant dans la carte tournée", () => {
+    const missions = [
+      creerMission({ id: "a", statut: "en_cours", patientNom: "Mme Lefèvre" }),
+      creerMission({ id: "b", statut: "a_faire", patientNom: "Mme Chevalier", heurePrevue: "15:15:00" }),
+      creerMission({ id: "c", statut: "terminee", patientNom: "M. Bruno", heurePrevue: "09:00:00" }),
+    ];
+    render(
+      <TableauDeBordDesktop prenom="Camille" missions={missions} nombrePatients={12} montantCotationJour={64.5} />
+    );
+
+    // "Mme Lefèvre" apparaît une fois dans la carte tournée, mais pas répétée dans la liste
+    expect(screen.getAllByText("Mme Lefèvre")).toHaveLength(1);
+    expect(screen.getByText("Mme Chevalier")).toBeInTheDocument();
+    expect(screen.queryByText("M. Bruno")).not.toBeInTheDocument();
+  });
+
+  it("affiche un etat vide sobre quand plus aucun arret ne reste apres celui en cours", () => {
+    const missions = [creerMission({ id: "a", statut: "en_cours" })];
+    render(
+      <TableauDeBordDesktop prenom="Camille" missions={missions} nombrePatients={12} montantCotationJour={64.5} />
+    );
+
+    expect(screen.getByText("Aucun autre arrêt aujourd'hui.")).toBeInTheDocument();
+  });
+});
