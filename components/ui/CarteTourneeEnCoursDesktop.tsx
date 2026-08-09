@@ -1,5 +1,5 @@
 import type { MissionTourneeVue } from "@/lib/data/ma-journee";
-import { estimerHeureFin, formatHeure, formatHeureDepuisTimestamp } from "@/lib/tournee-vue";
+import { estimerHeureFin, formatHeure, formatHeureDepuisTimestamp, getInitiales } from "@/lib/tournee-vue";
 import { formaterNomPropre } from "@/lib/format";
 import { hrefWaze } from "@/lib/waze";
 
@@ -47,7 +47,7 @@ export function CarteTourneeEnCoursDesktop({ missions }: { missions: MissionTour
               </p>
               <div className="mt-4 flex flex-wrap items-center gap-3 rounded-[16px] border border-white/10 bg-white/[0.06] p-3.5">
                 <div className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[13px] bg-[linear-gradient(140deg,#8b5cf6,#6d28d9)] text-[14px] font-bold">
-                  {formaterNomPropre(prochainArret.patientNom).slice(0, 2).toUpperCase()}
+                  {getInitiales(prochainArret.patientNom)}
                 </div>
                 <div className="min-w-[150px] flex-1">
                   <p className="text-[15px] font-bold tracking-tight">{formaterNomPropre(prochainArret.patientNom)}</p>

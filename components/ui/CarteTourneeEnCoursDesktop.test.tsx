@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { CarteTourneeEnCoursDesktop } from "./CarteTourneeEnCoursDesktop";
+import { getInitiales } from "@/lib/tournee-vue";
 import type { MissionTourneeVue } from "@/lib/data/ma-journee";
 
 function creerMission(surcharge: Partial<MissionTourneeVue> = {}): MissionTourneeVue {
@@ -77,5 +78,14 @@ describe("CarteTourneeEnCoursDesktop", () => {
     render(<CarteTourneeEnCoursDesktop missions={missions} />);
 
     expect(screen.getByText("Tournée terminée")).toBeInTheDocument();
+  });
+
+  it("affiche les bonnes initiales en ignorant la civilité", () => {
+    const nomAvecCivilite = "M. Nguyen";
+    const missions = [creerMission({ id: "a", statut: "en_cours", patientNom: nomAvecCivilite })];
+    render(<CarteTourneeEnCoursDesktop missions={missions} />);
+
+    const initialesAttendue = getInitiales(nomAvecCivilite);
+    expect(screen.getByText(initialesAttendue)).toBeInTheDocument();
   });
 });
