@@ -178,7 +178,7 @@ describe("ConversationEly — contexte de mission", () => {
     );
 
     expect(screen.getByText("Pour Marie Dupont")).toBeInTheDocument();
-    expect(screen.queryByText(/·/)).not.toBeInTheDocument();
+    expect(screen.getByText("Pour Marie Dupont")).toHaveTextContent(/^Pour Marie Dupont$/);
   });
 
   it("n'affiche aucun rappel de patient quand patientContexte est absent (comportement par défaut)", async () => {

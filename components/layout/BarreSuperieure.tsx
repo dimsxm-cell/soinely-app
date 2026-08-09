@@ -41,9 +41,15 @@ function estAccueilOuTournee(pathname: string): boolean {
   return pathname === "/ma-journee" || pathname === "/ma-tournee";
 }
 
+/** Ely porte son propre bandeau violet (identité ELY + statistiques), sans
+ *  logo ni lien « Mon compte » — la barre blanche globale ferait doublon. */
+function estEly(pathname: string): boolean {
+  return pathname === "/ely";
+}
+
 export function BarreSuperieure({ avatarUrl }: BarreSuperieureProps) {
   const pathname = usePathname();
-  if (estFichePatient(pathname) || estAccueilOuTournee(pathname)) return null;
+  if (estFichePatient(pathname) || estAccueilOuTournee(pathname) || estEly(pathname)) return null;
 
   return (
     <header className="print:hidden">

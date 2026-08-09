@@ -177,6 +177,38 @@ describe("getSituationTerrainDetail", () => {
   });
 });
 
+describe("countSituationsTerrainPublished", () => {
+  it("retourne le compte exact des situations publiées", async () => {
+    const fakeClient = {
+      from: () => ({
+        select: () => ({
+          eq: () => Promise.resolve({ count: 7, error: null }),
+        }),
+      }),
+    } as unknown as SupabaseClient;
+
+    const { countSituationsTerrainPublished } = await import("./recherche");
+    const result = await countSituationsTerrainPublished(fakeClient);
+
+    expect(result).toBe(7);
+  });
+
+  it("retourne 0 en cas d'erreur", async () => {
+    const fakeClient = {
+      from: () => ({
+        select: () => ({
+          eq: () => Promise.resolve({ count: null, error: { message: "boom" } }),
+        }),
+      }),
+    } as unknown as SupabaseClient;
+
+    const { countSituationsTerrainPublished } = await import("./recherche");
+    const result = await countSituationsTerrainPublished(fakeClient);
+
+    expect(result).toBe(0);
+  });
+});
+
 describe("getAllSituationsTerrain", () => {
   it("retourne toutes les situations publiées, mappées et triées par titre", async () => {
     const fakeClient = {

@@ -64,4 +64,12 @@ describe("BarreSuperieure", () => {
     render(<BarreSuperieure />);
     expect(screen.getByRole("link", { name: "Mon compte" })).toBeInTheDocument();
   });
+
+  it("disparaît sur Ely, qui porte désormais son propre bandeau violet", async () => {
+    const { BarreSuperieure } = await import("./BarreSuperieure");
+
+    usePathnameMock.mockReturnValue("/ely");
+    const { container } = render(<BarreSuperieure />);
+    expect(container).toBeEmptyDOMElement();
+  });
 });

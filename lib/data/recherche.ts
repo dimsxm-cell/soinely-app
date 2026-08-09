@@ -84,6 +84,18 @@ export async function getSituationTerrainDetail(
   };
 }
 
+export async function countSituationsTerrainPublished(
+  supabase: SupabaseClient<Database>
+): Promise<number> {
+  const { count, error } = await supabase
+    .from("situations_terrain")
+    .select("id", { count: "exact", head: true })
+    .eq("published", true);
+
+  if (error) journaliserEchec("countSituationsTerrainPublished", error);
+  return error || count === null ? 0 : count;
+}
+
 export async function getAllSituationsTerrain(
   supabase: SupabaseClient<Database>
 ): Promise<SituationTerrain[]> {
