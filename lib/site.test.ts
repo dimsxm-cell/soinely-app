@@ -3,7 +3,7 @@ import { SITE_URL, DONNEES_STRUCTUREES_SITE } from "./site";
 
 describe("SITE_URL", () => {
   it("pointe vers le domaine de production, sans slash final", () => {
-    expect(SITE_URL).toBe("https://soinely.app");
+    expect(SITE_URL).toBe("https://www.soinely.com");
   });
 });
 
@@ -15,8 +15,8 @@ describe("DONNEES_STRUCTUREES_SITE", () => {
     const organisation = graph.find((n) => n["@type"] === "Organization");
     expect(organisation).toMatchObject({
       name: "Soinely",
-      url: "https://soinely.app",
-      logo: "https://soinely.app/logo-soinely.png",
+      url: "https://www.soinely.com",
+      logo: "https://www.soinely.com/logo-soinely.png",
       description: "Le copilote des infirmiers libéraux.",
     });
     expect(organisation).not.toHaveProperty("aggregateRating");
@@ -25,7 +25,7 @@ describe("DONNEES_STRUCTUREES_SITE", () => {
     const site = graph.find((n) => n["@type"] === "WebSite");
     expect(site).toMatchObject({
       name: "Soinely",
-      url: "https://soinely.app",
+      url: "https://www.soinely.com",
     });
   });
 });

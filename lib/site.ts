@@ -2,7 +2,7 @@
  * Domaine de production, source unique : tout le reste (sitemap, robots,
  * metadonnees, canonical) en derive plutot que de le recopier.
  */
-export const SITE_URL = "https://soinely.app";
+export const SITE_URL = "https://www.soinely.com";
 
 /**
  * Donnees structurees JSON-LD, injectees telles quelles dans le layout

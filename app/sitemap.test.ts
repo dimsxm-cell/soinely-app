@@ -8,9 +8,9 @@ describe("sitemap", () => {
 
     const urls = entries.map((e) => e.url);
     expect(urls).toEqual([
-      "https://soinely.app",
-      "https://soinely.app/conditions",
-      "https://soinely.app/confidentialite",
+      "https://www.soinely.com",
+      "https://www.soinely.com/conditions",
+      "https://www.soinely.com/confidentialite",
     ]);
   });
 
@@ -24,7 +24,7 @@ describe("sitemap", () => {
 
   it("donne la priorite la plus haute a la page d'accueil", () => {
     const entries = sitemap();
-    const home = entries.find((e) => e.url === "https://soinely.app");
+    const home = entries.find((e) => e.url === "https://www.soinely.com");
     expect(home?.priority).toBe(1);
   });
 });

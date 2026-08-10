@@ -13,7 +13,7 @@ describe("robots", () => {
     const rules = result.rules as ReglesRobots;
     expect(rules.userAgent).toBe("*");
     expect(rules.allow).toBe("/");
-    expect(result.sitemap).toBe("https://soinely.app/sitemap.xml");
+    expect(result.sitemap).toBe("https://www.soinely.com/sitemap.xml");
   });
 
   it("interdit les routes non publiques", () => {
