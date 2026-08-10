@@ -147,7 +147,7 @@ export default function LoginPage() {
         width={478}
         height={457}
         aria-hidden="true"
-        className="pointer-events-none absolute bottom-0 left-[4%] hidden h-[74vh] w-auto object-contain lg:block xl:left-[10%]"
+        className="pointer-events-none absolute bottom-0 right-[calc(50%+255px)] hidden h-[74vh] w-auto object-contain lg:block"
       />
 
       {/* En-tête violet, cohérent avec le reste de l'app (Accueil, Ma tournée,
