@@ -5,6 +5,7 @@ export const size = {
   height: 630,
 };
 export const contentType = "image/png";
+export const alt = "Soinely — Le copilote des infirmiers libéraux";
 
 const VIOLET_CHARTE = "#6A4CFF";
 

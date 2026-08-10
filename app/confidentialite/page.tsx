@@ -2,10 +2,27 @@ import type { Metadata } from "next";
 import { PageLegale, type SectionLegale } from "@/components/legal/PageLegale";
 import { SITE_URL } from "@/lib/site";
 
+const TITRE = "Politique de confidentialité — Soinely";
+const DESCRIPTION =
+  "Comment Soinely collecte, utilise et protège les données personnelles et les données de santé.";
+
 export const metadata: Metadata = {
-  title: "Politique de confidentialité — Soinely",
-  description: "Comment Soinely collecte, utilise et protège les données personnelles et les données de santé.",
+  title: TITRE,
+  description: DESCRIPTION,
   alternates: { canonical: `${SITE_URL}/confidentialite` },
+  // Next remplace entièrement l'objet openGraph du layout racine dès que
+  // cette page en déclare un (pas de fusion profonde) : on reprend donc ici
+  // les champs partagés (siteName, locale, type, image) pour ne rien perdre,
+  // avec une URL et un titre propres à cette page.
+  openGraph: {
+    title: TITRE,
+    description: DESCRIPTION,
+    url: `${SITE_URL}/confidentialite`,
+    siteName: "Soinely",
+    locale: "fr_FR",
+    type: "website",
+    images: "/opengraph-image",
+  },
 };
 
 const SECTIONS: SectionLegale[] = [
