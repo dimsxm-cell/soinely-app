@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { PageLegale, type SectionLegale } from "@/components/legal/PageLegale";
 import { DUREE_ESSAI_GRATUIT_JOURS } from "@/lib/data/abonnement";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Conditions générales d'utilisation — Soinely",
   description: "Les règles d'utilisation du service Soinely, destiné aux infirmiers et infirmières libéraux.",
+  alternates: { canonical: `${SITE_URL}/conditions` },
 };
 
 const SECTIONS: SectionLegale[] = [

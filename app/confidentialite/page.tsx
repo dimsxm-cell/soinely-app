@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { PageLegale, type SectionLegale } from "@/components/legal/PageLegale";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Politique de confidentialité — Soinely",
   description: "Comment Soinely collecte, utilise et protège les données personnelles et les données de santé.",
+  alternates: { canonical: `${SITE_URL}/confidentialite` },
 };
 
 const SECTIONS: SectionLegale[] = [

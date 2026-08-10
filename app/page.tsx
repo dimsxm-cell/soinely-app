@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { EnTeteMarketing } from "@/components/marketing/EnTeteMarketing";
 import { Hero } from "@/components/marketing/Hero";
 import { Benefices } from "@/components/marketing/Benefices";
@@ -10,6 +11,11 @@ import { ListeAttente } from "@/components/marketing/ListeAttente";
 import { CtaFinal } from "@/components/marketing/CtaFinal";
 import { PiedDePageMarketing } from "@/components/marketing/PiedDePageMarketing";
 import { Reveal } from "@/components/marketing/Reveal";
+import { SITE_URL } from "@/lib/site";
+
+export const metadata: Metadata = {
+  alternates: { canonical: SITE_URL },
+};
 
 export default function Page() {
   return (
