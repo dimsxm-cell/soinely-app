@@ -3,6 +3,7 @@ import { Fraunces, Geist_Mono, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ActiverAppuiTactile } from "@/components/layout/ActiverAppuiTactile";
+import { SITE_URL, DONNEES_STRUCTUREES_SITE } from "@/lib/site";
 import "./globals.css";
 
 // Trois polices, chargées une seule fois pour toute l'application : le corps
@@ -31,8 +32,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "Soinely",
   description: "Le copilote des infirmiers libéraux",
+  openGraph: {
+    title: "Soinely",
+    description: "Le copilote des infirmiers libéraux",
+    url: SITE_URL,
+    siteName: "Soinely",
+    locale: "fr_FR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 export default function RootLayout({
@@ -46,6 +59,13 @@ export default function RootLayout({
       className={`${inter.variable} ${fraunces.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        {/* Contenu 100% statique (aucune donnee dynamique ni saisie
+            utilisateur) : JSON.stringify ici ne pose pas de risque
+            d'injection, contrairement a une interpolation de chaine. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(DONNEES_STRUCTUREES_SITE) }}
+        />
         <ActiverAppuiTactile />
         {children}
         <Analytics />
