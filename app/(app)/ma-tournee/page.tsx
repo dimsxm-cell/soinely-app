@@ -32,6 +32,7 @@ export default async function MaTourneePage({
 
   const avatarPath = user?.user_metadata?.avatar_path as string | undefined;
   const avatarUrl = avatarPath ? await getAvatarUrl(supabase, avatarPath) : null;
+  const nomComplet = user?.user_metadata?.full_name as string | undefined;
 
   const tournee: Tournee | null = user ? await getTourneeDuJour(supabase, user.id) : null;
 
@@ -65,6 +66,7 @@ export default async function MaTourneePage({
             filtre={filtre}
             counts={counts}
             avatarUrl={avatarUrl}
+            nomComplet={nomComplet}
           />
 
           <div className="mx-auto max-w-2xl px-4 pt-4 pb-8">
