@@ -12,7 +12,7 @@ import {
 import { calculerMontantTournee, formaterEuros, type ContexteTarifaire } from "@/lib/cotation";
 import { calculerMajorationsTournee } from "@/lib/majorations";
 import { formatDateDuJour, formaterNomPropre, initialesUtilisateur } from "@/lib/format";
-import { distanceRetenue, formaterKm } from "@/lib/kilometrage";
+import { distanceRetenue } from "@/lib/kilometrage";
 import { OngletsFiltresTournee } from "@/components/ui/OngletsFiltresTournee";
 import { RubanLemniscateHero } from "@/components/ui/RubanLemniscateHero";
 
@@ -86,7 +86,7 @@ export function EnTeteTournee({
               <img src={avatarUrl} alt="" className="h-9 w-9 rounded-full object-cover ring-2 ring-white/50" />
             ) : (
               <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[linear-gradient(140deg,#a855f7,#6d28d9)] text-[12.5px] font-bold tracking-[-0.2px] text-white ring-2 ring-white/30">
-                {initialesUtilisateur(nomComplet ?? "")}
+                {initialesUtilisateur(nomComplet ?? "") || "?"}
               </span>
             )}
           </Link>
@@ -139,7 +139,7 @@ export function EnTeteTournee({
           </div>
           <div className="flex-1 rounded-[14px] border border-white/10 bg-white/[0.07] px-2.5 py-2.5">
             <p className="font-display text-[17px] font-bold tabular-nums">
-              {totalKm > 0 ? formaterKm(totalKm) : "—"}
+              {totalKm > 0 ? Math.round(totalKm) : "—"}
             </p>
             <p className="mt-0.5 text-[9.5px] font-bold uppercase tracking-[0.08em] text-[#9d94b8]">Km</p>
           </div>

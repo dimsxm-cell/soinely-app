@@ -99,25 +99,14 @@ describe("EnTeteTournee", () => {
         avatarUrl={null}
       />
     );
-    // 5 (m1, pas de correction) + 4,7 (m2, la correction prime) + 0 (m3, aucune donnee) = 9,7
-    expect(screen.getByText("9,7 km")).toBeInTheDocument();
+    // 5 (m1) + 4,7 (m2, la correction prime) + 0 (m3) = 9,7, arrondi a 10
+    expect(screen.getByText("10")).toBeInTheDocument();
   });
 
   it("affiche un tiret pour la stat Km quand aucune mission n'a de distance", () => {
-    // La mission porte un acte cotant reellement (comme dans
-    // lib/cotation.test.ts), pour que la stat Cotation ne soit PAS "—"
-    // elle aussi — sinon getByText("—") trouverait deux elements et
-    // echouerait sans dire lequel des deux stats est realement teste.
-    const missions = [
-      creerMission({
-        actes: [
-          { libelle: "Injection", code: "AMI 1", cotation: 3.15, lettreCle: "AMI", coefficient: 1, derogatoireBsi: false, eligibleMci: false },
-        ],
-      }),
-    ];
     render(
       <EnTeteTournee
-        missions={missions}
+        missions={[creerMission()]}
         tournee={TOURNEE}
         contexteTarifaire={CONTEXTE}
         filtre="tout"
@@ -125,7 +114,22 @@ describe("EnTeteTournee", () => {
         avatarUrl={null}
       />
     );
-    expect(screen.getByText("—")).toBeInTheDocument();
+    const labelKm = screen.getByText("Km");
+    expect(labelKm.parentElement).toHaveTextContent("—");
+  });
+
+  it("affiche un tiret de repli pour l'avatar quand aucun nom n'est fourni", () => {
+    render(
+      <EnTeteTournee
+        missions={[]}
+        tournee={TOURNEE}
+        contexteTarifaire={CONTEXTE}
+        filtre="tout"
+        counts={{ tout: 0, a_faire: 0, alertes: 0, valides: 0 }}
+        avatarUrl={null}
+      />
+    );
+    expect(screen.getByText("?")).toBeInTheDocument();
   });
 
   it("n'affiche aucun element fabrique de la maquette (banniere Ely, boutons carte/plus, point en ligne)", () => {
