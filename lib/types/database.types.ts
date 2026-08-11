@@ -488,6 +488,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          adeli_rpps: string | null
           code_postal: string | null
           adresse_cabinet: string | null
           cabinet_latitude: number | null
@@ -496,8 +497,10 @@ export type Database = {
           full_name: string
           id: string
           role: string
+          telephone: string | null
         }
         Insert: {
+          adeli_rpps?: string | null
           code_postal?: string | null
           adresse_cabinet?: string | null
           cabinet_latitude?: number | null
@@ -506,8 +509,10 @@ export type Database = {
           full_name: string
           id: string
           role?: string
+          telephone?: string | null
         }
         Update: {
+          adeli_rpps?: string | null
           code_postal?: string | null
           adresse_cabinet?: string | null
           cabinet_latitude?: number | null
@@ -516,6 +521,7 @@ export type Database = {
           full_name?: string
           id?: string
           role?: string
+          telephone?: string | null
         }
         Relationships: []
       }
