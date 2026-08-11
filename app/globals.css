@@ -496,54 +496,151 @@ a:hover .btn-arrow { transform: translateX(5px); }
 }
 
 
-/* Fond animé de l'en-tête « Ma tournée » : trois nappes violettes qui
-   dérivent lentement l'une sur l'autre, évoquant une matière liquide.
-   En CSS pur, et non en WebGL : la simulation d'eau de threejs-components
-   échantillonne une texture flottante en filtrage linéaire, ce qu'iOS
-   Safari ne fournit pas (OES_texture_float_linear absente) — l'effet y
-   restait invisible alors que tout semblait s'initialiser correctement.
-   Ces nappes s'affichent partout, sans dépendance ni coût GPU notable.
-   L'arrêt sous prefers-reduced-motion est déjà assuré par la règle
-   globale `* { animation-duration: .001ms }` plus haut dans ce fichier. */
+/* ── Fond liquide ultra-riche (fallback CSS pour iOS) ────────────────────
+   Simulation de matière liquide métallique en CSS pur : sept couches
+   organiques avec reflets métalliques, caustiques lumineuses, morphing
+   et irisation — conçu pour imiter au maximum l'effet WebGL liquid de
+   threejs-components sur les appareils qui ne le supportent pas.
+   L'arrêt sous prefers-reduced-motion est assuré par la règle globale
+   `* { animation-duration: .001ms }` plus haut dans ce fichier. */
+
 .nappes-liquide {
   position: absolute;
-  inset: -30%;
+  inset: -40%;
   pointer-events: none;
   overflow: hidden;
 }
+
 .nappes-liquide > span {
   position: absolute;
   display: block;
   border-radius: 9999px;
-  filter: blur(38px);
-  will-change: transform;
+  will-change: transform, opacity;
 }
-/* Masse concentrée dans le tiers haut : c'est la bande du titre et de la
-   date, la seule zone où l'effet peut s'affirmer sans gêner la lecture. */
+
+/* ── Couche 1 : nappe principale violette (masse dominante) ──────── */
 .nappes-liquide > span:nth-child(1) {
-  width: 66%; height: 64%; left: 2%; top: 0%;
-  background: radial-gradient(circle, rgba(192,132,252,.95), transparent 68%);
-  animation: nappe-a 21s ease-in-out infinite alternate;
+  width: 70%; height: 68%; left: 0%; top: -4%;
+  background: radial-gradient(ellipse 65% 60% at 40% 45%,
+    rgba(192,132,252,.95), rgba(147,51,234,.6) 40%, transparent 72%);
+  filter: blur(32px);
+  animation: nappe-a 18s ease-in-out infinite alternate;
 }
+
+/* ── Couche 2 : nappe fuchsia / rose organique ───────────────────── */
 .nappes-liquide > span:nth-child(2) {
-  width: 58%; height: 58%; right: 0%; top: 4%;
-  background: radial-gradient(circle, rgba(217,70,239,.8), transparent 68%);
-  animation: nappe-b 27s ease-in-out infinite alternate;
+  width: 55%; height: 62%; right: -5%; top: 2%;
+  background: radial-gradient(ellipse 70% 55% at 55% 40%,
+    rgba(217,70,239,.85), rgba(236,72,153,.5) 45%, transparent 74%);
+  filter: blur(36px);
+  animation: nappe-b 24s ease-in-out infinite alternate;
 }
+
+/* ── Couche 3 : nappe indigo profonde ────────────────────────────── */
 .nappes-liquide > span:nth-child(3) {
-  width: 72%; height: 52%; left: 14%; top: 18%;
-  background: radial-gradient(circle, rgba(139,92,246,.85), transparent 70%);
-  animation: nappe-c 24s ease-in-out infinite alternate;
+  width: 75%; height: 56%; left: 10%; top: 14%;
+  background: radial-gradient(ellipse 60% 65% at 50% 50%,
+    rgba(139,92,246,.9), rgba(99,53,211,.55) 42%, transparent 70%);
+  filter: blur(30px);
+  animation: nappe-c 21s ease-in-out infinite alternate;
 }
+
+/* ── Couche 4 : reflet métallique blanc (simule la metalness WebGL) ── */
+.nappes-liquide > span:nth-child(4) {
+  width: 48%; height: 34%; left: 18%; top: 6%;
+  background: radial-gradient(ellipse 80% 50% at 50% 45%,
+    rgba(255,255,255,.28), rgba(200,180,255,.15) 40%, transparent 68%);
+  filter: blur(22px);
+  mix-blend-mode: overlay;
+  animation: nappe-sheen 14s ease-in-out infinite alternate;
+}
+
+/* ── Couche 5 : caustique lumineuse (tache claire qui se déplace) ── */
+.nappes-liquide > span:nth-child(5) {
+  width: 32%; height: 28%; left: 35%; top: 10%;
+  background: radial-gradient(circle,
+    rgba(255,255,255,.35), rgba(200,170,255,.2) 35%, transparent 65%);
+  filter: blur(18px);
+  mix-blend-mode: soft-light;
+  animation: nappe-caustic 11s ease-in-out infinite alternate;
+}
+
+/* ── Couche 6 : nappe cyan / irisation (simule les reflets prismatiques) */
+.nappes-liquide > span:nth-child(6) {
+  width: 42%; height: 38%; right: 8%; top: 20%;
+  background: radial-gradient(ellipse 55% 60% at 50% 50%,
+    rgba(96,165,250,.45), rgba(129,140,248,.3) 40%, transparent 70%);
+  filter: blur(34px);
+  mix-blend-mode: screen;
+  opacity: .6;
+  animation: nappe-iridescent 16s ease-in-out infinite alternate;
+}
+
+/* ── Couche 7 : micro-reflet métallique glissant (sheen final) ───── */
+.nappes-liquide > span:nth-child(7) {
+  width: 90%; height: 10%; left: 5%; top: 12%;
+  background: linear-gradient(105deg,
+    transparent 30%, rgba(255,255,255,.22) 48%, rgba(255,255,255,.32) 50%,
+    rgba(255,255,255,.22) 52%, transparent 70%);
+  filter: blur(8px);
+  mix-blend-mode: overlay;
+  border-radius: 0;
+  animation: nappe-sweep 9s ease-in-out infinite alternate;
+}
+
+/* ── Animations ──────────────────────────────────────────────────── */
+
+/* Nappe principale — mouvement organique lent */
 @keyframes nappe-a {
-  from { transform: translate3d(0,0,0) scale(1); }
-  to   { transform: translate3d(14%,8%,0) scale(1.18); }
+  0%   { transform: translate3d(0,0,0) scale(1) rotate(0deg); }
+  33%  { transform: translate3d(8%,4%,0) scale(1.08) rotate(1.5deg); }
+  66%  { transform: translate3d(4%,10%,0) scale(1.14) rotate(-0.8deg); }
+  100% { transform: translate3d(14%,8%,0) scale(1.2) rotate(1deg); }
 }
+
+/* Nappe fuchsia — dérive opposée */
 @keyframes nappe-b {
-  from { transform: translate3d(0,0,0) scale(1.1); }
-  to   { transform: translate3d(-12%,10%,0) scale(.9); }
+  0%   { transform: translate3d(0,0,0) scale(1.1) rotate(0deg); }
+  33%  { transform: translate3d(-6%,5%,0) scale(1.02) rotate(-1.2deg); }
+  66%  { transform: translate3d(-10%,3%,0) scale(.92) rotate(0.6deg); }
+  100% { transform: translate3d(-14%,10%,0) scale(.88) rotate(-1.5deg); }
 }
+
+/* Nappe indigo — mouvement circulaire lent */
 @keyframes nappe-c {
-  from { transform: translate3d(0,0,0) scale(.95); }
-  to   { transform: translate3d(8%,-12%,0) scale(1.2); }
+  0%   { transform: translate3d(0,0,0) scale(.95) rotate(0deg); }
+  25%  { transform: translate3d(5%,-5%,0) scale(1.05) rotate(1deg); }
+  50%  { transform: translate3d(10%,-2%,0) scale(1.12) rotate(-0.5deg); }
+  75%  { transform: translate3d(6%,-10%,0) scale(1.08) rotate(1.2deg); }
+  100% { transform: translate3d(8%,-14%,0) scale(1.2) rotate(-0.8deg); }
+}
+
+/* Reflet métallique — glisse en arc doux */
+@keyframes nappe-sheen {
+  0%   { transform: translate3d(-12%,0,0) scale(1) rotate(-2deg); opacity: .6; }
+  50%  { transform: translate3d(8%,6%,0) scale(1.15) rotate(1deg); opacity: .85; }
+  100% { transform: translate3d(20%,2%,0) scale(1.05) rotate(-1deg); opacity: .65; }
+}
+
+/* Caustique lumineuse — scintillement errant */
+@keyframes nappe-caustic {
+  0%   { transform: translate3d(0,0,0) scale(1); opacity: .7; }
+  25%  { transform: translate3d(-15%,8%,0) scale(1.3); opacity: .9; }
+  50%  { transform: translate3d(-8%,16%,0) scale(.9); opacity: .6; }
+  75%  { transform: translate3d(10%,12%,0) scale(1.2); opacity: .85; }
+  100% { transform: translate3d(18%,4%,0) scale(1.1); opacity: .7; }
+}
+
+/* Irisation — dérive latérale lente */
+@keyframes nappe-iridescent {
+  0%   { transform: translate3d(0,0,0) scale(1) rotate(0deg); }
+  50%  { transform: translate3d(-16%,6%,0) scale(1.15) rotate(2deg); }
+  100% { transform: translate3d(-8%,14%,0) scale(.95) rotate(-1deg); }
+}
+
+/* Balayage du reflet métallique linéaire */
+@keyframes nappe-sweep {
+  0%   { transform: translate3d(-30%,0,0) rotate(-3deg); opacity: .5; }
+  50%  { transform: translate3d(10%,8%,0) rotate(0deg); opacity: .9; }
+  100% { transform: translate3d(40%,4%,0) rotate(2deg); opacity: .5; }
 }
