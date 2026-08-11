@@ -2,7 +2,7 @@ import Image from "next/image";
 import type { MissionDuJour } from "@/lib/types/clinical";
 import { calculerKmTournee, compterMissionsAccueil, formatDateDuJour, formatSalutation } from "@/lib/accueil-vue";
 import { BarreLogoProfilHero } from "@/components/ui/BarreLogoProfilHero";
-import { RubanLemniscateHero } from "@/components/ui/RubanLemniscateHero";
+import { FondHeroViolet } from "@/components/ui/FondHeroViolet";
 
 export function EnTeteAccueil({
   prenom,
@@ -17,12 +17,8 @@ export function EnTeteAccueil({
   const km = calculerKmTournee(missions);
 
   return (
-    <div className="relative overflow-hidden bg-[linear-gradient(168deg,#221b33_0%,#2c1f47_58%,#3a2260_100%)] px-5 pb-4 pt-6 text-white">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -right-16 -top-24 h-[280px] w-[280px] rounded-full bg-[radial-gradient(circle,rgba(168,85,247,.4),transparent_68%)]"
-      />
-      <RubanLemniscateHero />
+    <div className="relative isolate overflow-hidden bg-[linear-gradient(168deg,#221b33_0%,#2c1f47_58%,#3a2260_100%)] px-5 pb-4 pt-6 text-white">
+      <FondHeroViolet />
       <div className="relative mx-auto max-w-2xl">
         <BarreLogoProfilHero avatarUrl={avatarUrl} />
 

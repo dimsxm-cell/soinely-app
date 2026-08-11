@@ -13,9 +13,8 @@ import { calculerMontantTournee, formaterEuros, type ContexteTarifaire } from "@
 import { calculerMajorationsTournee } from "@/lib/majorations";
 import { formatDateDuJour, formaterNomPropre, initialesUtilisateur } from "@/lib/format";
 import { distanceRetenue } from "@/lib/kilometrage";
-import { LiquidEffectAnimation } from "@/components/ui/liquid-effect-animation";
+import { FondHeroViolet } from "@/components/ui/FondHeroViolet";
 import { OngletsFiltresTournee } from "@/components/ui/OngletsFiltresTournee";
-import { RubanLemniscateHero } from "@/components/ui/RubanLemniscateHero";
 
 const CIRCONFERENCE = 2 * Math.PI * 33;
 
@@ -62,22 +61,7 @@ export function EnTeteTournee({
 
   return (
     <div className="relative isolate overflow-hidden bg-[linear-gradient(168deg,#221b33_0%,#2c1f47_58%,#3a2260_100%)] px-5 pb-4 pt-6 text-white">
-      {/* Matière liquide de la maquette : décorative, sous tout le reste
-          (-z-10), puis atténuée par le dégradé sombre qui la suit pour
-          garder le contenu parfaitement lisible par-dessus. */}
-      <LiquidEffectAnimation className="-z-10" />
-      {/* Voile vertical plutôt qu'uniforme : presque transparent sur la bande
-          du titre, où les nappes doivent se voir, puis franchement opaque sous
-          les statistiques et les filtres, qui se lisent en tournée. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(34,27,51,.08)_0%,rgba(34,27,51,.14)_26%,rgba(40,28,64,.5)_52%,rgba(45,30,72,.74)_78%,rgba(45,30,72,.8)_100%)]"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -left-12 -top-20 h-[260px] w-[260px] rounded-full bg-[radial-gradient(circle,rgba(168,85,247,.4),transparent_68%)]"
-      />
-      <RubanLemniscateHero />
+      <FondHeroViolet halo="gauche" />
       <div className="relative mx-auto max-w-2xl">
         <div className="flex items-center justify-between">
           <div className="min-w-0">

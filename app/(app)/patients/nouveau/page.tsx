@@ -9,7 +9,7 @@ import { ChampAvecDictee } from "@/components/ui/ChampAvecDictee";
 import { ChampsIdentite } from "@/components/ui/ChampsIdentite";
 import { ChampTelephone } from "@/components/ui/ChampTelephone";
 import { ChampForfaitBsi } from "@/components/ui/ChampForfaitBsi";
-import { RubanLemniscateHero } from "@/components/ui/RubanLemniscateHero";
+import { FondHeroViolet } from "@/components/ui/FondHeroViolet";
 
 function IconeSection({ path }: { path: string }) {
   return (
@@ -62,12 +62,8 @@ export default function NouveauPatientPage() {
 
   return (
     <main className="min-h-screen bg-[#F6F7F5] pb-28 text-navy">
-      <div className="relative overflow-hidden bg-[linear-gradient(168deg,#221b33_0%,#2c1f47_58%,#3a2260_100%)] px-5 pb-6 pt-6 text-white">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-16 -top-24 h-[280px] w-[280px] rounded-full bg-[radial-gradient(circle,rgba(168,85,247,.4),transparent_68%)]"
-        />
-        <RubanLemniscateHero />
+      <div className="relative isolate overflow-hidden bg-[linear-gradient(168deg,#221b33_0%,#2c1f47_58%,#3a2260_100%)] px-5 pb-6 pt-6 text-white">
+        <FondHeroViolet />
         <div className="relative mx-auto max-w-2xl">
           <Link
             href="/patients"

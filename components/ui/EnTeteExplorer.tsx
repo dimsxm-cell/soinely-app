@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { RubanLemniscateHero } from "@/components/ui/RubanLemniscateHero";
+import { FondHeroViolet } from "@/components/ui/FondHeroViolet";
 import { OngletsExplorer } from "@/components/ui/OngletsExplorer";
 
 export function EnTeteExplorer({
@@ -19,12 +19,8 @@ export function EnTeteExplorer({
   placeholder: string;
 }) {
   return (
-    <div className="relative overflow-hidden bg-[linear-gradient(168deg,#221b33_0%,#2c1f47_58%,#3a2260_100%)] px-5 pb-4 pt-6 text-white">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -right-16 -top-24 h-[280px] w-[280px] rounded-full bg-[radial-gradient(circle,rgba(168,85,247,.4),transparent_68%)]"
-      />
-      <RubanLemniscateHero />
+    <div className="relative isolate overflow-hidden bg-[linear-gradient(168deg,#221b33_0%,#2c1f47_58%,#3a2260_100%)] px-5 pb-4 pt-6 text-white">
+      <FondHeroViolet />
       <div className="relative mx-auto max-w-2xl">
         <div className="flex items-center justify-between gap-3">
           <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#b3aacd]">Ressources</span>

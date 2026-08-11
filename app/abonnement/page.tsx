@@ -3,7 +3,7 @@ import Link from "next/link";
 import { createClient, getUtilisateurConnecte } from "@/lib/supabase/server";
 import { getAbonnement, getJoursRestantsEssaiGratuit } from "@/lib/data/abonnement";
 import { CartesTarifs } from "@/components/ui/CartesTarifs";
-import { RubanLemniscateHero } from "@/components/ui/RubanLemniscateHero";
+import { FondHeroViolet } from "@/components/ui/FondHeroViolet";
 
 export default async function AbonnementPage() {
   const supabase = await createClient();
@@ -27,16 +27,8 @@ export default async function AbonnementPage() {
         </filter>
       </svg>
 
-      <div className="relative overflow-hidden bg-[linear-gradient(168deg,#221b33_0%,#2c1f47_58%,#3a2260_100%)] px-6 pb-12 pt-6 text-white sm:pt-10">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-24 -top-24 h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle,rgba(168,85,247,.4),transparent_68%)]"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -bottom-40 -left-24 h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle,rgba(168,85,247,.4),transparent_68%)]"
-        />
-        <RubanLemniscateHero />
+      <div className="relative isolate overflow-hidden bg-[linear-gradient(168deg,#221b33_0%,#2c1f47_58%,#3a2260_100%)] px-6 pb-12 pt-6 text-white sm:pt-10">
+        <FondHeroViolet halo="double" />
 
         <div className="relative mx-auto flex max-w-[1060px] flex-col items-center text-center">
           <Link

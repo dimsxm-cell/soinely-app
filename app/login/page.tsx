@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { LogoSoinely } from "@/components/ui/LogoSoinely";
-import { RubanLemniscateHero } from "@/components/ui/RubanLemniscateHero";
+import { FondHeroViolet } from "@/components/ui/FondHeroViolet";
 import { createClient } from "@/lib/supabase/client";
 import { signInAction, signUpAction, requestPasswordResetAction } from "./actions";
 
@@ -152,12 +152,8 @@ export default function LoginPage() {
 
       {/* En-tête violet, cohérent avec le reste de l'app (Accueil, Ma tournée,
           Ely, Patients) : logo, ruban lemniscate, titre et bascule de mode. */}
-      <div className="relative overflow-hidden bg-[linear-gradient(168deg,#221b33_0%,#2c1f47_60%,#3a2260_100%)] px-[22px] pb-7 pt-5 text-white sm:pt-14">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-16 -top-24 h-[280px] w-[280px] rounded-full bg-[radial-gradient(circle,rgba(168,85,247,.4),transparent_68%)]"
-        />
-        <RubanLemniscateHero />
+      <div className="relative isolate overflow-hidden bg-[linear-gradient(168deg,#221b33_0%,#2c1f47_60%,#3a2260_100%)] px-[22px] pb-7 pt-5 text-white sm:pt-14">
+        <FondHeroViolet />
         <div className="relative mx-auto flex w-full max-w-[430px] flex-col">
           <div className="flex shrink-0 items-center justify-between">
             {/* Retour — même traitement de verre que les autres boutons clairs */}
