@@ -13,6 +13,7 @@ import { calculerMontantTournee, formaterEuros, type ContexteTarifaire } from "@
 import { calculerMajorationsTournee } from "@/lib/majorations";
 import { formatDateDuJour, formaterNomPropre, initialesUtilisateur } from "@/lib/format";
 import { distanceRetenue } from "@/lib/kilometrage";
+import { FondLiquide } from "@/components/ui/FondLiquide";
 import { OngletsFiltresTournee } from "@/components/ui/OngletsFiltresTournee";
 import { RubanLemniscateHero } from "@/components/ui/RubanLemniscateHero";
 
@@ -60,7 +61,20 @@ export function EnTeteTournee({
       : "Tous les soins du jour sont validés";
 
   return (
-    <div className="relative overflow-hidden bg-[linear-gradient(168deg,#221b33_0%,#2c1f47_58%,#3a2260_100%)] px-5 pb-4 pt-6 text-white">
+    <div className="relative isolate overflow-hidden bg-[linear-gradient(168deg,#221b33_0%,#2c1f47_58%,#3a2260_100%)] px-5 pb-4 pt-6 text-white">
+      {/* Fond liquide de la maquette : décoratif, en dessous de tout le
+          reste (-z-10), atténué par le dégradé sombre qui le suit pour
+          garder le contenu lisible par-dessus. */}
+      <FondLiquide
+        // Texture provisoire (asset Soinely réel déjà utilisé ailleurs) en
+        // attendant l'image définitive prévue pour cet effet.
+        image="/marketing/hero-nurse.webp"
+        className="-z-10 opacity-55"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(168deg,rgba(34,27,51,.62)_0%,rgba(44,31,71,.55)_58%,rgba(58,34,96,.5)_100%)]"
+      />
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -left-12 -top-20 h-[260px] w-[260px] rounded-full bg-[radial-gradient(circle,rgba(168,85,247,.4),transparent_68%)]"
