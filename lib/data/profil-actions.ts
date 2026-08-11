@@ -147,3 +147,52 @@ export async function enregistrerCabinetAction(
 
   return { succes: true };
 }
+
+/**
+ * Enregistre les coordonnées imprimables dans le profil, à la demande.
+ *
+ * Distincte de `enregistrerCabinetAction` : celle-ci géocode l'adresse, ce qui
+ * n'a pas lieu d'être quand l'IDEL corrige une coordonnée juste avant
+ * d'imprimer. Un échec ici n'empêche pas d'imprimer — la valeur saisie reste
+ * valable pour l'impression en cours.
+ */
+export async function enregistrerCoordonneesPraticienAction(
+  formData: FormData
+): Promise<ResultatCabinet> {
+  const valeurOuNull = (clef: string) => {
+    const v = String(formData.get(clef) ?? "").trim();
+    return v === "" ? null : v;
+  };
+
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { succes: false, erreur: "Vous devez être connectée." };
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .update({
+      full_name: String(formData.get("nom") ?? "").trim() || user.email || "",
+      adresse_cabinet: valeurOuNull("adresse"),
+      code_postal: valeurOuNull("codePostal"),
+      telephone: valeurOuNull("telephone"),
+      adeli_rpps: valeurOuNull("adeliRpps"),
+    })
+    .eq("id", user.id)
+    .select("id");
+
+  if (error) {
+    journaliserEchec("enregistrerCoordonneesPraticienAction", error);
+    return { succes: false, erreur: `L'enregistrement a échoué : ${error.message}` };
+  }
+
+  if (!data || data.length === 0) {
+    return { succes: false, erreur: "Votre profil est introuvable. Signalez-le, il doit être recréé." };
+  }
+
+  revalidatePath("/compte");
+  return { succes: true };
+}
