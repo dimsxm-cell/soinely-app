@@ -1,19 +1,13 @@
 import type { MissionDuJour } from "@/lib/types/clinical";
 import { formaterNomPropre } from "@/lib/format";
 
+// Deplacee vers lib/format.ts (formatage partage entre plusieurs ecrans),
+// mais re-exportee ici pour ne rien casser chez les imports existants.
+export { formatDateDuJour } from "@/lib/format";
+
 /** Salutation dependant de l'heure du jour, a l'affichage. */
 export function formatSalutation(): string {
   return new Date().getHours() < 18 ? "Bonjour" : "Bonsoir";
-}
-
-/** Date du jour, en toutes lettres, capitalisee. */
-export function formatDateDuJour(): string {
-  const date = new Date().toLocaleDateString("fr-FR", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  });
-  return date.charAt(0).toUpperCase() + date.slice(1);
 }
 
 export interface CountsAccueil {
