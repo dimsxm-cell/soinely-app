@@ -82,6 +82,16 @@ export async function enregistrerCabinetAction(
   const adresseSaisie = String(formData.get("adresseCabinet") ?? "").trim();
   const adresseCabinet = adresseSaisie === "" ? null : adresseSaisie;
 
+  // Champs libres : ni format ni longueur imposés. Un numéro se note « 0690 12
+  // 34 56 » comme « +590690123456 », et un ADELI comme un RPPS n'ont pas la
+  // même longueur — refuser une saisie ici ferait perdre une coordonnée juste
+  // parce qu'elle est écrite autrement.
+  const telephoneSaisi = String(formData.get("telephone") ?? "").trim();
+  const telephone = telephoneSaisi === "" ? null : telephoneSaisi;
+
+  const adeliSaisi = String(formData.get("adeliRpps") ?? "").trim();
+  const adeliRpps = adeliSaisi === "" ? null : adeliSaisi;
+
   const supabase = await createClient();
 
   const {
@@ -105,6 +115,8 @@ export async function enregistrerCabinetAction(
       adresse_cabinet: adresseCabinet,
       cabinet_latitude: position?.latitude ?? null,
       cabinet_longitude: position?.longitude ?? null,
+      telephone,
+      adeli_rpps: adeliRpps,
     })
     .eq("id", user.id)
     .select("id");

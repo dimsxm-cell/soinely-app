@@ -52,10 +52,12 @@ export default async function ComptePage() {
   const [abonnement, avatarUrl, profil] = await Promise.all([
     getAbonnement(supabase, user.id),
     avatarPath ? getAvatarUrl(supabase, avatarPath) : Promise.resolve(null),
-    supabase.from("profiles").select("code_postal, adresse_cabinet, cabinet_latitude").eq("id", user.id).maybeSingle(),
+    supabase.from("profiles").select("code_postal, adresse_cabinet, cabinet_latitude, telephone, adeli_rpps").eq("id", user.id).maybeSingle(),
   ]);
   const codePostal = profil.data?.code_postal ?? "";
   const adresseCabinet = profil.data?.adresse_cabinet ?? "";
+  const telephone = profil.data?.telephone ?? "";
+  const adeliRpps = profil.data?.adeli_rpps ?? "";
   const zone = determinerZone(codePostal);
   const joursRestantsEssai = abonnement ? 0 : getJoursRestantsEssaiGratuit(user.created_at);
   const ecoutePermanenteActivee = Boolean(user.user_metadata?.ecoute_permanente_ely);
@@ -110,6 +112,8 @@ export default async function ComptePage() {
             <FormulaireCabinet
               codePostal={codePostal}
               adresseCabinet={adresseCabinet}
+              telephone={telephone}
+              adeliRpps={adeliRpps}
               zone={zone}
             />
           </section>

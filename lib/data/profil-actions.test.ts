@@ -174,6 +174,8 @@ describe("adresse du cabinet", () => {
       adresse_cabinet: "15 rue Schoelcher, 97110 Pointe-à-Pitre",
       cabinet_latitude: 16.2415,
       cabinet_longitude: -61.5343,
+      telephone: null,
+      adeli_rpps: null,
     });
   });
 
