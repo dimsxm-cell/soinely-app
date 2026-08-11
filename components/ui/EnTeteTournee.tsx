@@ -13,7 +13,7 @@ import { calculerMontantTournee, formaterEuros, type ContexteTarifaire } from "@
 import { calculerMajorationsTournee } from "@/lib/majorations";
 import { formatDateDuJour, formaterNomPropre, initialesUtilisateur } from "@/lib/format";
 import { distanceRetenue } from "@/lib/kilometrage";
-import { FondAnime } from "@/components/ui/FondAnime";
+import { LiquidEffectAnimation } from "@/components/ui/liquid-effect-animation";
 import { OngletsFiltresTournee } from "@/components/ui/OngletsFiltresTournee";
 import { RubanLemniscateHero } from "@/components/ui/RubanLemniscateHero";
 
@@ -65,7 +65,7 @@ export function EnTeteTournee({
       {/* Matière liquide de la maquette : décorative, sous tout le reste
           (-z-10), puis atténuée par le dégradé sombre qui la suit pour
           garder le contenu parfaitement lisible par-dessus. */}
-      <FondAnime className="-z-10" />
+      <LiquidEffectAnimation className="-z-10" />
       {/* Voile vertical plutôt qu'uniforme : presque transparent sur la bande
           du titre, où les nappes doivent se voir, puis franchement opaque sous
           les statistiques et les filtres, qui se lisent en tournée. */}
