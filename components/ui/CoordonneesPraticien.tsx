@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 import type { CoordonneesPraticien } from "@/lib/data/profil";
 import { enregistrerCoordonneesPraticienAction } from "@/lib/data/profil-actions";
+import { formaterNomPropre } from "@/lib/format";
 
 /**
  * Coordonnées professionnelles imprimées sur les documents émis par l'IDEL.
@@ -49,7 +50,11 @@ export function BlocCoordonneesPraticien({ className = "" }: { className?: strin
 
   const lieu = [adresse, codePostal].filter(Boolean).join(", ");
   const lignes = [
-    nom,
+    // Même mise en forme que l'en-tête et le bloc signature du document
+    // (ElementsDocument) : sans elle, une inscription en capitales sortait en
+    // « MARIE DUPONT » ici et en « Marie Dupont » dix centimètres plus haut,
+    // sur la même feuille.
+    nom ? formaterNomPropre(nom) : "",
     lieu,
     telephone ? `Tél. ${telephone}` : "",
     adeliRpps ? `ADELI/RPPS ${adeliRpps}` : "",
