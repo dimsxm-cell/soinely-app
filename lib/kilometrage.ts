@@ -82,6 +82,14 @@ export function distanceRetenue(
   return distanceCorrigeeKm ?? distanceCalculeeKm;
 }
 
+/**
+ * Distance totale d'une tournee, au format francais (ex. "13,7 km"), pour
+ * affichage. Meme motif que formaterEuros() dans lib/cotation.ts.
+ */
+export function formaterKm(km: number): string {
+  return `${km.toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} km`;
+}
+
 function arrondirCentimes(valeur: number): number {
   return Math.round(valeur * 100) / 100;
 }

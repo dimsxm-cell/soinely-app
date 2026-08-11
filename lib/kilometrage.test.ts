@@ -4,6 +4,7 @@ import type { ValeursLettresCles } from "./zone-tarifaire";
 import {
   calculerIndemniteKilometrique,
   distanceRetenue,
+  formaterKm,
   kilometresIndemnisables,
 } from "./kilometrage";
 
@@ -93,5 +94,19 @@ describe("distanceRetenue", () => {
 
   it("rend null quand rien n'est connu", () => {
     expect(distanceRetenue(null, null)).toBeNull();
+  });
+});
+
+describe("formaterKm", () => {
+  it("ecrit la distance a la francaise, une decimale", () => {
+    expect(formaterKm(13.7)).toBe("13,7 km");
+  });
+
+  it("ajoute un zero decimal a une valeur entiere", () => {
+    expect(formaterKm(5)).toBe("5,0 km");
+  });
+
+  it("gere zero", () => {
+    expect(formaterKm(0)).toBe("0,0 km");
   });
 });
