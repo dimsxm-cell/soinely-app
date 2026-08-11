@@ -65,10 +65,13 @@ export function EnTeteTournee({
       {/* Matière liquide de la maquette : décorative, sous tout le reste
           (-z-10), puis atténuée par le dégradé sombre qui la suit pour
           garder le contenu parfaitement lisible par-dessus. */}
-      <FondAnime className="-z-10 opacity-70" />
+      <FondAnime className="-z-10" />
+      {/* Voile vertical plutôt qu'uniforme : presque transparent sur la bande
+          du titre, où les nappes doivent se voir, puis franchement opaque sous
+          les statistiques et les filtres, qui se lisent en tournée. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(168deg,rgba(34,27,51,.5)_0%,rgba(44,31,71,.42)_58%,rgba(58,34,96,.38)_100%)]"
+        className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(34,27,51,.08)_0%,rgba(34,27,51,.14)_26%,rgba(40,28,64,.5)_52%,rgba(45,30,72,.74)_78%,rgba(45,30,72,.8)_100%)]"
       />
       <div
         aria-hidden="true"
