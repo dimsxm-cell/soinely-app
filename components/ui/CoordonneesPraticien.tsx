@@ -90,15 +90,23 @@ export function BarreImpressionPraticien() {
   const [message, setMessage] = useState<string | null>(null);
 
   async function imprimer() {
-    // L'enregistrement ne conditionne jamais l'impression : une écriture qui
-    // échoue laisse la valeur saisie valable pour la feuille en cours.
-    if (enregistrer) {
-      const formData = new FormData();
-      for (const { clef } of CHAMPS) formData.set(clef, coordonnees[clef]);
-      const resultat = await enregistrerCoordonneesPraticienAction(formData);
-      if (!resultat.succes) setMessage(resultat.erreur ?? "L'enregistrement a échoué.");
+    // L'enregistrement ne conditionne jamais l'impression. Le `finally` n'est
+    // pas une précaution de style : en tournée, le réseau tombe, et l'appel
+    // rejette alors au lieu de rendre une erreur. Sans lui, l'exception
+    // remonterait et l'IDEL resterait sans sa feuille pour une écriture de
+    // profil qui n'était même pas nécessaire.
+    try {
+      if (enregistrer) {
+        const formData = new FormData();
+        for (const { clef } of CHAMPS) formData.set(clef, coordonnees[clef]);
+        const resultat = await enregistrerCoordonneesPraticienAction(formData);
+        if (!resultat.succes) setMessage(resultat.erreur ?? "L'enregistrement a échoué.");
+      }
+    } catch {
+      setMessage("Coordonnées non enregistrées — impression lancée tout de même.");
+    } finally {
+      window.print();
     }
-    window.print();
   }
 
   return (

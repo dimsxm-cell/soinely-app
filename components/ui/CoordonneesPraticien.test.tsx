@@ -91,6 +91,36 @@ describe("BarreImpressionPraticien", () => {
     expect(within(bloc).getByText(/0590112233/)).toBeInTheDocument();
   });
 
+  it("imprime meme quand l'enregistrement echoue proprement", async () => {
+    const { enregistrerCoordonneesPraticienAction } = await import("@/lib/data/profil-actions");
+    vi.mocked(enregistrerCoordonneesPraticienAction).mockResolvedValueOnce({
+      succes: false,
+      erreur: "Profil introuvable.",
+    });
+    const imprimerSpy = vi.spyOn(window, "print").mockImplementation(() => {});
+
+    rendre(COMPLETES);
+    fireEvent.click(screen.getByLabelText(/enregistrer dans mon profil/i));
+    fireEvent.click(screen.getByRole("button", { name: /imprimer/i }));
+
+    await vi.waitFor(() => expect(imprimerSpy).toHaveBeenCalledTimes(1));
+    expect(screen.getByText("Profil introuvable.")).toBeInTheDocument();
+    imprimerSpy.mockRestore();
+  });
+
+  it("imprime meme quand l'enregistrement rejette, reseau coupe en tournee", async () => {
+    const { enregistrerCoordonneesPraticienAction } = await import("@/lib/data/profil-actions");
+    vi.mocked(enregistrerCoordonneesPraticienAction).mockRejectedValueOnce(new Error("offline"));
+    const imprimerSpy = vi.spyOn(window, "print").mockImplementation(() => {});
+
+    rendre(COMPLETES);
+    fireEvent.click(screen.getByLabelText(/enregistrer dans mon profil/i));
+    fireEvent.click(screen.getByRole("button", { name: /imprimer/i }));
+
+    await vi.waitFor(() => expect(imprimerSpy).toHaveBeenCalledTimes(1));
+    imprimerSpy.mockRestore();
+  });
+
   it("est masquee a l'impression", () => {
     const { container } = rendre(COMPLETES);
     expect(container.querySelector("[data-barre-impression]")).toHaveClass("print:hidden");
