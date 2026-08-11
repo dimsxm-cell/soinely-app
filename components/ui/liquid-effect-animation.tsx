@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useSyncExternalStore } from "react"
 import { FondAnime } from "@/components/ui/FondAnime"
 
 /**
@@ -37,22 +37,42 @@ function supportsWebGLFloat(): boolean {
   }
 }
 
+/**
+ * Capacité de l'appareil, lue une seule fois puis mémorisée : elle ne change
+ * pas au cours de la vie de la page, et `getSnapshot` doit rendre une valeur
+ * stable sous peine de boucle de rendu.
+ */
+let capaciteMemorisee: boolean | null = null
+function supporteEffetWebGL(): boolean {
+  if (capaciteMemorisee === null) {
+    capaciteMemorisee = !isIOSDevice() && supportsWebGLFloat()
+  }
+  return capaciteMemorisee
+}
+
+// Aucun abonnement : la capacité du navigateur ne varie jamais.
+const sansAbonnement = () => () => {}
+
 export function LiquidEffectAnimation({
   className = "",
 }: {
   className?: string
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [useFallback, setUseFallback] = useState(false)
   const scriptRef = useRef<HTMLScriptElement | null>(null)
 
-  useEffect(() => {
-    // Détection iOS ou absence de WebGL float linear → fallback CSS
-    if (isIOSDevice() || !supportsWebGLFloat()) {
-      setUseFallback(true)
-      return
-    }
+  // Lecture d'une capacité du navigateur, pas un état applicatif : le serveur
+  // rend toujours le repli CSS, le client bascule sur WebGL s'il le supporte.
+  // useSyncExternalStore evite le setState-dans-un-effet, que React deconseille
+  // parce qu'il declenche un second rendu en cascade.
+  const supporteWebGL = useSyncExternalStore(
+    sansAbonnement,
+    supporteEffetWebGL,
+    () => false
+  )
 
+  useEffect(() => {
+    if (!supporteWebGL) return
     if (!canvasRef.current) return
 
     const canvasId = `liquid-canvas-${Math.random().toString(36).slice(2, 9)}`
@@ -86,10 +106,10 @@ export function LiquidEffectAnimation({
         document.body.removeChild(scriptRef.current)
       }
     }
-  }, [])
+  }, [supporteWebGL])
 
-  // Fallback CSS pour iOS et appareils sans WebGL float
-  if (useFallback) {
+  // Repli CSS pour iOS et les appareils sans WebGL float
+  if (!supporteWebGL) {
     return <FondAnime className={className} />
   }
 
@@ -108,6 +128,7 @@ export function LiquidEffectAnimation({
 
 declare global {
   interface Window {
-    __liquidApp?: any
+    /** Instance posee par le script injecte ; seul `dispose` nous sert. */
+    __liquidApp?: { dispose?: () => void }
   }
 }

@@ -189,7 +189,7 @@ export function ConversationEly({
       <EnTeteEly aDesMessages={aDesMessages} onReset={nouvelleConversation} nombreFiches={nombreFiches} />
       <div className="mx-auto flex max-w-2xl flex-col px-6 py-6 sm:py-8">
         <p className="text-[12px] leading-relaxed text-navy/40">
-          Ely t'aide à analyser la situation ; la décision et la responsabilité restent à toi.
+          Ely t&apos;aide à analyser la situation ; la décision et la responsabilité restent à toi.
         </p>
 
         {patientContexte && (

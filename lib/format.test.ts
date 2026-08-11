@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { formatDateDuJour, formaterNomPropre, initialesUtilisateur } from "./format";
+import { formatDateDuJour, initialesUtilisateur } from "./format";
 
 describe("initialesUtilisateur", () => {
   it("prend la premiere lettre du premier mot et la premiere lettre du dernier mot", () => {
