@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import {
   BarreImpressionPraticien,
@@ -39,9 +39,13 @@ describe("BlocCoordonneesPraticien", () => {
 
   it("n'affiche que les champs renseignes, sans ligne vide", () => {
     const { container } = rendre({ ...COMPLETES, telephone: "", adeliRpps: "" });
-    expect(screen.getByText("Sophie Lambert")).toBeInTheDocument();
-    expect(screen.queryByText(/ADELI/)).not.toBeInTheDocument();
-    expect(container.querySelectorAll("[data-ligne-coordonnee]")).toHaveLength(2);
+    const bloc = container.querySelector<HTMLElement>("[data-bloc-coordonnees]")!;
+    expect(within(bloc).getByText("Sophie Lambert")).toBeInTheDocument();
+    // Porté sur le bloc imprimé, et non sur tout le rendu : l'éditeur affiche
+    // en permanence un libellé « ADELI / RPPS », pour qu'un champ vide puisse
+    // justement être rempli avant d'imprimer.
+    expect(within(bloc).queryByText(/ADELI/)).not.toBeInTheDocument();
+    expect(bloc.querySelectorAll("[data-ligne-coordonnee]")).toHaveLength(2);
   });
 
   it("ne rend rien du tout quand aucun champ n'est renseigne", () => {
@@ -74,6 +78,17 @@ describe("BarreImpressionPraticien", () => {
     rendre(COMPLETES);
     fireEvent.click(screen.getByRole("button", { name: /imprimer/i }));
     expect(enregistrerCoordonneesPraticienAction).not.toHaveBeenCalled();
+  });
+
+  it("permet de renseigner un champ vide, sans passer par l'ecran compte", () => {
+    const { container } = rendre({ ...COMPLETES, telephone: "" });
+    const champ = screen.getByLabelText("Téléphone");
+    expect(champ).toHaveValue("");
+
+    fireEvent.change(champ, { target: { value: "0590112233" } });
+
+    const bloc = container.querySelector<HTMLElement>("[data-bloc-coordonnees]")!;
+    expect(within(bloc).getByText(/0590112233/)).toBeInTheDocument();
   });
 
   it("est masquee a l'impression", () => {

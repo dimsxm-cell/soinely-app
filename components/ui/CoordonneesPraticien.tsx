@@ -89,13 +89,6 @@ export function BarreImpressionPraticien() {
   const [enregistrer, setEnregistrer] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  // Seuls les champs déjà renseignés sont proposés à la correction : cette
-  // barre sert à corriger une coordonnée existante juste avant d'imprimer,
-  // pas à compléter un profil — ça, c'est le rôle de l'écran /compte. Figé au
-  // montage pour qu'un champ effacé pendant la saisie ne disparaisse pas du
-  // panneau sous les doigts de l'IDEL.
-  const [champsAffiches] = useState(() => CHAMPS.filter(({ clef }) => coordonnees[clef] !== ""));
-
   async function imprimer() {
     // L'enregistrement ne conditionne jamais l'impression : une écriture qui
     // échoue laisse la valeur saisie valable pour la feuille en cours.
@@ -122,7 +115,10 @@ export function BarreImpressionPraticien() {
       {ouvert && (
         <div className="w-full max-w-[520px] rounded-[16px] border border-navy/10 bg-white p-4">
           <div className="flex flex-col gap-3">
-            {champsAffiches.map(({ clef, libelle }) => (
+            {/* Tous les champs, y compris vides : une IDEL qui n'a jamais
+                saisi son téléphone doit pouvoir l'ajouter ici, juste avant
+                d'imprimer, sans passer par l'écran /compte. */}
+            {CHAMPS.map(({ clef, libelle }) => (
               <div key={clef}>
                 <label htmlFor={`coord-${clef}`} className="block text-[13px] text-navy/55">
                   {libelle}
