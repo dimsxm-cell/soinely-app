@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { MissionTourneeVue } from "@/lib/data/ma-journee";
 import type { Tournee } from "@/lib/types/clinical";
 import {
@@ -10,9 +11,9 @@ import {
 } from "@/lib/tournee-vue";
 import { calculerMontantTournee, formaterEuros, type ContexteTarifaire } from "@/lib/cotation";
 import { calculerMajorationsTournee } from "@/lib/majorations";
-import { formaterNomPropre } from "@/lib/format";
+import { formatDateDuJour, formaterNomPropre, initialesUtilisateur } from "@/lib/format";
+import { distanceRetenue, formaterKm } from "@/lib/kilometrage";
 import { OngletsFiltresTournee } from "@/components/ui/OngletsFiltresTournee";
-import { BarreLogoProfilHero } from "@/components/ui/BarreLogoProfilHero";
 import { RubanLemniscateHero } from "@/components/ui/RubanLemniscateHero";
 
 const CIRCONFERENCE = 2 * Math.PI * 33;
@@ -24,6 +25,7 @@ export function EnTeteTournee({
   filtre,
   counts,
   avatarUrl,
+  nomComplet,
 }: {
   missions: MissionTourneeVue[];
   tournee: Tournee;
@@ -31,6 +33,7 @@ export function EnTeteTournee({
   filtre: Filtre;
   counts: CountsMissions;
   avatarUrl?: string | null;
+  nomComplet?: string;
 }) {
   const total = missions.length;
   const valides = missions.filter((m) => m.statut === "terminee" || m.statut === "absent").length;
@@ -41,6 +44,10 @@ export function EnTeteTournee({
   const montantActes = calculerMontantTournee(missions, contexteTarifaire);
   const montantMajorations = calculerMajorationsTournee(missions, tournee.date, contexteTarifaire);
   const montantTotal = Math.round((montantActes + montantMajorations) * 100) / 100;
+  const totalKm = missions.reduce(
+    (somme, m) => somme + (distanceRetenue(m.distanceKm, m.distanceKmCorrigee) ?? 0),
+    0
+  );
 
   const enCours = missions.find((m) => m.statut === "en_cours") ?? null;
   const retard = enCours ? calculerRetardMinutes(enCours) : null;
@@ -60,7 +67,30 @@ export function EnTeteTournee({
       />
       <RubanLemniscateHero />
       <div className="relative mx-auto max-w-2xl">
-        <BarreLogoProfilHero avatarUrl={avatarUrl} />
+        <div className="flex items-center justify-between">
+          <div className="min-w-0">
+            <p className="text-[9.5px] font-bold uppercase tracking-[0.08em] text-[#9d94b8]">
+              {formatDateDuJour()}
+            </p>
+            <p className="font-display mt-[3px] text-[20px] font-bold leading-[1.15] tracking-[-0.6px]">
+              Ma tournée
+            </p>
+          </div>
+          <Link
+            href="/compte"
+            aria-label="Mon compte"
+            className="flex h-9 w-9 shrink-0 items-center justify-center"
+          >
+            {avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element -- URL signée à courte durée de vie, incompatible avec le cache de next/image
+              <img src={avatarUrl} alt="" className="h-9 w-9 rounded-full object-cover ring-2 ring-white/50" />
+            ) : (
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[linear-gradient(140deg,#a855f7,#6d28d9)] text-[12.5px] font-bold tracking-[-0.2px] text-white ring-2 ring-white/30">
+                {initialesUtilisateur(nomComplet ?? "")}
+              </span>
+            )}
+          </Link>
+        </div>
 
         <div className="mt-5 flex items-center gap-3.5">
           <div className="relative h-[70px] w-[70px] shrink-0">
@@ -108,7 +138,9 @@ export function EnTeteTournee({
             <p className="mt-0.5 text-[9.5px] font-bold uppercase tracking-[0.08em] text-[#9d94b8]">Reste</p>
           </div>
           <div className="flex-1 rounded-[14px] border border-white/10 bg-white/[0.07] px-2.5 py-2.5">
-            <p className="font-display text-[17px] font-bold tabular-nums">—</p>
+            <p className="font-display text-[17px] font-bold tabular-nums">
+              {totalKm > 0 ? formaterKm(totalKm) : "—"}
+            </p>
             <p className="mt-0.5 text-[9.5px] font-bold uppercase tracking-[0.08em] text-[#9d94b8]">Km</p>
           </div>
           <div className="flex-1 rounded-[14px] border border-white/10 bg-white/[0.07] px-2.5 py-2.5">
