@@ -30,8 +30,8 @@ export default async function DocumentIdentitePatientPage({
   return (
     <main className="min-h-screen bg-[#F6F7F5] text-navy print:bg-white">
       <FournisseurCoordonneesPraticien initiales={coordonnees}>
-        <BlocCoordonneesPraticien className="mb-4" />
         <div className="mx-auto flex max-w-[720px] flex-col gap-6 px-6 py-10 sm:py-14 print:py-0">
+          <BlocCoordonneesPraticien className="mb-4" />
           <div className="print:hidden">
             <LienRetour href={`/patients/${patient.id}`} label={formaterNomPropre(patient.nomComplet)} />
           </div>

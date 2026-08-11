@@ -9,7 +9,7 @@ export function LienRetour({ href, label }: LienRetourProps) {
   return (
     <Link
       href={href}
-      className="btn-glace-clair inline-flex items-center gap-1.5 rounded-[10px] border border-navy/15 bg-white py-1.5 pl-2 pr-3 text-[12.5px] font-semibold text-navy"
+      className="btn-glace-clair inline-flex items-center gap-1.5 rounded-[10px] border border-navy/15 bg-white py-1.5 pl-2 pr-3 text-[12.5px] font-semibold text-navy print:hidden"
     >
       <svg
         viewBox="0 0 24 24"

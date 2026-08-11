@@ -657,3 +657,29 @@ a:hover .btn-arrow { transform: translateX(5px); }
   100% { transform: translate3d(-10%,16%,0) scale(.92) rotate(-1.5deg); }
 }
 
+/* Impression des documents émis depuis Soinely — consentements, protocoles,
+   fiches. Le rendu écran est pensé pour un téléphone tenu en tournée ; sur
+   une feuille A4, ses fonds colorés et ses ombres coûtent de l'encre sans
+   rien apporter. */
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  /* Aucune ombre à l'impression : elles se rendent en aplats gris sales. */
+  [class*="shadow"] {
+    box-shadow: none !important;
+  }
+
+  /* Une section ne doit pas se couper en deux au saut de page. */
+  section,
+  [data-bloc-coordonnees] {
+    break-inside: avoid;
+  }
+}
+
