@@ -13,7 +13,7 @@ import { calculerMontantTournee, formaterEuros, type ContexteTarifaire } from "@
 import { calculerMajorationsTournee } from "@/lib/majorations";
 import { formatDateDuJour, formaterNomPropre, initialesUtilisateur } from "@/lib/format";
 import { distanceRetenue } from "@/lib/kilometrage";
-import { FondLiquide } from "@/components/ui/FondLiquide";
+import { FondAnime } from "@/components/ui/FondAnime";
 import { OngletsFiltresTournee } from "@/components/ui/OngletsFiltresTournee";
 import { RubanLemniscateHero } from "@/components/ui/RubanLemniscateHero";
 
@@ -62,20 +62,13 @@ export function EnTeteTournee({
 
   return (
     <div className="relative isolate overflow-hidden bg-[linear-gradient(168deg,#221b33_0%,#2c1f47_58%,#3a2260_100%)] px-5 pb-4 pt-6 text-white">
-      {/* Fond liquide de la maquette : décoratif, en dessous de tout le
-          reste (-z-10), atténué par le dégradé sombre qui le suit pour
-          garder le contenu lisible par-dessus. */}
-      <FondLiquide
-        // Bande paysage recadrée dans le plumage d'ELY : à ce cadrage la
-        // mascotte ne se reconnaît plus, elle ne donne qu'une matière violette
-        // abstraite — une image figurative entière passerait derrière le texte
-        // et nuirait à la lisibilité.
-        image="/marketing/ely-texture-liquide.webp"
-        className="-z-10 opacity-55"
-      />
+      {/* Matière liquide de la maquette : décorative, sous tout le reste
+          (-z-10), puis atténuée par le dégradé sombre qui la suit pour
+          garder le contenu parfaitement lisible par-dessus. */}
+      <FondAnime className="-z-10 opacity-70" />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(168deg,rgba(34,27,51,.62)_0%,rgba(44,31,71,.55)_58%,rgba(58,34,96,.5)_100%)]"
+        className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(168deg,rgba(34,27,51,.5)_0%,rgba(44,31,71,.42)_58%,rgba(58,34,96,.38)_100%)]"
       />
       <div
         aria-hidden="true"
