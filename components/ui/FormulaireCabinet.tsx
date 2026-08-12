@@ -18,10 +18,14 @@ import { Button } from "@/components/ui/Button";
 export function FormulaireCabinet({
   codePostal,
   adresseCabinet,
+  telephone,
+  adeliRpps,
   zone,
 }: {
   codePostal: string;
   adresseCabinet: string;
+  telephone: string;
+  adeliRpps: string;
   zone: "metropole" | "dom";
 }) {
   const [resultat, envoyer, enCours] = useActionState<ResultatCabinet | null, FormData>(
@@ -44,6 +48,35 @@ export function FormulaireCabinet({
             placeholder="15 rue Schoelcher, 97110 Pointe-à-Pitre"
             className="mt-1 w-full rounded-[12px] border border-navy/15 bg-white px-3 py-2 text-[15px] text-navy placeholder:text-navy/30 focus:border-brand-violet focus:outline-none focus:ring-2 focus:ring-brand-violet/30"
           />
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <div className="min-w-[160px] flex-1">
+            <label htmlFor="telephone" className="block text-[13px] text-navy/55">
+              Téléphone
+            </label>
+            <input
+              id="telephone"
+              name="telephone"
+              type="tel"
+              defaultValue={telephone}
+              placeholder="0690 12 34 56"
+              className="mt-1 w-full rounded-[12px] border border-navy/15 bg-white px-3 py-2 text-[15px] text-navy placeholder:text-navy/30 focus:border-brand-violet focus:outline-none focus:ring-2 focus:ring-brand-violet/30"
+            />
+          </div>
+          <div className="min-w-[160px] flex-1">
+            <label htmlFor="adeliRpps" className="block text-[13px] text-navy/55">
+              Numéro ADELI / RPPS
+            </label>
+            <input
+              id="adeliRpps"
+              name="adeliRpps"
+              type="text"
+              defaultValue={adeliRpps}
+              placeholder="971234567"
+              className="mt-1 w-full rounded-[12px] border border-navy/15 bg-white px-3 py-2 text-[15px] tabular-nums text-navy placeholder:text-navy/30 focus:border-brand-violet focus:outline-none focus:ring-2 focus:ring-brand-violet/30"
+            />
+          </div>
         </div>
 
         <div className="flex flex-wrap items-end gap-3">

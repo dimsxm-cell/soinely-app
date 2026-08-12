@@ -174,6 +174,8 @@ describe("adresse du cabinet", () => {
       adresse_cabinet: "15 rue Schoelcher, 97110 Pointe-à-Pitre",
       cabinet_latitude: 16.2415,
       cabinet_longitude: -61.5343,
+      telephone: null,
+      adeli_rpps: null,
     });
   });
 
@@ -307,3 +309,188 @@ describe("uploadAvatarAction — l'échec se voit", () => {
     expect(resultat.erreur).toMatch(/envoi a échoué/);
   });
 })
+
+/**
+ * La barre d'impression écrit dans les mêmes colonnes que l'écran /compte :
+ * elle doit donc porter les mêmes gardes. Sans elles, une coordonnée corrigée
+ * à la volée avant d'imprimer faussait durablement les montants d'une tournée.
+ */
+describe("enregistrerCoordonneesPraticienAction", () => {
+  const CHAMPS_COMPLETS = {
+    nom: "Marie Dupont-Léger",
+    adresse: "15 rue Schoelcher, 97110 Pointe-à-Pitre",
+    codePostal: "97110",
+    telephone: "0690123456",
+    adeliRpps: "971234567",
+  };
+
+  function formulaire(champs: Record<string, string>): FormData {
+    const formData = new FormData();
+    for (const [clef, valeur] of Object.entries(champs)) formData.set(clef, valeur);
+    return formData;
+  }
+
+  function connectee() {
+    getUserMock.mockResolvedValue({
+      data: { user: { id: "u1", email: "marie@exemple.fr" } },
+      error: null,
+    });
+    selectApresUpdateMock.mockResolvedValue({ data: [{ id: "u1" }], error: null });
+    updateUserMock.mockResolvedValue({ data: {}, error: null });
+  }
+
+  it("écrit les colonnes des coordonnées sur la seule ligne de l'utilisatrice", async () => {
+    connectee();
+    geocoderMock.mockResolvedValueOnce({ latitude: 16.2415, longitude: -61.5343 });
+
+    const { enregistrerCoordonneesPraticienAction } = await import("./profil-actions");
+    await enregistrerCoordonneesPraticienAction(formulaire(CHAMPS_COMPLETS));
+
+    expect(fromMock).toHaveBeenCalledWith("profiles");
+    expect(updateMock).toHaveBeenCalledWith({
+      full_name: "Marie Dupont-Léger",
+      code_postal: "97110",
+      adresse_cabinet: "15 rue Schoelcher, 97110 Pointe-à-Pitre",
+      cabinet_latitude: 16.2415,
+      cabinet_longitude: -61.5343,
+      telephone: "0690123456",
+      adeli_rpps: "971234567",
+    });
+    expect(eqMock).toHaveBeenCalledWith("id", "u1");
+  });
+
+  it("refuse un code postal incomplet plutôt que de l'effacer", async () => {
+    connectee();
+
+    const { enregistrerCoordonneesPraticienAction } = await import("./profil-actions");
+    const resultat = await enregistrerCoordonneesPraticienAction(
+      formulaire({ ...CHAMPS_COMPLETS, codePostal: "971" })
+    );
+
+    // Un code postal vidé ou amputé range le cabinet en métropole : les actes
+    // d'une IDEL de Guadeloupe seraient sous-cotés d'environ 4,5 % sans qu'un
+    // seul écran ne le signale.
+    expect(updateMock).not.toHaveBeenCalled();
+    expect(resultat.succes).toBe(false);
+    expect(resultat.erreur).toMatch(/cinq chiffres/);
+  });
+
+  it("géocode l'adresse corrigée avant impression", async () => {
+    connectee();
+    geocoderMock.mockResolvedValueOnce({ latitude: 16.2415, longitude: -61.5343 });
+
+    const { enregistrerCoordonneesPraticienAction } = await import("./profil-actions");
+    await enregistrerCoordonneesPraticienAction(formulaire(CHAMPS_COMPLETS));
+
+    expect(geocoderMock).toHaveBeenCalledWith("15 rue Schoelcher, 97110 Pointe-à-Pitre");
+  });
+
+  it("efface la position quand la nouvelle adresse n'est pas localisée", async () => {
+    connectee();
+    geocoderMock.mockResolvedValueOnce(null);
+
+    const { enregistrerCoordonneesPraticienAction } = await import("./profil-actions");
+    const resultat = await enregistrerCoordonneesPraticienAction(
+      formulaire({ ...CHAMPS_COMPLETS, adresse: "adresse illisible" })
+    );
+
+    // Laisser l'ancienne position ferait compter les kilomètres depuis un
+    // cabinet où l'IDEL n'exerce plus, en silence.
+    expect(updateMock).toHaveBeenCalledWith(
+      expect.objectContaining({ cabinet_latitude: null, cabinet_longitude: null })
+    );
+    expect(resultat.succes).toBe(true);
+    expect(resultat.erreur).toMatch(/non localisée/);
+  });
+
+  it("n'interroge pas le géocodeur quand l'adresse est vidée", async () => {
+    connectee();
+
+    const { enregistrerCoordonneesPraticienAction } = await import("./profil-actions");
+    await enregistrerCoordonneesPraticienAction(
+      formulaire({ ...CHAMPS_COMPLETS, adresse: "   " })
+    );
+
+    expect(geocoderMock).not.toHaveBeenCalled();
+    expect(updateMock).toHaveBeenCalledWith(
+      expect.objectContaining({ adresse_cabinet: null, cabinet_latitude: null })
+    );
+  });
+
+  it("laisse le nom du profil intact quand le champ est vidé", async () => {
+    connectee();
+
+    const { enregistrerCoordonneesPraticienAction } = await import("./profil-actions");
+    await enregistrerCoordonneesPraticienAction(formulaire({ ...CHAMPS_COMPLETS, nom: "  " }));
+
+    // L'action écrivait l'adresse e-mail à la place du nom : « marie@exemple.fr »
+    // s'imprimait alors comme nom professionnel, sous les yeux du patient.
+    expect(updateMock).toHaveBeenCalledWith(
+      expect.not.objectContaining({ full_name: expect.anything() })
+    );
+    expect(updateMock).toHaveBeenCalledWith(expect.objectContaining({ code_postal: "97110" }));
+    expect(updateUserMock).not.toHaveBeenCalled();
+  });
+
+  it("propage le nom vers les métadonnées d'authentification", async () => {
+    connectee();
+
+    const { enregistrerCoordonneesPraticienAction } = await import("./profil-actions");
+    await enregistrerCoordonneesPraticienAction(formulaire(CHAMPS_COMPLETS));
+
+    // L'en-tête du document et le bloc que le patient signe lisent le nom ici,
+    // et non dans `profiles` : sans propagation, la feuille sortait avec deux
+    // noms différents.
+    expect(updateUserMock).toHaveBeenCalledWith({ data: { full_name: "Marie Dupont-Léger" } });
+  });
+
+  it("enregistre quand même si la propagation du nom échoue", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    connectee();
+    updateUserMock.mockResolvedValueOnce({ data: {}, error: { message: "jeton expiré" } });
+
+    const { enregistrerCoordonneesPraticienAction } = await import("./profil-actions");
+    const resultat = await enregistrerCoordonneesPraticienAction(formulaire(CHAMPS_COMPLETS));
+
+    // Le profil est déjà écrit : annoncer un échec ferait tout recommencer
+    // pour rien, juste avant d'imprimer.
+    expect(resultat.succes).toBe(true);
+  });
+
+  it("enregistre quand même si la propagation du nom rejette", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    connectee();
+    updateUserMock.mockRejectedValueOnce(new Error("réseau coupé"));
+
+    const { enregistrerCoordonneesPraticienAction } = await import("./profil-actions");
+    const resultat = await enregistrerCoordonneesPraticienAction(formulaire(CHAMPS_COMPLETS));
+
+    // La barre d'impression imprime dans son `finally`, mais une exception
+    // remontée ici ferait afficher « non enregistrées » alors que le profil
+    // vient d'être écrit.
+    expect(resultat.succes).toBe(true);
+  });
+
+  it("n'écrit rien sans utilisatrice connectée", async () => {
+    getUserMock.mockResolvedValue({ data: { user: null }, error: null });
+
+    const { enregistrerCoordonneesPraticienAction } = await import("./profil-actions");
+    const resultat = await enregistrerCoordonneesPraticienAction(formulaire(CHAMPS_COMPLETS));
+
+    expect(updateMock).not.toHaveBeenCalled();
+    expect(resultat.succes).toBe(false);
+  });
+
+  it("signale un profil introuvable plutôt qu'un faux succès", async () => {
+    connectee();
+    selectApresUpdateMock.mockResolvedValue({ data: [], error: null });
+
+    const { enregistrerCoordonneesPraticienAction } = await import("./profil-actions");
+    const resultat = await enregistrerCoordonneesPraticienAction(formulaire(CHAMPS_COMPLETS));
+
+    expect(resultat.succes).toBe(false);
+    expect(resultat.erreur).toMatch(/profil est introuvable/);
+    // Rien ne doit être propagé dans les métadonnées d'un profil qui n'existe pas.
+    expect(updateUserMock).not.toHaveBeenCalled();
+  });
+});
