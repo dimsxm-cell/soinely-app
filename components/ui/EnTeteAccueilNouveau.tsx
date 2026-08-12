@@ -28,7 +28,7 @@ export function EnTeteAccueilNouveau({ prenom, nomComplet, avatarUrl }: EnTeteAc
         alignItems: "center",
         justifyContent: "space-between",
         gap: "12px",
-        padding: "54px 20px 14px",
+        padding: "16px 20px 14px",
       }}
     >
       {/* Salutation + prénom */}

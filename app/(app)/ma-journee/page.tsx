@@ -5,13 +5,9 @@ import { formaterNomPropre } from "@/lib/format";
 import { getMissionEnCoursHref, getMissionsDuJour, getTourneeDuJour } from "@/lib/data/ma-journee";
 import { getAvatarUrl } from "@/lib/data/profil";
 import { reorganiserTourneeAction } from "@/lib/data/reorganisation-tournee";
-import {
-  formatDateDuJour,
-  prochaineActionAccueil,
-} from "@/lib/accueil-vue";
 import { FormulaireAvecRetour } from "@/components/ui/FormulaireAvecRetour";
 import { getMaterielDuJour } from "@/lib/data/materiel";
-import { updateMissionStatutAction } from "@/lib/data/ma-journee-actions";
+import { formatDateDuJour } from "@/lib/accueil-vue";
 import { EnTeteAccueilNouveau } from "@/components/ui/EnTeteAccueilNouveau";
 import { CarteProgressionTournee } from "@/components/ui/CarteProgressionTournee";
 import { ActionsRapidesAccueil } from "@/components/ui/ActionsRapidesAccueil";
@@ -38,7 +34,6 @@ export default async function MaJourneePage() {
     : [[], null, []];
 
   const missionsAFaire = missions.filter((m) => m.statut === "a_faire").length;
-  const actionRapide = tournee ? prochaineActionAccueil(missions) : null;
 
   return (
     <main
@@ -198,38 +193,7 @@ export default async function MaJourneePage() {
         )}
       </div>
 
-      {/* ─── Bouton flottant : action rapide (Démarrer / Terminer) ─── */}
-      {tournee && actionRapide && (
-        <div className="fixed bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] z-10 mx-auto w-full max-w-2xl px-4">
-          <FormulaireAvecRetour action={updateMissionStatutAction} messageSucces="Passage mis à jour.">
-            <input type="hidden" name="missionId" value={actionRapide.missionId} />
-            <input type="hidden" name="nouveauStatut" value={actionRapide.nouveauStatut} />
-            <button
-              type="submit"
-              style={{
-                display: "flex",
-                minHeight: "52px",
-                width: "100%",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-                borderRadius: "16px",
-                background: "linear-gradient(135deg,#6d28d9,#a855f7)",
-                padding: "0 16px",
-                fontSize: "15px",
-                fontWeight: 700,
-                color: "#fff",
-                border: 0,
-                cursor: "pointer",
-                fontFamily: "inherit",
-                boxShadow: "0 14px 28px -12px rgba(109,40,217,.9)",
-              }}
-            >
-              {actionRapide.label}
-            </button>
-          </FormulaireAvecRetour>
-        </div>
-      )}
+
     </main>
   );
 }
